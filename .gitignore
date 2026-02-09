@@ -52,3 +52,18 @@ backend/venv/
 **/ios
 **/android
 **/node_modules
+
+# Python
+venv/
+venv310/
+.venv/
+models/venv310/
+
+
+# PyTorch / ML junk
+__pycache__/
+*.pth
+*.pt
+
+# Windows
+*.dll
