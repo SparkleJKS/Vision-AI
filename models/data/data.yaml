@@ -1,0 +1,18 @@
+path: datasets/processed
+train: images/train
+val: images/val
+
+names:
+  0: person
+  1: car
+  2: bike
+  3: bus
+  4: truck
+  5: door
+  6: stairs
+  7: chair
+  8: table
+  9: wall
+ 10: pole
+ 11: traffic_light
+ 12: sign
