@@ -2,11 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Splash } from '../Splash';
 import { Navigation } from './Navigation';
 
-const SPLASH_DURATION_MS = 2500;
+const SPLASH_DURATION_MS = 11_000;
 
-/**
- * Main container: shows Splash on app init, then the main app navigation.
- */
 export function MainContainer() {
   const [isSplashVisible, setIsSplashVisible] = useState<boolean>(true);
 

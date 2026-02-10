@@ -16,9 +16,6 @@ const lightTheme = {
   },
 };
 
-/**
- * Root navigation: shows the main tab screen (Home, Explore, View).
- */
 export function Navigation() {
   return (
     <NavigationContainer theme={lightTheme}>
