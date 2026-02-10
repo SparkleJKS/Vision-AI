@@ -22,3 +22,6 @@ allprojects {
 
 apply plugin: "expo-root-project"
 apply plugin: "com.facebook.react.rootproject"
+
+// Pin NDK to 26.x to avoid C++ stdlib linker errors with NDK 27 (expo-modules-core, react-native-worklets)
+rootProject.ext.ndkVersion = "26.1.10909125"
