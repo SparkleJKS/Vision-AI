@@ -1,16 +1,17 @@
-import "./global.css";
-import React from "react";
-import { StatusBar } from "expo-status-bar";
-import { Text, View } from "react-native";
+import './global.css';
+import React from 'react';
+import { View } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { MainContainer } from './src/screens/Main';
 
 export default function App() {
   return (
-    <View className="flex-1 bg-white items-center justify-center">
-      <Text className="text-lg text-gray-800">
-        Open up App.tsx to start working on your app!
-      </Text>
-      <Text className="text-lg text-gray-800">Hello World</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaProvider>
+      <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
+        <MainContainer />
+      </View>
+      <StatusBar style="dark" />
+    </SafeAreaProvider>
   );
 }
