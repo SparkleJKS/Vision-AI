@@ -1,10 +1,6 @@
 import React from 'react';
 import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 
-/**
- * Shown while NavigationContainer is getting ready.
- * Matches Splash styling so the transition from Splash → Loader → Tabs feels continuous.
- */
 export function Loader() {
   return (
     <View style={styles.container}>
