@@ -77,6 +77,8 @@ Or from the Android project directory: `cd frontend/android` then `./gradlew ins
 `sdk.dir=C\:\\Users\\YOUR_USERNAME\\AppData\\Local\\Android\\Sdk`  
 (use your own SDK path; `local.properties` is gitignored.)
 
+**NDK:** The project is pinned to **NDK 26.1.10909125**. Install it via **Android Studio → SDK Manager → SDK Tools** → "Show Package Details" → **NDK** → **26.1.10909125** → Apply. If only NDK 27 is installed, the native build can fail with undefined C++ symbol errors. A patched React Native header (`graphicsConversions.h`) is applied automatically (via `patch-package` and the app’s Gradle/CMake setup) for NDK 26 compatibility.
+
 ### Backend & models
 
 Backend is implemented with FastAPI. See [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md) for backend and ML setup.
