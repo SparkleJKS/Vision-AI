@@ -63,6 +63,20 @@ npx expo start --tunnel
 
 Then open in Expo Go (scan QR code) or press `a` (Android) / `i` (iOS) / `w` (web).
 
+### Android dev build (physical device / emulator)
+
+To build and install the **dev debug** app on a connected Android device or emulator:
+
+```bash
+cd frontend
+npm run android:install-dev
+```
+
+Or from the Android project directory: `cd frontend/android` then `./gradlew installDevDebug` (macOS/Linux) or `gradlew.bat installDevDebug` (Windows). That builds and installs the dev variant (app id: `com.anonymous.VisionAI.dev`). If the build fails with “SDK location not found”, add `frontend/android/local.properties` with:
+
+`sdk.dir=C\:\\Users\\YOUR_USERNAME\\AppData\\Local\\Android\\Sdk`  
+(use your own SDK path; `local.properties` is gitignored.)
+
 ### Backend & models
 
 Backend and models folders are placeholders. See [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md) for future backend and ML setup.
