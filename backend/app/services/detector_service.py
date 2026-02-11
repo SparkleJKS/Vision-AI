@@ -1,49 +1,47 @@
-from ultralytics import YOLO
-from pathlib import Path
+from __future__ import annotations
 
-# Import mapping from models/
 import sys
-sys.path.append(str(Path(__file__).resolve().parents[3] / "models"))
+from pathlib import Path
+from typing import Any
 
+from ultralytics import YOLO
+
+# Import class/threshold mapping from models/
+sys.path.append(str(Path(__file__).resolve().parents[3] / "models"))
 from coco_mapping import COCO_ID_TO_APP, CONF_THRESHOLDS
 
 
 class DetectorService:
-    def __init__(self):
+    def __init__(self) -> None:
         model_path = Path(__file__).resolve().parents[3] / "models" / "yolov8n.pt"
         self.model = YOLO(str(model_path))
 
-    def detect(self, image_path: str):
-        results = self.model(image_path, verbose=False)[0]
-        detections = []
+    def detect(self, image: Any) -> list[dict[str, Any]]:
+        results = self.model(image, verbose=False)[0]
+        detections: list[dict[str, Any]] = []
+        boxes = results.boxes
 
-        if results.boxes is None:
+        if boxes is None:
             return detections
 
-        for box in results.boxes:
+        for box in boxes:
             cls_id = int(box.cls.item())
-            conf = float(box.conf.item())
+            confidence = float(box.conf.item())
+            label = COCO_ID_TO_APP.get(cls_id)
 
-            if cls_id not in COCO_ID_TO_APP:
+            if label is None:
                 continue
 
-            label = COCO_ID_TO_APP[cls_id]
-            if conf < CONF_THRESHOLDS[label]:
+            if confidence < CONF_THRESHOLDS.get(label, 0.5):
                 continue
 
-            x1, y1, x2, y2 = map(float, box.xyxy[0])
-
-            detections.append({
-                "label": label,
-                "confidence": round(conf, 2),
-                "bbox": [x1, y1, x2, y2]
-            })
+            x1, y1, x2, y2 = map(float, box.xyxy[0].tolist())
+            detections.append(
+                {
+                    "label": label,
+                    "confidence": round(confidence, 2),
+                    "box": [x1, y1, x2, y2],
+                }
+            )
 
         return detections
-
-if __name__ == "__main__":
-    detector = DetectorService()
-    results = detector.detect(
-        r"D:\BITS\SEM 8\SOP(JK Sahoo)\Vision-AI\models\data\raw\custom\images\pexels-kindelmedia-7148445.jpg"
-    )
-    print(results)

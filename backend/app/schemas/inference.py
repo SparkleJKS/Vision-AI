@@ -21,7 +21,7 @@ class DescribeResponse(BaseModel):
 class DetectedObject(BaseModel):
     label: str
     confidence: float = Field(ge=0.0, le=1.0)
-    box: List[int] = Field(min_length=4, max_length=4)
+    box: List[float] = Field(min_length=4, max_length=4)
 
 
 class DetectResponse(BaseModel):

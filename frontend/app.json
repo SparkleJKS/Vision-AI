@@ -29,7 +29,20 @@
       "bundler": "metro"
     },
     "plugins": [
-      ["expo-build-properties",{"android":{"ndkVersion":"26.1.10909125"}}]
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow VisionAI to use your camera for live object detection."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "ndkVersion": "26.1.10909125"
+          }
+        }
+      ]
     ]
   }
 }
