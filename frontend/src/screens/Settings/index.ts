@@ -1,3 +1,3 @@
 export { SettingsStack } from './SettingsStack';
 export { SettingsListScreen } from './SettingsListScreen';
-export { ProfileScreen } from './ProfileScreen';
+export { SETTINGS_ITEMS } from './config';

@@ -1,6 +1,8 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { ScreenNames } from '../../configs/navigation';
+import type { IHomeTabParamList } from '../screens.types';
 import { HomeScreen } from '../Home';
 import { ExploreScreen } from '../Explore';
 import { VoiceScreen } from '../Voice';
@@ -8,15 +10,7 @@ import { AlertsScreen } from '../Alerts';
 import { SettingsStack } from '../Settings/SettingsStack';
 import { colors } from '../../theme/colors';
 
-export type MainTabParamList = {
-  Home: undefined;
-  Explore: undefined;
-  Voice: undefined;
-  Alerts: undefined;
-  Settings: undefined;
-};
-
-const Tab = createBottomTabNavigator<MainTabParamList>();
+const Tab = createBottomTabNavigator<IHomeTabParamList>();
 
 export function Tabs() {
   return (
@@ -38,7 +32,7 @@ export function Tabs() {
       }}
     >
       <Tab.Screen
-        name="Home"
+        name={ScreenNames.Home}
         component={HomeScreen}
         options={{
           title: 'HOME',
@@ -52,7 +46,7 @@ export function Tabs() {
         }}
       />
       <Tab.Screen
-        name="Explore"
+        name={ScreenNames.Explore}
         component={ExploreScreen}
         options={{
           title: 'EXPLORE',
@@ -66,7 +60,7 @@ export function Tabs() {
         }}
       />
       <Tab.Screen
-        name="Voice"
+        name={ScreenNames.Voice}
         component={VoiceScreen}
         options={{
           title: 'VOICE',
@@ -76,7 +70,7 @@ export function Tabs() {
         }}
       />
       <Tab.Screen
-        name="Alerts"
+        name={ScreenNames.Alerts}
         component={AlertsScreen}
         options={{
           title: 'ALERTS',
@@ -90,7 +84,7 @@ export function Tabs() {
         }}
       />
       <Tab.Screen
-        name="Settings"
+        name={ScreenNames.Settings}
         component={SettingsStack}
         options={{
           title: 'SETTINGS',

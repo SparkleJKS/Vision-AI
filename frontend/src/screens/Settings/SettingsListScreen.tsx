@@ -10,42 +10,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { colors } from '../../theme/colors';
-import type { SettingsStackParamList } from './SettingsStack';
+import { SETTINGS_ITEMS } from './config';
+import type { ISettingsStackParamList } from '../screens.types';
 
-const SETTINGS_ITEMS = [
-  {
-    id: 'voice',
-    title: 'Voice & Audio',
-    subtitle: 'Adjust speed & pitch',
-    icon: 'volume-high' as const,
-  },
-  {
-    id: 'vision',
-    title: 'Vision Settings',
-    subtitle: 'Contrast & detection modes',
-    icon: 'eye' as const,
-  },
-  {
-    id: 'devices',
-    title: 'Connected Devices',
-    subtitle: 'Glasses & hearing aids',
-    icon: 'bluetooth' as const,
-  },
-  {
-    id: 'accessibility',
-    title: 'Accessibility',
-    subtitle: 'Haptics & gestures',
-    icon: 'accessibility' as const,
-  },
-  {
-    id: 'profile',
-    title: 'Profile',
-    subtitle: 'Personal details & preferences',
-    icon: 'person' as const,
-  },
-];
-
-type NavProp = NativeStackNavigationProp<SettingsStackParamList, 'SettingsList'>;
+type NavProp = NativeStackNavigationProp<ISettingsStackParamList>;
 
 export function SettingsListScreen() {
   const insets = useSafeAreaInsets();
@@ -70,9 +38,7 @@ export function SettingsListScreen() {
             key={item.id}
             className="bg-card rounded-2xl p-4 mb-3 flex-row items-center"
             activeOpacity={0.8}
-            onPress={() =>
-              item.id === 'profile' ? navigation.navigate('Profile') : undefined
-            }
+            onPress={() => navigation.navigate(item.screenName)}
           >
             <View className="w-12 h-12 rounded-full bg-card-light items-center justify-center mr-4">
               <Ionicons
