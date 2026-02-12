@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
 
 export function VoiceScreen() {
   const insets = useSafeAreaInsets();
-  const [isListening, setIsListening] = useState(true);
+  const [isListening, setIsListening] = useState<boolean>(false);
 
   return (
     <View

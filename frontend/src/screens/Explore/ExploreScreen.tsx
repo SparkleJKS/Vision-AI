@@ -7,10 +7,12 @@ import {
   Text,
   View,
 } from 'react-native';
-import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
+import { useFocusEffect } from '@react-navigation/native';
+import { CameraType, CameraView, PermissionResponse, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ensureCameraPermission } from '../../permissions';
 import { detectObjects } from '../../services/detectionApi';
 import type { DetectedObject } from '../../services/detectionApi';
 
@@ -35,7 +37,18 @@ function formatError(error: unknown): string {
 export function ExploreScreen() {
   const insets = useSafeAreaInsets();
   const cameraRef = useRef<CameraView | null>(null);
-  const [permission, requestPermission] = useCameraPermissions();
+  const [hookPermission, requestPermission, getPermission] = useCameraPermissions();
+  const [permission, setPermission] = useState<PermissionResponse | null>(hookPermission);
+
+  useEffect(() => {
+    setPermission(hookPermission);
+  }, [hookPermission]);
+
+  const refreshPermission = useCallback(async () => {
+    const result = await getPermission();
+    setPermission(result);
+  }, [getPermission]);
+
   const [isScanning, setIsScanning] = useState<boolean>(false);
   const [isBusy, setIsBusy] = useState<boolean>(false);
   const [facing, setFacing] = useState<CameraType>('back');
@@ -96,14 +109,33 @@ export function ExploreScreen() {
     }
   }, [isScanning]);
 
-  const handleStartStop = useCallback(() => {
+  // Refetch permission when returning from Settings
+  useFocusEffect(
+    useCallback(() => {
+      void refreshPermission();
+    }, [refreshPermission]),
+  );
+
+  const handleStartStop = useCallback(async () => {
     if (!permission?.granted) {
-      void requestPermission();
+      const granted = await ensureCameraPermission();
+      if (granted) {
+        await refreshPermission();
+      }
       return;
     }
 
     setIsScanning((previous) => !previous);
-  }, [permission?.granted, requestPermission]);
+  }, [permission?.granted, refreshPermission]);
+
+  const handlePermissionButtonPress = useCallback(async () => {
+    if (permission?.canAskAgain) {
+      const result = await requestPermission();
+      setPermission(result);
+    } else {
+      await ensureCameraPermission();
+    }
+  }, [permission?.canAskAgain, requestPermission]);
 
   const handleFlipCamera = useCallback(() => {
     setFacing((previous: CameraType) =>
@@ -124,7 +156,15 @@ export function ExploreScreen() {
         <Text style={styles.subtitle}>Live object detection from camera feed</Text>
 
         <View style={styles.cameraCard}>
-          {permission?.granted ? (
+          {permission === null ? (
+            <View style={styles.permissionWrap}>
+              <ActivityIndicator size="large" color={ACCENT_YELLOW} />
+              <Text style={styles.permissionTitle}>Checking camera…</Text>
+              <Text style={styles.permissionText}>
+                Verifying camera access…
+              </Text>
+            </View>
+          ) : permission.granted ? (
             <View style={styles.cameraWrap}>
               <CameraView ref={cameraRef} style={styles.camera} facing={facing} />
               <View style={styles.badgesRow}>
@@ -147,16 +187,29 @@ export function ExploreScreen() {
             </View>
           ) : (
             <View style={styles.permissionWrap}>
-              <Ionicons name="camera-outline" size={34} color={ACCENT_YELLOW} />
+              <Ionicons name="camera-outline" size={48} color={ACCENT_YELLOW} />
               <Text style={styles.permissionTitle}>Camera access needed</Text>
               <Text style={styles.permissionText}>
-                Enable camera permission to start live object detection.
+                {permission.canAskAgain
+                  ? 'Enable camera permission to start live object detection.'
+                  : 'Camera permission was denied. Open Settings to enable it.'}
               </Text>
               <Pressable
-                onPress={() => void requestPermission()}
-                style={[styles.controlButton, styles.startButton]}
+                onPress={handlePermissionButtonPress}
+                style={[
+                  styles.permissionButton,
+                  permission.canAskAgain ? styles.permissionButtonPrimary : styles.permissionButtonOutline,
+                ]}
               >
-                <Text style={styles.startButtonText}>Enable Camera</Text>
+                <Text
+                  style={
+                    permission.canAskAgain
+                      ? styles.permissionButtonPrimaryText
+                      : styles.permissionButtonOutlineText
+                  }
+                >
+                  {permission.canAskAgain ? 'Enable Camera' : 'Open Settings'}
+                </Text>
               </Pressable>
             </View>
           )}
@@ -302,6 +355,32 @@ const styles = StyleSheet.create({
     color: GREY,
     textAlign: 'center',
     marginBottom: 6,
+  },
+  permissionButton: {
+    minHeight: 48,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    minWidth: 180,
+  },
+  permissionButtonPrimary: {
+    backgroundColor: ACCENT_YELLOW,
+  },
+  permissionButtonOutline: {
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: ACCENT_YELLOW,
+  },
+  permissionButtonPrimaryText: {
+    color: '#111827',
+    fontWeight: '700',
+    fontSize: 15,
+  },
+  permissionButtonOutlineText: {
+    color: ACCENT_YELLOW,
+    fontWeight: '700',
+    fontSize: 15,
   },
   controlsRow: {
     flexDirection: 'row',
