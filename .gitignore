@@ -54,6 +54,9 @@ models/venv/
 # **/android
 **/node_modules
 
-
+# Mayukh PC
+.idea/
+.vscode/
+docs/
 
 batman-development/
