@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Text,
   View,
-  StyleSheet,
   ScrollView,
   TouchableOpacity,
   useWindowDimensions,
@@ -10,16 +9,6 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../../theme/colors';
-
-const {
-  accentYellow,
-  cardBg,
-  cardBgLight,
-  screenBg,
-  white,
-  grey,
-  green,
-} = colors;
 
 const FEATURE_CARDS = [
   {
@@ -66,38 +55,48 @@ export function HomeScreen() {
   const recentCardWidth = (width - 32 - insets.left - insets.right - cardGap) / 2;
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View className="flex-1 bg-screen" style={{ paddingTop: insets.top }}>
       <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingBottom: insets.bottom + 80 },
-        ]}
+        className="flex-1"
+        contentContainerStyle={{
+          paddingHorizontal: 16,
+          paddingTop: 8,
+          paddingBottom: insets.bottom + 80,
+        }}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={styles.header}>
+        <View className="flex-row justify-between items-center mb-6">
           <View>
-            <Text style={styles.greeting}>
-              Hello, <Text style={styles.userName}>{USER_NAME}</Text>
+            <Text className="text-white text-[28px] font-bold">
+              Hello, <Text className="text-accent">{USER_NAME}</Text>
             </Text>
           </View>
-          <TouchableOpacity style={styles.avatar} activeOpacity={0.8}>
-            <Text style={styles.avatarText}>{USER_NAME[0]}</Text>
+          <TouchableOpacity
+            className="w-11 h-11 rounded-full bg-accent items-center justify-center"
+            activeOpacity={0.8}
+          >
+            <Text className="text-black text-lg font-bold">{USER_NAME[0]}</Text>
           </TouchableOpacity>
         </View>
 
         {/* System Status Card */}
-        <View style={styles.systemStatusCard}>
-          <View style={styles.systemStatusLeft}>
-            <Text style={styles.systemStatusLabel}>System Status</Text>
-            <View style={styles.statusRow}>
-              <View style={styles.greenDot} />
-              <Text style={styles.systemStatusValue}>Online & Ready</Text>
+        <View className="bg-card rounded-2xl p-4 mb-3 flex-row justify-between items-center">
+          <View className="flex-1">
+            <Text className="text-grey text-xs mb-1">System Status</Text>
+            <View className="flex-row items-center gap-2">
+              <View className="w-2 h-2 rounded-full bg-success" />
+              <Text className="text-white text-lg font-semibold">
+                Online & Ready
+              </Text>
             </View>
           </View>
-          <View style={styles.equalizerIcon}>
-            <Ionicons name="cellular" size={24} color={accentYellow} />
+          <View className="ml-3">
+            <Ionicons
+              name="cellular"
+              size={24}
+              color={colors.accentYellow}
+            />
           </View>
         </View>
 
@@ -105,38 +104,34 @@ export function HomeScreen() {
         {FEATURE_CARDS.map((card) => (
           <TouchableOpacity
             key={card.id}
-            style={[
-              styles.featureCard,
-              card.highlighted && styles.featureCardHighlighted,
-            ]}
+            className={`flex-row items-center rounded-2xl p-4 mb-3 ${
+              card.highlighted ? 'bg-accent' : 'bg-card'
+            }`}
             activeOpacity={0.8}
           >
             <View
-              style={[
-                styles.featureIconWrap,
-                card.highlighted ? styles.featureIconWrapHighlighted : null,
-              ]}
+              className={`w-12 h-12 rounded-full items-center justify-center mr-4 ${
+                card.highlighted ? 'bg-white/50' : 'bg-card-light'
+              }`}
             >
               <Ionicons
                 name={card.icon as any}
                 size={24}
-                color={card.highlighted ? '#000000' : white}
+                color={card.highlighted ? '#000000' : colors.white}
               />
             </View>
-            <View style={styles.featureTextWrap}>
+            <View className="flex-1">
               <Text
-                style={[
-                  styles.featureTitle,
-                  card.highlighted && styles.featureTitleDark,
-                ]}
+                className={`text-lg font-bold mb-0.5 ${
+                  card.highlighted ? 'text-black' : 'text-white'
+                }`}
               >
                 {card.title}
               </Text>
               <Text
-                style={[
-                  styles.featureSubtitle,
-                  card.highlighted && styles.featureSubtitleDark,
-                ]}
+                className={`text-sm ${
+                  card.highlighted ? 'text-black/70' : 'text-grey'
+                }`}
               >
                 {card.subtitle}
               </Text>
@@ -145,22 +140,27 @@ export function HomeScreen() {
         ))}
 
         {/* RECENT Section */}
-        <Text style={styles.recentHeading}>RECENT</Text>
-        <View style={styles.recentRow}>
+        <Text className="text-white text-sm font-bold uppercase mt-6 mb-3">
+          RECENT
+        </Text>
+        <View className="flex-row gap-3">
           {RECENT_ITEMS.map((item) => (
             <TouchableOpacity
               key={item.id}
-              style={[styles.recentCard, { width: recentCardWidth }]}
+              className="bg-card rounded-2xl p-5 items-center min-h-[120px]"
+              style={{ width: recentCardWidth }}
               activeOpacity={0.8}
             >
-              <View style={styles.recentIconWrap}>
+              <View className="mb-3">
                 <Ionicons
                   name={item.icon as any}
                   size={28}
-                  color={accentYellow}
+                  color={colors.accentYellow}
                 />
               </View>
-              <Text style={styles.recentTitle}>{item.title}</Text>
+              <Text className="text-white text-sm font-bold text-center">
+                {item.title}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -168,150 +168,3 @@ export function HomeScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: screenBg,
-  },
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  greeting: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: white,
-  },
-  userName: {
-    color: accentYellow,
-  },
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: accentYellow,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#000000',
-  },
-  systemStatusCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: cardBg,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-  },
-  systemStatusLeft: {
-    flex: 1,
-  },
-  systemStatusLabel: {
-    fontSize: 12,
-    color: grey,
-    marginBottom: 4,
-  },
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  greenDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: green,
-  },
-  systemStatusValue: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: white,
-  },
-  equalizerIcon: {
-    marginLeft: 12,
-  },
-  featureCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: cardBg,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-  },
-  featureCardHighlighted: {
-    backgroundColor: accentYellow,
-  },
-  featureIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: cardBgLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 16,
-  },
-  featureIconWrapHighlighted: {
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-  },
-  featureTextWrap: {
-    flex: 1,
-  },
-  featureTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: white,
-    marginBottom: 2,
-  },
-  featureTitleDark: {
-    color: '#000000',
-  },
-  featureSubtitle: {
-    fontSize: 14,
-    color: grey,
-  },
-  featureSubtitleDark: {
-    color: 'rgba(0, 0, 0, 0.7)',
-  },
-  recentHeading: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: white,
-    textTransform: 'uppercase',
-    marginTop: 24,
-    marginBottom: 12,
-  },
-  recentRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  recentCard: {
-    backgroundColor: cardBg,
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-    minHeight: 120,
-  },
-  recentIconWrap: {
-    marginBottom: 12,
-  },
-  recentTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: white,
-    textAlign: 'center',
-  },
-});

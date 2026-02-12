@@ -1,21 +1,10 @@
 import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
-import { colors } from '../../theme/colors';
+import { Text, View } from 'react-native';
 
 export function ProfileScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Profile</Text>
+    <View className="flex-1 bg-screen items-center justify-center">
+      <Text className="text-white text-xl">Profile</Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.screenBg,
-  },
-  text: { fontSize: 20, color: colors.white },
-});
