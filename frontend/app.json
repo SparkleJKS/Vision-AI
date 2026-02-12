@@ -36,6 +36,13 @@
         }
       ],
       [
+        "react-native-vision-camera",
+        {
+          "cameraPermissionText": "Allow VisionAI to use your camera for live object detection.",
+          "enableFrameProcessors": true
+        }
+      ],
+      [
         "expo-build-properties",
         {
           "android": {
