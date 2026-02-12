@@ -9,7 +9,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../../theme/colors';
-import { useBackHandler } from '../../navigation';
+import { useBackHandler } from '../../navigators';
 
 const FEATURE_CARDS = [
   {

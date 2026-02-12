@@ -1,14 +1,17 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { ScreenNames } from '../../configs/navigation';
+import type { ISettingsStackParamList } from '../screens.types';
 import { SettingsListScreen } from './SettingsListScreen';
-import { ProfileScreen } from './ProfileScreen';
+import {
+  ProfileScreen,
+  VoiceAndAudioScreen,
+  VisionSettingsScreen,
+  ConnectedDevicesScreen,
+  AccessibilityScreen,
+} from './screens';
 
-export type SettingsStackParamList = {
-  SettingsList: undefined;
-  Profile: undefined;
-};
-
-const Stack = createNativeStackNavigator<SettingsStackParamList>();
+const Stack = createNativeStackNavigator<ISettingsStackParamList>();
 
 export function SettingsStack() {
   return (
@@ -19,8 +22,12 @@ export function SettingsStack() {
         gestureEnabled: true,
       }}
     >
-      <Stack.Screen name="SettingsList" component={SettingsListScreen} />
-      <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name={ScreenNames.SettingsList} component={SettingsListScreen} />
+      <Stack.Screen name={ScreenNames.Profile} component={ProfileScreen} />
+      <Stack.Screen name={ScreenNames.VoiceAndAudio} component={VoiceAndAudioScreen} />
+      <Stack.Screen name={ScreenNames.VisionSettings} component={VisionSettingsScreen} />
+      <Stack.Screen name={ScreenNames.ConnectedDevices} component={ConnectedDevicesScreen} />
+      <Stack.Screen name={ScreenNames.Accessibility} component={AccessibilityScreen} />
     </Stack.Navigator>
   );
 }
