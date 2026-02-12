@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { HomeScreen } from '../Home';
 import { VoiceScreen } from '../Voice';
 import { AlertsScreen } from '../Alerts';
-import { SettingsScreen } from '../Settings';
+import { SettingsStack } from '../Settings/SettingsStack';
 import { colors } from '../../theme/colors';
 
 export type MainTabParamList = {
@@ -75,7 +75,7 @@ export function Tabs() {
       />
       <Tab.Screen
         name="Settings"
-        component={SettingsScreen}
+        component={SettingsStack}
         options={{
           title: 'SETTINGS',
           tabBarIcon: ({ color, focused }) => (

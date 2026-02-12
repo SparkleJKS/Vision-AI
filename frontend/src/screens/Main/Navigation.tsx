@@ -2,6 +2,7 @@ import React from 'react';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { Tabs } from './Tabs';
 import { colors } from '../../theme/colors';
+import { navigationRef } from '../../navigation';
 
 const darkTheme = {
   ...DefaultTheme,
@@ -19,7 +20,7 @@ const darkTheme = {
 
 export function Navigation() {
   return (
-    <NavigationContainer theme={darkTheme}>
+    <NavigationContainer ref={navigationRef} theme={darkTheme}>
       <Tabs />
     </NavigationContainer>
   );
