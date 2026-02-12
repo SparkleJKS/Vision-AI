@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { HomeScreen } from '../Home';
 import { VoiceScreen } from '../Voice';
 import { AlertsScreen } from '../Alerts';
-import { ProfileScreen } from '../Profile';
 import { SettingsScreen } from '../Settings';
 import { colors } from '../../theme/colors';
 
@@ -12,7 +11,6 @@ export type MainTabParamList = {
   Home: undefined;
   Voice: undefined;
   Alerts: undefined;
-  Profile: undefined;
   Settings: undefined;
 };
 
@@ -76,22 +74,16 @@ export function Tabs() {
         }}
       />
       <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          title: 'PROFILE',
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="person-outline" size={24} color={color} />
-          ),
-        }}
-      />
-      <Tab.Screen
         name="Settings"
         component={SettingsScreen}
         options={{
           title: 'SETTINGS',
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="settings-outline" size={24} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'settings' : 'settings-outline'}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
