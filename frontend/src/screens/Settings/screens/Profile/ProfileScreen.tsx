@@ -8,8 +8,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { colors } from '../../theme/colors';
-import { useBackHandler } from '../../navigation';
+import { colors } from '../../../../theme';
+import { useBackHandler } from '../../../../navigators';
 
 const PROFILE_OPTIONS = [
   {

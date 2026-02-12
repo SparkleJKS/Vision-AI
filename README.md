@@ -79,9 +79,34 @@ Or from the Android project directory: `cd frontend/android` then `./gradlew ins
 
 **NDK:** The project is pinned to **NDK 26.1.10909125**. Install it via **Android Studio → SDK Manager → SDK Tools** → "Show Package Details" → **NDK** → **26.1.10909125** → Apply. If only NDK 27 is installed, the native build can fail with undefined C++ symbol errors. A patched React Native header (`graphicsConversions.h`) is applied automatically (via `patch-package` and the app’s Gradle/CMake setup) for NDK 26 compatibility.
 
-### Backend & models
+### Backend (FastAPI)
 
-Backend is implemented with FastAPI. See [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md) for backend and ML setup.
+From the **backend** folder:
+
+```bash
+cd backend
+python -m venv venv
+
+# Windows
+venv\Scripts\activate
+
+# macOS/Linux
+source venv/bin/activate
+
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Backend runs at `http://localhost:8000`.
+
+**Endpoints:** `GET /health` | `POST /v1/describe` | `POST /v1/detect` (multipart form field `file`)
+
+**Example:**
+```bash
+curl -X POST "http://localhost:8000/v1/detect" -F "file=@path/to/image.jpg"
+```
+
+See [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md) for environment variables and detailed backend setup.
 
 ## Detection Runtime Notes (Developers)
 
