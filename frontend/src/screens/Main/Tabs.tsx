@@ -2,6 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { HomeScreen } from '../Home';
+import { ExploreScreen } from '../Explore';
 import { VoiceScreen } from '../Voice';
 import { AlertsScreen } from '../Alerts';
 import { SettingsStack } from '../Settings/SettingsStack';
@@ -9,6 +10,7 @@ import { colors } from '../../theme/colors';
 
 export type MainTabParamList = {
   Home: undefined;
+  Explore: undefined;
   Voice: undefined;
   Alerts: undefined;
   Settings: undefined;
@@ -43,6 +45,20 @@ export function Tabs() {
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'home' : 'home-outline'}
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Explore"
+        component={ExploreScreen}
+        options={{
+          title: 'EXPLORE',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'compass' : 'compass-outline'}
               size={24}
               color={color}
             />

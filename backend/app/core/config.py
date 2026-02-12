@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     environment: str = "local"
     log_level: str = "INFO"
     cors_allow_origins: str = "*"
-    model_version: str = "mock-0.1"
+    model_version: str = "yolov8n-0.1"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
