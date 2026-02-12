@@ -6,7 +6,10 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { colors } from '../../theme/colors';
+import { useBackHandler } from '../../navigation';
 
 const PROFILE_OPTIONS = [
   {
@@ -29,12 +32,14 @@ const PROFILE_OPTIONS = [
 const USER_NAME = 'Alex Johnson';
 const USER_STATUS = 'Vision Premium User';
 
-type ProfileViewProps = {
-  onBack: () => void;
-  insets: { top: number; bottom: number };
-};
+export function ProfileScreen() {
+  const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
 
-export function ProfileView({ onBack, insets }: ProfileViewProps) {
+  useBackHandler({
+    onBack: () => navigation.goBack(),
+  });
+
   return (
     <View
       className="flex-1 bg-screen"
@@ -42,7 +47,7 @@ export function ProfileView({ onBack, insets }: ProfileViewProps) {
     >
       <TouchableOpacity
         className="flex-row items-center px-4 pt-4 pb-2"
-        onPress={onBack}
+        onPress={() => navigation.goBack()}
         activeOpacity={0.8}
       >
         <Ionicons name="arrow-back" size={24} color={colors.white} />

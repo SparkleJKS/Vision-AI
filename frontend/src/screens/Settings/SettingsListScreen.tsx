@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Text,
   View,
@@ -7,8 +7,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { colors } from '../../theme/colors';
-import { ProfileView } from './ProfileView';
+import type { SettingsStackParamList } from './SettingsStack';
 
 const SETTINGS_ITEMS = [
   {
@@ -43,18 +45,11 @@ const SETTINGS_ITEMS = [
   },
 ];
 
-export function SettingsScreen() {
-  const insets = useSafeAreaInsets();
-  const [showProfile, setShowProfile] = useState(false);
+type NavProp = NativeStackNavigationProp<SettingsStackParamList, 'SettingsList'>;
 
-  if (showProfile) {
-    return (
-      <ProfileView
-        onBack={() => setShowProfile(false)}
-        insets={insets}
-      />
-    );
-  }
+export function SettingsListScreen() {
+  const insets = useSafeAreaInsets();
+  const navigation = useNavigation<NavProp>();
 
   return (
     <View
@@ -76,7 +71,7 @@ export function SettingsScreen() {
             className="bg-card rounded-2xl p-4 mb-3 flex-row items-center"
             activeOpacity={0.8}
             onPress={() =>
-              item.id === 'profile' ? setShowProfile(true) : undefined
+              item.id === 'profile' ? navigation.navigate('Profile') : undefined
             }
           >
             <View className="w-12 h-12 rounded-full bg-card-light items-center justify-center mr-4">
