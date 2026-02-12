@@ -9,6 +9,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../../theme/colors';
+import { useBackHandler } from '../../navigation';
 
 const FEATURE_CARDS = [
   {
@@ -51,6 +52,11 @@ const USER_NAME = 'Alex';
 export function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+
+  useBackHandler({
+    showExitPrompt: true,
+  })
+
   const cardGap = 12;
   const recentCardWidth = (width - 32 - insets.left - insets.right - cardGap) / 2;
 
