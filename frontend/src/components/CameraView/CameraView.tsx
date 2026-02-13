@@ -1,13 +1,6 @@
-// @ts-nocheck
-import React, {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-} from 'react';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { runOnJS } from 'react-native-worklets';
+import { scheduleOnRN } from 'react-native-worklets';
 import {
   Camera,
   runAsync,
@@ -16,44 +9,15 @@ import {
   useCameraPermission,
   useFrameProcessor,
 } from 'react-native-vision-camera';
+import type { Frame } from 'react-native-vision-camera';
 
-import { createInferenceWorker } from '../workers/inferenceWorker';
+import { createInferenceWorker } from '../../workers/inferenceWorker';
+import type { InferenceWorker } from '../../workers/inferenceWorker';
+import { DEFAULT_MAX_INFERENCE_FPS, DEFAULT_INPUT_RESOLUTION, DEFAULT_ONNX_PROVIDERS } from './config';
+import { normalizeMaxInferenceFps, normalizeInputResolution, normalizeExecutionProviders } from './utils';
+import type { CameraViewRef, CameraViewProps, FramePacket } from './types';
 
-const DEFAULT_MAX_INFERENCE_FPS = 8;
-const DEFAULT_INPUT_RESOLUTION = [512, 512];
-const DEFAULT_ONNX_PROVIDERS = ['nnapi', 'cpu'];
-
-function normalizeMaxInferenceFps(value) {
-  const numericValue = typeof value === 'number' ? value : Number(value);
-  if (!Number.isFinite(numericValue)) {
-    return DEFAULT_MAX_INFERENCE_FPS;
-  }
-  return Math.min(Math.max(Math.trunc(numericValue), 1), 30);
-}
-
-function normalizeInputResolution(value) {
-  if (Array.isArray(value) && value.length === 2) {
-    const width = Math.trunc(Number(value[0]));
-    const height = Math.trunc(Number(value[1]));
-    if (width > 0 && height > 0) {
-      return [width, height];
-    }
-  }
-  return [...DEFAULT_INPUT_RESOLUTION];
-}
-
-function normalizeExecutionProviders(value) {
-  if (!Array.isArray(value)) {
-    return [...DEFAULT_ONNX_PROVIDERS];
-  }
-
-  const providers = value
-    .map((provider) => String(provider).trim().toLowerCase())
-    .filter((provider) => provider.length > 0);
-  return providers.length > 0 ? providers : [...DEFAULT_ONNX_PROVIDERS];
-}
-
-const CameraView = forwardRef(function CameraView(
+const CameraView = forwardRef<CameraViewRef | null, CameraViewProps>(function CameraView(
   {
     style,
     isActive = true,
@@ -96,14 +60,19 @@ const CameraView = forwardRef(function CameraView(
     [onnxExecutionProviders],
   );
 
-  const workerRef = useRef(null);
-  const cameraRef = useRef(null);
-  const permissionStateRef = useRef({
+  const workerRef = useRef<InferenceWorker | null>(null);
+  const cameraRef = useRef<Camera | null>(null);
+  const permissionStateRef = useRef<{
+    requestAttempted: boolean;
+    deniedReported: boolean;
+    missingDeviceReportedFor: string | null;
+  }>({
     requestAttempted: false,
     deniedReported: false,
     missingDeviceReportedFor: null,
   });
-  if (!workerRef.current) {
+
+  if (workerRef.current === null) {
     workerRef.current = createInferenceWorker({
       config: {
         maxInferenceFps: normalizedMaxInferenceFps,
@@ -131,20 +100,17 @@ const CameraView = forwardRef(function CameraView(
   useImperativeHandle(
     ref,
     () => ({
-      async takeSnapshot(options = {}) {
+      async takeSnapshot(options?: { quality?: number }) {
         const cameraInstance = cameraRef.current;
-        if (!cameraInstance) {
-          throw new Error('Camera is not initialized yet.');
-        }
-
+        if (!cameraInstance) throw new Error('Camera is not initialized yet.');
         if (typeof cameraInstance.takeSnapshot === 'function') {
-          return cameraInstance.takeSnapshot(options);
+          const result = await cameraInstance.takeSnapshot(options ?? {});
+          return result as { path?: string; filePath?: string; uri?: string };
         }
-
         if (typeof cameraInstance.takePhoto === 'function') {
-          return cameraInstance.takePhoto(options);
+          const result = await cameraInstance.takePhoto(options as Record<string, unknown>);
+          return result as { path?: string; filePath?: string; uri?: string };
         }
-
         throw new Error('Snapshot capture is not supported by this camera runtime.');
       },
     }),
@@ -157,55 +123,38 @@ const CameraView = forwardRef(function CameraView(
 
   useEffect(() => {
     let cancelled = false;
-
     if (hasPermission) {
       permissionStateRef.current.requestAttempted = false;
       permissionStateRef.current.deniedReported = false;
-      return () => {
-        cancelled = true;
-      };
+      return () => { cancelled = true; };
     }
 
-    const reportPermissionFailure = (message) => {
-      if (permissionStateRef.current.deniedReported) {
-        return;
-      }
+    const reportPermissionFailure = (message: string) => {
+      if (permissionStateRef.current.deniedReported) return;
       permissionStateRef.current.deniedReported = true;
-      if (typeof onInferenceError === 'function') {
-        onInferenceError(new Error(message));
-      }
+      if (typeof onInferenceError === 'function') onInferenceError(new Error(message));
     };
 
     const ensurePermission = async () => {
       if (permissionStateRef.current.requestAttempted) {
-        reportPermissionFailure(
-          'Camera permission is required for real-time detection. Enable it in app settings.',
-        );
+        reportPermissionFailure('Camera permission is required for real-time detection. Enable it in app settings.');
         return;
       }
-
       permissionStateRef.current.requestAttempted = true;
       try {
         const granted = await requestPermission();
         if (!granted && !cancelled) {
-          reportPermissionFailure(
-            'Camera permission is required for real-time detection. Enable it in app settings.',
-          );
+          reportPermissionFailure('Camera permission is required for real-time detection. Enable it in app settings.');
         }
       } catch (error) {
         if (!cancelled) {
-          reportPermissionFailure(
-            error instanceof Error ? error.message : 'Unable to request camera permission.',
-          );
+          reportPermissionFailure(error instanceof Error ? error.message : 'Unable to request camera permission.');
         }
       }
     };
 
     void ensurePermission();
-
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [hasPermission, onInferenceError, requestPermission]);
 
   useEffect(() => {
@@ -213,31 +162,29 @@ const CameraView = forwardRef(function CameraView(
       permissionStateRef.current.missingDeviceReportedFor = null;
       return;
     }
-
     if (device) {
       permissionStateRef.current.missingDeviceReportedFor = null;
       return;
     }
-
-    if (permissionStateRef.current.missingDeviceReportedFor === devicePosition) {
-      return;
-    }
-
+    if (permissionStateRef.current.missingDeviceReportedFor === devicePosition) return;
     permissionStateRef.current.missingDeviceReportedFor = devicePosition;
     if (typeof onInferenceError === 'function') {
-      onInferenceError(
-        new Error(`No ${devicePosition} camera device is available on this device.`),
-      );
+      onInferenceError(new Error(`No ${devicePosition} camera device is available on this device.`));
     }
   }, [device, devicePosition, hasPermission, onInferenceError]);
 
   useEffect(() => {
-    workerRef.current.setResultHandler(onInferenceResult);
-    workerRef.current.setErrorHandler(onInferenceError);
+    const worker = workerRef.current;
+    if (worker) {
+      worker.setResultHandler(onInferenceResult);
+      worker.setErrorHandler(onInferenceError);
+    }
   }, [onInferenceResult, onInferenceError]);
 
   useEffect(() => {
-    workerRef.current.configure({
+    const worker = workerRef.current;
+    if (!worker) return;
+    worker.configure({
       maxInferenceFps: normalizedMaxInferenceFps,
       confidenceThreshold,
       nmsIoU,
@@ -277,59 +224,41 @@ const CameraView = forwardRef(function CameraView(
   const canRunDetection = isActive && detectionEnabled && hasPermission && Boolean(device);
 
   useEffect(() => {
-    // Keep inference worker idle unless camera permissions and device availability are valid.
-    if (canRunDetection) {
-      workerRef.current.start();
-    } else {
-      workerRef.current.stop();
-    }
+    const worker = workerRef.current;
+    if (!worker) return;
+    if (canRunDetection) worker.start();
+    else worker.stop();
   }, [canRunDetection]);
 
-  useEffect(() => {
-    return () => {
-      void workerRef.current?.dispose();
-    };
+  useEffect(() => () => void workerRef.current?.dispose(), []);
+
+  const dispatchFrameToWorker = useCallback((framePacket: FramePacket) => {
+    workerRef.current?.enqueueFrame(framePacket);
   }, []);
 
-  const dispatchFrameToWorker = useMemo(
-    () =>
-      runOnJS((framePacket) => {
-        workerRef.current?.enqueueFrame(framePacket);
-      }),
-    [],
-  );
-
   const frameProcessor = useFrameProcessor(
-    (frame) => {
+    (frame: Frame) => {
       'worklet';
-
-      if (!detectionEnabled) {
-        return;
-      }
-
-      // Frame-level throttle keeps UI-runtime overhead predictable before JS handoff.
+      if (!detectionEnabled) return;
       runAtTargetFps(normalizedMaxInferenceFps, () => {
         'worklet';
         runAsync(frame, () => {
           'worklet';
-
-          if (typeof frame.toArrayBuffer !== 'function') {
-            return;
-          }
-
+          if (typeof frame.toArrayBuffer !== 'function') return;
           const frameBuffer = frame.toArrayBuffer();
-          const frameTimestamp =
-            typeof frame.timestamp === 'number' ? frame.timestamp : Date.now();
-          dispatchFrameToWorker({
+          const frameTimestamp = typeof frame.timestamp === 'number' ? frame.timestamp : Date.now();
+          const frameExt = frame as Frame & { rotationDegrees?: number };
+          const rotationDegrees = typeof frameExt.rotationDegrees === 'number' ? frameExt.rotationDegrees : 0;
+          const packet: FramePacket = {
             frameId: `${frameTimestamp}-${frame.width}x${frame.height}`,
             timestamp: frameTimestamp,
             width: frame.width,
             height: frame.height,
             pixelFormat: frame.pixelFormat ?? 'rgb',
-            rotationDegrees:
-              typeof frame.rotationDegrees === 'number' ? frame.rotationDegrees : 0,
+            rotationDegrees,
             bytes: frameBuffer,
-          });
+          };
+          scheduleOnRN(dispatchFrameToWorker, packet);
         });
       });
     },
@@ -349,7 +278,6 @@ const CameraView = forwardRef(function CameraView(
           video={false}
           audio={false}
           frameProcessor={frameProcessor}
-          frameProcessorFps={normalizedMaxInferenceFps}
           onInitialized={onInitialized ?? undefined}
           {...cameraProps}
         />
@@ -363,13 +291,6 @@ const CameraView = forwardRef(function CameraView(
 export default CameraView;
 
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    height: '100%',
-    overflow: 'hidden',
-  },
-  placeholder: {
-    flex: 1,
-    backgroundColor: '#000000',
-  },
+  container: { width: '100%', height: '100%', overflow: 'hidden' },
+  placeholder: { flex: 1, backgroundColor: '#000000' },
 });
