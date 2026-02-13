@@ -219,25 +219,28 @@ export function ExploreScreen() {
             <Text style={styles.permissionPlaceholderSubtext}>
               Enable camera to use live object detection.
             </Text>
-            <Pressable
-              style={({ pressed }) => [
+            <View
+              style={[
                 styles.permissionButton,
                 permission.canAskAgain ? styles.permissionButtonPrimary : styles.permissionButtonOutline,
-                pressed && styles.buttonPressed,
               ]}
-              onPress={handlePermissionButtonPress}
-              accessibilityRole="button"
-              accessibilityLabel={permission.canAskAgain ? 'Enable camera' : 'Open settings'}
             >
-              <Text
-                style={[
-                  styles.permissionButtonText,
-                  permission.canAskAgain ? styles.permissionButtonTextPrimary : styles.permissionButtonTextOutline,
-                ]}
+              <Pressable
+                style={({ pressed }) => [StyleSheet.absoluteFill, styles.permissionButtonInner, pressed && styles.buttonPressed]}
+                onPress={handlePermissionButtonPress}
+                accessibilityRole="button"
+                accessibilityLabel={permission.canAskAgain ? 'Enable camera' : 'Open settings'}
               >
-                {permission.canAskAgain ? 'Enable Camera' : 'Open Settings'}
-              </Text>
-            </Pressable>
+                <Text
+                  style={[
+                    styles.permissionButtonText,
+                    permission.canAskAgain ? styles.permissionButtonTextPrimary : styles.permissionButtonTextOutline,
+                  ]}
+                >
+                  {permission.canAskAgain ? 'Enable Camera' : 'Open Settings'}
+                </Text>
+              </Pressable>
+            </View>
           </View>
         ) : (
           <>
