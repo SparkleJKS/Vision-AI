@@ -79,5 +79,6 @@ models/**
 .idea/
 .vscode/
 docs/
+android_app/
 
 batman-development/
