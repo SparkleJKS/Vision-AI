@@ -1,32 +1,32 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
-import { Camera, useCameraPermissions } from 'expo-camera';
+import { Camera } from 'react-native-vision-camera';
 import { useFocusEffect } from '@react-navigation/native';
-import { ensureCameraPermission } from '../../../permissions';
+import { ensureCameraPermission, statusToPermission } from '../../../permissions';
+
+type PermissionState = {
+  granted: boolean;
+  canAskAgain: boolean;
+} | null;
 
 export function useExplorePermissions() {
-  const [hookPermission, requestPermission] = useCameraPermissions();
-  const [permission, setPermission] = useState(hookPermission);
+  const [permission, setPermission] = useState<PermissionState>(null);
 
-  useEffect(() => {
-    setPermission(hookPermission);
-  }, [hookPermission]);
-
-  const refreshPermission = useCallback(async () => {
-    const result = await Camera.getCameraPermissionsAsync();
-    setPermission(result);
+  const refreshPermission = useCallback(() => {
+    const status = Camera.getCameraPermissionStatus();
+    setPermission(statusToPermission(status));
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      void refreshPermission();
+      refreshPermission();
     }, [refreshPermission]),
   );
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (nextState: AppStateStatus) => {
       if (nextState === 'active') {
-        void refreshPermission();
+        refreshPermission();
       }
     });
     return () => subscription.remove();
@@ -34,12 +34,13 @@ export function useExplorePermissions() {
 
   const handlePermissionButtonPress = useCallback(async () => {
     if (permission?.canAskAgain) {
-      const result = await requestPermission();
-      setPermission(result);
+      const result = await Camera.requestCameraPermission();
+      setPermission({ granted: result === 'granted', canAskAgain: result !== 'granted' });
     } else {
       await ensureCameraPermission();
+      refreshPermission();
     }
-  }, [permission?.canAskAgain, requestPermission]);
+  }, [permission?.canAskAgain, refreshPermission]);
 
   return { permission, refreshPermission, handlePermissionButtonPress };
 }
