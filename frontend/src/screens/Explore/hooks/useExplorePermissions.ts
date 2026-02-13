@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 import { Camera, useCameraPermissions } from 'expo-camera';
 import { useFocusEffect } from '@react-navigation/native';
 import { ensureCameraPermission } from '../../../permissions';
@@ -21,6 +22,15 @@ export function useExplorePermissions() {
       void refreshPermission();
     }, [refreshPermission]),
   );
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextState: AppStateStatus) => {
+      if (nextState === 'active') {
+        void refreshPermission();
+      }
+    });
+    return () => subscription.remove();
+  }, [refreshPermission]);
 
   const handlePermissionButtonPress = useCallback(async () => {
     if (permission?.canAskAgain) {
