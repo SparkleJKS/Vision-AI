@@ -1,5 +1,5 @@
 /**
- * Design tokens - single source of truth for theme colors.
+ * Design tokens: Single source of truth for theme colors.
  * Used by tailwind.config.js and colors.ts
  */
 module.exports = {

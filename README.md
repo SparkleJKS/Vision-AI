@@ -79,9 +79,54 @@ Or from the Android project directory: `cd frontend/android` then `./gradlew ins
 
 **NDK:** The project is pinned to **NDK 26.1.10909125**. Install it via **Android Studio → SDK Manager → SDK Tools** → "Show Package Details" → **NDK** → **26.1.10909125** → Apply. If only NDK 27 is installed, the native build can fail with undefined C++ symbol errors. A patched React Native header (`graphicsConversions.h`) is applied automatically (via `patch-package` and the app’s Gradle/CMake setup) for NDK 26 compatibility.
 
-### Backend & models
+### Backend (FastAPI)
 
-Backend is implemented with FastAPI. See [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md) for backend and ML setup.
+From the **backend** folder:
+
+```bash
+cd backend
+python -m venv venv
+
+# Windows
+venv\Scripts\activate
+
+# macOS/Linux
+source venv/bin/activate
+
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Backend runs at `http://localhost:8000`.
+
+**Endpoints:** `GET /health` | `POST /v1/describe` | `POST /v1/detect` (multipart form field `file`)
+
+**Example:**
+```bash
+curl -X POST "http://localhost:8000/v1/detect" -F "file=@path/to/image.jpg"
+```
+
+See [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md) for environment variables and detailed backend setup.
+
+## Detection Runtime Notes (Developers)
+
+- `TFLite` is the default runtime because it is typically the lowest-latency, lowest-power path on mobile (GPU/NNAPI/XNNPACK delegates).
+- Server fallback is only used when on-device runtimes are unavailable or fail at load/inference time.
+- Swap models safely by following this sequence:
+  1. Keep model binaries out of git-tracked paths (or explicitly update `.gitignore` rules first).
+  2. Match model IO contracts (`inputResolution`, YOLOv8-style outputs: `bbox + class + confidence`).
+  3. Update model asset references in `frontend/src/lib/modelManager.js`.
+  4. Unload/reload runtime (`modelManager.unload()` then `modelManager.loadRuntime(...)`) so native sessions are recreated cleanly.
+  5. Re-run the checklist below before merging.
+
+## Minimal Detection Test Checklist
+
+- [ ] Camera permission denied path shows a clear runtime error and detection does not start.
+- [ ] Start/Stop detection toggles the inference loop without app freeze/crash.
+- [ ] Runtime fallback chain works: `TFLite -> ONNX -> Server` when failures are forced.
+- [ ] Confidence threshold and NMS toggle change prediction counts as expected.
+- [ ] Snapshot capture works while detection is running.
+- [ ] FPS and inference latency values update continuously under load.
 
 ## Detailed setup
 

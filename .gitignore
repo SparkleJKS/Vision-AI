@@ -45,6 +45,27 @@ venv/
 .venv/
 backend/venv/
 models/venv/
+**/.venv/
+**/venv/
+
+# ML artifacts and large binaries (keep local to avoid bloating git history)
+models/**
+!models/.gitkeep
+!models/README.md
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.weights
+*.engine
+*.onnx
+*.tflite
+*.mlmodel
+*.pb
+*.pbtxt
+*.bin
+*.npy
+*.npz
 
 # typescript
 *.tsbuildinfo

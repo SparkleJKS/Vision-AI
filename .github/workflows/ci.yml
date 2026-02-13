@@ -35,11 +35,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Django check
-        run: python manage.py check
-
-      - name: Check migrations
-        run: python manage.py migrate --check --no-input
+      - name: Verify FastAPI app
+        run: python -c "from app.main import app; print('OK')"
 
   frontend:
     name: Frontend
