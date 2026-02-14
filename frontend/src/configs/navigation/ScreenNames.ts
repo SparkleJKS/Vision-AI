@@ -8,6 +8,10 @@
  * 3. Register the screen in the appropriate navigator (Tabs, SettingsStack, etc.)
  */
 export enum ScreenNames {
+  // ── Auth ───────────────────────────────────────
+  SignIn = 'SignIn',
+  SignUp = 'SignUp',
+
   // ── Bottom Tabs ────────────────────────────────
   HomeTabs = 'HomeTabs',
   Home = 'Home',
