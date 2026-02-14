@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Writes android/local.properties with sdk.dir.
- * Run automatically after expo prebuild (which deletes this file).
+ * Run after prebuild to recreate local.properties (SDK path).
  * Uses ANDROID_HOME or ANDROID_SDK_ROOT, or falls back to default Windows path.
  */
 const fs = require('fs');

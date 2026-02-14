@@ -3,11 +3,12 @@
 # dependencies
 node_modules/
 
-# Expo
-.expo/
+# Build
 dist/
 web-build/
-expo-env.d.ts
+
+# Expo (legacy / leftover)
+.expo/
 
 # Native
 .kotlin/

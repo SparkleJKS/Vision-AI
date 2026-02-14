@@ -2,12 +2,11 @@
   "name": "visionai",
   "version": "1.0.0",
   "private": true,
-  "description": "VisionAI monorepo: frontend (Expo), backend, models",
+  "description": "VisionAI monorepo: frontend (React Native CLI), backend, models",
   "scripts": {
     "start": "npm run start --prefix frontend",
     "android": "npm run android --prefix frontend",
     "ios": "npm run ios --prefix frontend",
-    "web": "npm run web --prefix frontend",
     "frontend": "npm run start --prefix frontend"
   }
 }
