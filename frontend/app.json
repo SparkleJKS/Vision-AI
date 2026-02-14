@@ -30,9 +30,9 @@
     },
     "plugins": [
       [
-        "expo-camera",
+        "react-native-vision-camera",
         {
-          "cameraPermission": "Allow VisionAI to use your camera for live object detection."
+          "cameraPermissionText": "Allow VisionAI to use your camera for live object detection."
         }
       ],
       [

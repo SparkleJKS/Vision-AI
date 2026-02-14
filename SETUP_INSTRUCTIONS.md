@@ -116,6 +116,30 @@ The app uses React Native’s **New Architecture** and builds native code with *
 - **Patched header:** A patch is applied to React Native’s `graphicsConversions.h` (for NDK 26’s C++ stdlib). It is applied automatically when you run `npm install` in `frontend/` (via `patch-package`). The app’s Gradle/CMake setup copies this patched header and passes it to the native build so both the app and autolinked libraries use it.
 - **First native build:** From `frontend/` run `npm run android:install-dev` (or from `frontend/android`: `./gradlew installDevDebug` on macOS/Linux, `gradlew.bat installDevDebug` on Windows). The first build can take several minutes.
 
+#### Prebuild and `local.properties`
+
+When you run `npx expo prebuild` (or `expo prebuild --clean`), Expo regenerates the `android/` folder and **removes** `android/local.properties`. That file tells Gradle where the Android SDK is located, so without it you may see "SDK location not found" errors.
+
+**Solution:** Use the project's `prebuild` script instead of calling `expo prebuild` directly:
+
+```bash
+cd frontend
+npm run prebuild -- --clean
+```
+
+This runs `expo prebuild` and then a **postprebuild** script (`scripts/setup-local-properties.js`) that recreates `local.properties` with the correct `sdk.dir`. The script looks for the SDK in this order:
+
+1. `ANDROID_HOME` environment variable  
+2. `ANDROID_SDK_ROOT` environment variable  
+3. Default path (e.g. `%LOCALAPPDATA%\Android\Sdk` on Windows, `~/Android/Sdk` on macOS/Linux)
+
+**Optional:** Set `ANDROID_HOME` (or `ANDROID_SDK_ROOT`) so the script always finds your SDK:
+
+- **Windows:** `set ANDROID_HOME=%LOCALAPPDATA%\Android\Sdk` (or add it in System Environment Variables)
+- **macOS/Linux:** `export ANDROID_HOME=~/Android/Sdk` (or add to `~/.bashrc` / `~/.zshrc`)
+
+`local.properties` is gitignored because it contains machine-specific paths.
+
 ### Frontend tech stack
 
 - **Expo** SDK 54
@@ -189,6 +213,9 @@ The `models/` folder is a placeholder for ML model files (e.g. TensorFlow, ONNX)
 - **Android native build: undefined C++ symbols or std::format / graphicsConversions errors**  
   The project is pinned to **NDK 26.1.10909125**. Install it in **Android Studio → SDK Manager → SDK Tools** → "Show Package Details" → **NDK** → **26.1.10909125** → Apply. Ensure patches are applied: from `frontend/` run `npm install` (this runs `patch-package` and applies the React Native header patch). Then from `frontend/android` run `gradlew.bat clean` (Windows) or `./gradlew clean`, and build again (e.g. `gradlew.bat installDevDebug` or `./gradlew installDevDebug`).
 
+- **SDK location not found / `local.properties` missing**  
+  If you ran `npx expo prebuild --clean` directly, Expo removes `android/local.properties`. Use `npm run prebuild -- --clean` from `frontend/` instead; the postprebuild script recreates `local.properties` automatically. See [Prebuild and local.properties](#prebuild-and-localproperties) above.
+
 ### Backend
 
 - **Port 8000 in use**  
@@ -219,6 +246,7 @@ The `models/` folder is a placeholder for ML model files (e.g. TensorFlow, ONNX)
 | Start app         | `npm start`                   |
 | Android (Expo Go) | `npm run android`             |
 | Android dev build | `cd frontend && npm run android:install-dev` |
+| Prebuild (clean)  | `cd frontend && npm run prebuild -- --clean` |
 | iOS               | `npm run ios`                 |
 | Web               | `npm run web`                 |
 | Git hooks         | `git config core.hooksPath .githooks` |

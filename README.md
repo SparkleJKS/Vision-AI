@@ -72,10 +72,7 @@ cd frontend
 npm run android:install-dev
 ```
 
-Or from the Android project directory: `cd frontend/android` then `./gradlew installDevDebug` (macOS/Linux) or `gradlew.bat installDevDebug` (Windows). That builds and installs the dev variant (app id: `com.anonymous.VisionAI.dev`). If the build fails with “SDK location not found”, add `frontend/android/local.properties` with:
-
-`sdk.dir=C\:\\Users\\YOUR_USERNAME\\AppData\\Local\\Android\\Sdk`  
-(use your own SDK path; `local.properties` is gitignored.)
+Or from the Android project directory: `cd frontend/android` then `./gradlew installDevDebug` (macOS/Linux) or `gradlew.bat installDevDebug` (Windows). That builds and installs the dev variant (app id: `com.anonymous.VisionAI.dev`). If the build fails with “SDK location not found”, run `npm run prebuild -- --clean` from `frontend/` instead of `npx expo prebuild --clean` directly—the postprebuild script recreates `local.properties` automatically. See [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md#prebuild-and-localproperties) for details.
 
 **NDK:** The project is pinned to **NDK 26.1.10909125**. Install it via **Android Studio → SDK Manager → SDK Tools** → "Show Package Details" → **NDK** → **26.1.10909125** → Apply. If only NDK 27 is installed, the native build can fail with undefined C++ symbol errors. A patched React Native header (`graphicsConversions.h`) is applied automatically (via `patch-package` and the app’s Gradle/CMake setup) for NDK 26 compatibility.
 

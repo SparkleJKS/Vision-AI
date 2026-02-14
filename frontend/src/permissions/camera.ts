@@ -1,6 +1,6 @@
 import { Alert, Linking } from 'react-native';
-import { Camera } from 'expo-camera';
-import type { PermissionResponse } from 'expo-modules-core';
+import { Camera } from 'react-native-vision-camera';
+import type { CameraPermissionStatus } from 'react-native-vision-camera';
 
 export type CameraPermissionResult = {
   granted: boolean;
@@ -8,19 +8,30 @@ export type CameraPermissionResult = {
   shouldOpenSettings: boolean;
 };
 
+/** Map vision-camera status to a permission-like object for UI compatibility */
+export function statusToPermission(status: CameraPermissionStatus): {
+  granted: boolean;
+  canAskAgain: boolean;
+} {
+  return {
+    granted: status === 'granted',
+    canAskAgain: status === 'not-determined',
+  };
+}
+
 /**
  * Check if camera permission is granted.
  */
-export const hasCameraPermission = async (): Promise<boolean> => {
-  const response = await Camera.getCameraPermissionsAsync();
-  return response.granted;
+export const hasCameraPermission = (): boolean => {
+  const status = Camera.getCameraPermissionStatus();
+  return status === 'granted';
 };
 
 /**
  * Get current camera permission status.
  */
-export const getCameraPermissionStatus = async (): Promise<PermissionResponse | null> => {
-  return Camera.getCameraPermissionsAsync();
+export const getCameraPermissionStatus = (): CameraPermissionStatus => {
+  return Camera.getCameraPermissionStatus();
 };
 
 /**
@@ -31,10 +42,9 @@ export const getCameraPermissionStatus = async (): Promise<PermissionResponse | 
  * - Don't allow (blocked - must go to Settings)
  */
 export const requestCameraPermission = async (): Promise<CameraPermissionResult> => {
-  const status = await Camera.getCameraPermissionsAsync();
+  const status = Camera.getCameraPermissionStatus();
 
-  // Already granted
-  if (status.granted) {
+  if (status === 'granted') {
     return {
       granted: true,
       blocked: false,
@@ -42,8 +52,7 @@ export const requestCameraPermission = async (): Promise<CameraPermissionResult>
     };
   }
 
-  // Permanently blocked - must go to Settings
-  if (status.canAskAgain === false) {
+  if (status === 'denied' || status === 'restricted') {
     return {
       granted: false,
       blocked: true,
@@ -51,10 +60,9 @@ export const requestCameraPermission = async (): Promise<CameraPermissionResult>
     };
   }
 
-  // Try to request permission (covers: undetermined, or "ask every time" on Android)
-  const requestResult = await Camera.requestCameraPermissionsAsync();
+  const result = await Camera.requestCameraPermission();
 
-  if (requestResult.granted) {
+  if (result === 'granted') {
     return {
       granted: true,
       blocked: false,
@@ -62,11 +70,10 @@ export const requestCameraPermission = async (): Promise<CameraPermissionResult>
     };
   }
 
-  // Denied or blocked after request
   return {
     granted: false,
-    blocked: requestResult.canAskAgain === false,
-    shouldOpenSettings: requestResult.canAskAgain === false,
+    blocked: true,
+    shouldOpenSettings: true,
   };
 };
 
@@ -82,7 +89,6 @@ export const ensureCameraPermission = async (): Promise<boolean> => {
     return true;
   }
 
-  // Blocked - show alert to guide user to Settings
   if (result.shouldOpenSettings) {
     return new Promise<boolean>((resolve) => {
       Alert.alert(
@@ -110,7 +116,5 @@ export const ensureCameraPermission = async (): Promise<boolean> => {
     });
   }
 
-  // Can ask again - permission was denied but we could retry (e.g. "Ask every time" on Android)
-  // User dismissed the system dialog - return false, they can tap again
   return false;
 };
