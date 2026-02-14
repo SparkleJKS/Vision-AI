@@ -152,6 +152,32 @@ The app uses **Firebase Crashlytics** for crash reporting. Crashlytics works onl
 
 **Note:** `google-services.json` is committed to the repo.
 
+#### Firebase Authentication (Email/Password & Google)
+
+The app uses **Firebase Auth** with email/password and Google Sign-In.
+
+**1. Enable sign-in methods in Firebase Console:**
+
+- Go to [Firebase Console](https://console.firebase.google.com/) → your project → **Authentication** → **Sign-in method**
+- Enable **Email/Password**
+- Enable **Google** (add support email if prompted)
+
+**2. Google Sign-In – Web Client ID (required for Google auth):**
+
+- Firebase Console → Project Settings → **Your apps** → select your Android app
+- Under "SDK setup and configuration", if you have a **Web app** in the project, copy its **Web client ID** (format: `XXXXX-xxx.apps.googleusercontent.com`)
+- If you don't have a Web app: **Add app** → **Web** → register, then copy the Web client ID
+- Create `frontend/.env` (or set `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` in your environment):
+  ```
+  EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=YOUR_WEB_CLIENT_ID_HERE
+  ```
+- Rebuild the app after adding the env var
+
+**3. Add both package names to Firebase:**
+
+- Add Android apps for both `com.anonymous.VisionAI` and `com.anonymous.VisionAI.dev` (dev flavor)
+- The `google-services.json` should include clients for both (see Firebase Crashlytics section)
+
 ### Frontend tech stack
 
 - **React Native CLI**
