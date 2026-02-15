@@ -8,7 +8,10 @@ import { AppRegistry } from 'react-native';
 
 import crashlytics from '@react-native-firebase/crashlytics';
 import App from './App';
+import { logApp } from './src/utils/logger';
 
 crashlytics().setCrashlyticsCollectionEnabled(true);
+
+logApp('launch', { timestamp: new Date().toISOString() });
 
 AppRegistry.registerComponent('main', () => App);

@@ -34,6 +34,7 @@ import {
 } from './config';
 import { exploreStyles } from './styles';
 import type { CameraViewRef, CameraViewProps, ModelRuntime, TfliteDelegate } from './types';
+import { logEvent } from '../../utils/logger';
 
 const styles = exploreStyles;
 const { white, accent } = EXPLORE_COLORS;
@@ -145,19 +146,26 @@ export function ExploreScreen() {
       return;
     }
     if (detection.isDetecting) {
+      logEvent('Explore:DetectionStopped');
       detection.stopDetection();
       setSnapshotInfo(null);
       return;
     }
+    logEvent('Explore:DetectionStarted', { runtime: selectedRuntime });
     await detection.startDetection(selectedRuntime);
   }, [permission?.granted, refreshPermission, detection, selectedRuntime]);
 
   const handleFlipCamera = useCallback(() => {
-    setFacing((prev) => (prev === 'back' ? 'front' : 'back'));
+    setFacing((prev) => {
+      const next = prev === 'back' ? 'front' : 'back';
+      logEvent('Explore:FlipCamera', { from: prev, to: next });
+      return next;
+    });
   }, []);
 
   const handleModelSelect = useCallback(
     async (runtime: ModelRuntime) => {
+      logEvent('Explore:ModelSelected', { runtime });
       setSelectedRuntime(runtime);
       await detection.applyRuntimePreference(runtime);
     },
@@ -183,15 +191,18 @@ export function ExploreScreen() {
   const handleSnapshot = useCallback(async () => {
     const camera = cameraRef.current;
     if (!camera || typeof camera.takeSnapshot !== 'function') {
+      logEvent('Explore:SnapshotUnavailable');
       setSnapshotInfo('Snapshot unavailable on this build.');
       return;
     }
+    logEvent('Explore:SnapshotTaken');
     try {
       const result = await camera.takeSnapshot({ quality: 90 });
       triggerSnapshotFlash();
       const pathHint = result?.path ?? result?.filePath ?? result?.uri ?? 'Saved';
       setSnapshotInfo(`Snapshot: ${pathHint}`);
     } catch (error: unknown) {
+      logEvent('Explore:SnapshotError', { error: formatError(error) });
       setSnapshotInfo(formatError(error));
     }
   }, [triggerSnapshotFlash]);
