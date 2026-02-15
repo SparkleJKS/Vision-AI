@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from "react";
 import {
   Text,
   View,
@@ -7,45 +7,52 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
-  Alert,
   ScrollView,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@react-native-vector-icons/ionicons';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { colors } from '../../theme/colors';
-import { useAuth } from '../../auth/AuthContext';
-import { ScreenNames } from '../../configs/navigation';
-import type { IAuthStackParamList } from '../screens.types';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@react-native-vector-icons/ionicons";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { colors } from "../../theme/colors";
+import { useAuth } from "../../auth/AuthContext";
+import { ScreenNames } from "../../configs/navigation";
+import type { IAuthStackParamList } from "../screens.types";
 
 type NavProp = NativeStackNavigationProp<IAuthStackParamList>;
 
 export function SignUpScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavProp>();
-  const { signUpWithEmail, signInWithGoogle, authError, clearAuthError } = useAuth();
+  const { signUpWithEmail, signInWithGoogle, authError, clearAuthError } =
+    useAuth();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  const errorMessage = validationError ?? authError;
+  const clearError = () => {
+    setValidationError(null);
+    clearAuthError();
+  };
 
   const handleSignUp = async () => {
     if (!email.trim() || !password || !confirmPassword) {
-      Alert.alert('Error', 'Please fill in all fields');
+      setValidationError("Please fill in all fields");
       return;
     }
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      setValidationError("Passwords do not match");
       return;
     }
     if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
+      setValidationError("Password must be at least 6 characters");
       return;
     }
     setLoading(true);
-    clearAuthError();
+    clearError();
     try {
       await signUpWithEmail(email.trim(), password);
     } catch {
@@ -57,7 +64,7 @@ export function SignUpScreen() {
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
-    clearAuthError();
+    clearError();
     try {
       await signInWithGoogle();
     } catch {
@@ -70,29 +77,42 @@ export function SignUpScreen() {
   return (
     <KeyboardAvoidingView
       className="flex-1 bg-screen"
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={{ paddingTop: insets.top }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
+      keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}
     >
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
           paddingHorizontal: 24,
-          paddingBottom: insets.bottom + 24,
+          paddingBottom: insets.bottom + 40,
           flexGrow: 1,
-          justifyContent: 'center',
+          justifyContent: "center",
         }}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         showsVerticalScrollIndicator={false}
       >
-        <Text className="text-white text-[28px] font-bold mb-2">Create account</Text>
+        <Text className="text-white text-[28px] font-bold mb-2">
+          Create account
+        </Text>
         <Text className="text-grey text-base mb-8">
           Sign up to get started with VisionAI
         </Text>
 
-        {authError ? (
-          <View className="bg-warning/20 rounded-xl p-3 mb-4 flex-row items-center">
-            <Ionicons name="alert-circle" size={20} color={colors.warning} />
-            <Text className="text-warning text-sm ml-2 flex-1">{authError}</Text>
+        {errorMessage ? (
+          <View className="bg-card rounded-xl p-3 mb-4 flex-row items-center border-l-4 border-warning">
+            <Ionicons name="information-circle" size={20} color={colors.warning} />
+            <Text className="text-white text-sm ml-3 flex-1">
+              {errorMessage}
+            </Text>
+            <TouchableOpacity
+              onPress={clearError}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              className="p-1"
+            >
+              <Ionicons name="close" size={20} color={colors.grey} />
+            </TouchableOpacity>
           </View>
         ) : null}
 
@@ -101,7 +121,10 @@ export function SignUpScreen() {
           placeholder="Email"
           placeholderTextColor={colors.grey}
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(v) => {
+            setEmail(v);
+            clearError();
+          }}
           autoCapitalize="none"
           keyboardType="email-address"
           autoComplete="email"
@@ -112,7 +135,10 @@ export function SignUpScreen() {
           placeholder="Password (min 6 characters)"
           placeholderTextColor={colors.grey}
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(v) => {
+            setPassword(v);
+            clearError();
+          }}
           secureTextEntry
           autoComplete="new-password"
           editable={!loading}
@@ -122,7 +148,10 @@ export function SignUpScreen() {
           placeholder="Confirm password"
           placeholderTextColor={colors.grey}
           value={confirmPassword}
-          onChangeText={setConfirmPassword}
+          onChangeText={(v) => {
+            setConfirmPassword(v);
+            clearError();
+          }}
           secureTextEntry
           autoComplete="new-password"
           editable={!loading}

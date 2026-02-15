@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 import type { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { AUTH_CONFIG } from '../configs/auth';
 import { logEvent, logApp } from '../utils/logger';
+import { getAuthErrorMessage } from './authErrors';
 
 type User = FirebaseAuthTypes.User;
 
@@ -62,8 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const auth = require('@react-native-firebase/auth').default;
       await auth().signInWithEmailAndPassword(email, password);
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Sign in failed';
-      setAuthError(msg);
+      setAuthError(getAuthErrorMessage(e));
       throw e;
     }
   }, []);
@@ -74,8 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const auth = require('@react-native-firebase/auth').default;
       await auth().createUserWithEmailAndPassword(email, password);
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Sign up failed';
-      setAuthError(msg);
+      setAuthError(getAuthErrorMessage(e));
       throw e;
     }
   }, []);
@@ -106,7 +105,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await auth().signInWithCredential(credential);
       logEvent('Auth:SignInWithGoogleSuccess');
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Google sign in failed';
+      const msg = getAuthErrorMessage(e);
       logEvent('Auth:SignInWithGoogleError', { error: msg });
       setAuthError(msg);
       throw e;

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Text,
   View,
@@ -7,35 +7,43 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
-  Alert,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@react-native-vector-icons/ionicons';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { colors } from '../../theme/colors';
-import { useAuth } from '../../auth/AuthContext';
-import { ScreenNames } from '../../configs/navigation';
-import type { IAuthStackParamList } from '../screens.types';
+  ScrollView,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@react-native-vector-icons/ionicons";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { colors } from "../../theme/colors";
+import { useAuth } from "../../auth/AuthContext";
+import { ScreenNames } from "../../configs/navigation";
+import type { IAuthStackParamList } from "../screens.types";
 
 type NavProp = NativeStackNavigationProp<IAuthStackParamList>;
 
 export function SignInScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavProp>();
-  const { signInWithEmail, signInWithGoogle, authError, clearAuthError } = useAuth();
+  const { signInWithEmail, signInWithGoogle, authError, clearAuthError } =
+    useAuth();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  const errorMessage = validationError ?? authError;
+  const clearError = () => {
+    setValidationError(null);
+    clearAuthError();
+  };
 
   const handleSignIn = async () => {
     if (!email.trim() || !password) {
-      Alert.alert('Error', 'Please enter email and password');
+      setValidationError("Please enter email and password");
       return;
     }
     setLoading(true);
-    clearAuthError();
+    clearError();
     try {
       await signInWithEmail(email.trim(), password);
     } catch {
@@ -47,7 +55,7 @@ export function SignInScreen() {
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
-    clearAuthError();
+    clearError();
     try {
       await signInWithGoogle();
     } catch {
@@ -60,19 +68,42 @@ export function SignInScreen() {
   return (
     <KeyboardAvoidingView
       className="flex-1 bg-screen"
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
+      keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}
     >
-      <View className="flex-1 px-6 justify-center">
-        <Text className="text-white text-[28px] font-bold mb-2">Welcome back</Text>
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: "center",
+          paddingHorizontal: 24,
+          paddingBottom: insets.bottom + 40,
+        }}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        showsVerticalScrollIndicator={false}
+      >
+        <Text className="text-white text-[28px] font-bold mb-2">
+          Welcome back
+        </Text>
         <Text className="text-grey text-base mb-8">
           Sign in to continue to VisionAI
         </Text>
 
-        {authError ? (
-          <View className="bg-warning/20 rounded-xl p-3 mb-4 flex-row items-center">
-            <Ionicons name="alert-circle" size={20} color={colors.warning} />
-            <Text className="text-warning text-sm ml-2 flex-1">{authError}</Text>
+        {errorMessage ? (
+          <View className="bg-card rounded-xl p-3 mb-4 flex-row items-center border-l-4 border-warning">
+            <Ionicons name="information-circle" size={20} color={colors.warning} />
+            <Text className="text-white text-sm ml-3 flex-1">
+              {errorMessage}
+            </Text>
+            <TouchableOpacity
+              onPress={clearError}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              className="p-1"
+            >
+              <Ionicons name="close" size={20} color={colors.grey} />
+            </TouchableOpacity>
           </View>
         ) : null}
 
@@ -81,7 +112,10 @@ export function SignInScreen() {
           placeholder="Email"
           placeholderTextColor={colors.grey}
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(v) => {
+            setEmail(v);
+            clearError();
+          }}
           autoCapitalize="none"
           keyboardType="email-address"
           autoComplete="email"
@@ -92,7 +126,10 @@ export function SignInScreen() {
           placeholder="Password"
           placeholderTextColor={colors.grey}
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(v) => {
+            setPassword(v);
+            clearError();
+          }}
           secureTextEntry
           autoComplete="password"
           editable={!loading}
@@ -138,7 +175,7 @@ export function SignInScreen() {
             <Text className="text-accent text-sm font-semibold">Sign Up</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }

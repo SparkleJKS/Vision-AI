@@ -36,7 +36,7 @@ export function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const { user, signOut, authAvailable } = useAuth();
-  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState<boolean>(false);
 
   const handleSignOut = async () => {
     if (isSigningOut) return;
