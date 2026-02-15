@@ -1,7 +1,5 @@
 import './global.css';
-import React from 'react';
-import { View } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { View, StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { MainContainer } from './src/screens/Main';
@@ -13,7 +11,7 @@ export default function App() {
         <View className="flex-1 bg-screen">
         <MainContainer />
         </View>
-        <StatusBar style="light" />
+        <StatusBar barStyle="light-content" />
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

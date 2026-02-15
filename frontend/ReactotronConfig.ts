@@ -37,10 +37,10 @@ if (__DEV__) {
 
 reactotron.onCustomCommand({
   title: 'Show Dev Menu',
-  description: 'In Expo: shake device or press Cmd+D (iOS) / Cmd+M (Android)',
+  description: 'Shake device or press Cmd+D (iOS) / Cmd+M (Android)',
   command: 'showDevMenu',
   handler: () => {
-    Reactotron.log('Shake device or press Cmd+D (iOS) / Cmd+M (Android) to open Expo dev menu');
+    Reactotron.log('Shake device or press Cmd+D (iOS) / Cmd+M (Android) to open React Native dev menu');
   },
 });
 

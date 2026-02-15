@@ -266,7 +266,7 @@ const CameraView = forwardRef<CameraViewRef | null, CameraViewProps>(function Ca
   );
 
   return (
-    <View style={[styles.container, style]}>
+    <View style={style} className="w-full h-full overflow-hidden">
       {hasPermission && device ? (
         <Camera
           ref={cameraRef}
@@ -282,15 +282,10 @@ const CameraView = forwardRef<CameraViewRef | null, CameraViewProps>(function Ca
           {...cameraProps}
         />
       ) : (
-        <View style={styles.placeholder} />
+        <View className='flex-1 bg-black' />
       )}
     </View>
   );
 });
 
 export default CameraView;
-
-const styles = StyleSheet.create({
-  container: { width: '100%', height: '100%', overflow: 'hidden' },
-  placeholder: { flex: 1, backgroundColor: '#000000' },
-});

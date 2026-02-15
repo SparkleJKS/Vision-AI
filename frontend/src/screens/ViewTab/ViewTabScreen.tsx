@@ -1,20 +1,9 @@
-import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View } from 'react-native';
 
 export function ViewTabScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>View</Text>
+    <View className='flex-1 items-center justify-center bg-white'>
+      <Text className='text-[1.25rem] text-[#1e293b]'>View</Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#ffffff',
-  },
-  text: { fontSize: 20, color: '#1e293b' },
-});

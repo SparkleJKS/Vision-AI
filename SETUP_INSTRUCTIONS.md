@@ -4,7 +4,7 @@ Complete setup guide for VisionAI: an assistive app for the visually impaired wi
 
 ## 🏗️ Architecture
 
-- **Frontend**: React Native with **Expo** (SDK 54), **TypeScript**, **NativeWind** (Tailwind CSS)
+- **Frontend**: React Native CLI, **TypeScript**, **NativeWind** (Tailwind CSS)
 - **Backend**: FastAPI (Python) in `backend/`
 - **Models**: ML models (to be added in `models/`)
 - **Database**: Optional (add PostgreSQL or SQLite if you store data)
@@ -16,7 +16,7 @@ Complete setup guide for VisionAI: an assistive app for the visually impaired wi
 - **Node.js** (v18 or higher) — [nodejs.org](https://nodejs.org/)
 - **npm** (comes with Node.js)
 - **Git**
-- **Expo Go** app on your phone (for mobile testing)
+- **Android Studio** or **Xcode** (for emulator/device builds)
 
 ### Optional
 
@@ -64,7 +64,7 @@ Use only lowercase letters, numbers, dots, underscores, and hyphens in the slug.
 
 ---
 
-## 3. Frontend setup (Expo / React Native)
+## 3. Frontend setup (React Native CLI)
 
 ### Install dependencies
 
@@ -98,15 +98,14 @@ npm start
 
 ```bash
 cd frontend
-npx expo start
+npm start
 ```
 
 ### Run the app
 
-- **Web**: In the Expo terminal press `w`, or open the URL shown (e.g. `http://localhost:8081`).
-- **Mobile**: Scan the QR code with Expo Go (same Wi‑Fi as your machine).
-- **Android emulator**: Press `a` in the terminal (requires Android Studio).
-- **iOS simulator** (macOS only): Press `i` in the terminal (requires Xcode).
+- **Android emulator**: Run `npm run android` (requires Android Studio).
+- **iOS simulator** (macOS only): Run `npm run ios` (requires Xcode).
+- **Physical device**: Run `npm run android:install-dev` for a dev build, then connect via USB and ensure USB debugging is enabled.
 
 ### Android native build (dev client / New Architecture)
 
@@ -116,9 +115,46 @@ The app uses React Native’s **New Architecture** and builds native code with *
 - **Patched header:** A patch is applied to React Native’s `graphicsConversions.h` (for NDK 26’s C++ stdlib). It is applied automatically when you run `npm install` in `frontend/` (via `patch-package`). The app’s Gradle/CMake setup copies this patched header and passes it to the native build so both the app and autolinked libraries use it.
 - **First native build:** From `frontend/` run `npm run android:install-dev` (or from `frontend/android`: `./gradlew installDevDebug` on macOS/Linux, `gradlew.bat installDevDebug` on Windows). The first build can take several minutes.
 
+#### Prebuild and `local.properties`
+
+The `prebuild` script runs `scripts/setup-local-properties.js` to create or update `android/local.properties` with the correct `sdk.dir`. Without this file you may see "SDK location not found" errors.
+
+**Solution:** Run the prebuild script from `frontend/`:
+
+```bash
+cd frontend
+npm run prebuild
+```
+
+This runs the **postprebuild** script (`scripts/setup-local-properties.js`) that creates `local.properties`. The script looks for the SDK in this order:
+
+1. `ANDROID_HOME` environment variable  
+2. `ANDROID_SDK_ROOT` environment variable  
+3. Default path (e.g. `%LOCALAPPDATA%\Android\Sdk` on Windows, `~/Android/Sdk` on macOS/Linux)
+
+**Optional:** Set `ANDROID_HOME` (or `ANDROID_SDK_ROOT`) so the script always finds your SDK:
+
+- **Windows:** `set ANDROID_HOME=%LOCALAPPDATA%\Android\Sdk` (or add it in System Environment Variables)
+- **macOS/Linux:** `export ANDROID_HOME=~/Android/Sdk` (or add to `~/.bashrc` / `~/.zshrc`)
+
+`local.properties` is gitignored because it contains machine-specific paths.
+
+#### Firebase (Crashlytics)
+
+The app uses **Firebase Crashlytics** for crash reporting. Crashlytics works only in **development builds** (not in Expo Go).
+
+**Setup:**
+
+1. Create a project at [Firebase Console](https://console.firebase.google.com/).
+2. Add an **Android app** with package name `com.anonymous.VisionAI` (or `com.anonymous.VisionAI.dev` for the dev flavor).
+3. Download `google-services.json` and place it in `frontend/` (project root).
+4. Build the app: `npm run android:install-dev`.
+
+**Note:** `google-services.json` is committed to the repo.
+
 ### Frontend tech stack
 
-- **Expo** SDK 54
+- **React Native CLI**
 - **TypeScript**
 - **NativeWind** (Tailwind for React Native) — use `className` on React Native components
 - **React Native Reanimated** & **Safe Area Context**
@@ -177,17 +213,20 @@ The `models/` folder is a placeholder for ML model files (e.g. TensorFlow, ONNX)
 - **Metro/NativeWind cache issues**  
   ```bash
   cd frontend
-  npx expo start -c
+  npm start -- --reset-cache
   ```
 
 - **Node version**  
   Use Node 18+ and ensure `node` and `npm` are on your PATH.
 
-- **Expo Go not connecting**  
-  Ensure phone and computer are on the same Wi‑Fi and that no firewall is blocking the dev server port.
+- **Dev server not connecting to device**  
+  Ensure phone/emulator and computer are on the same Wi‑Fi (for wireless debugging) or use USB debugging. Check that no firewall is blocking the Metro port (default 8081).
 
 - **Android native build: undefined C++ symbols or std::format / graphicsConversions errors**  
   The project is pinned to **NDK 26.1.10909125**. Install it in **Android Studio → SDK Manager → SDK Tools** → "Show Package Details" → **NDK** → **26.1.10909125** → Apply. Ensure patches are applied: from `frontend/` run `npm install` (this runs `patch-package` and applies the React Native header patch). Then from `frontend/android` run `gradlew.bat clean` (Windows) or `./gradlew clean`, and build again (e.g. `gradlew.bat installDevDebug` or `./gradlew installDevDebug`).
+
+- **SDK location not found / `local.properties` missing**  
+  Run `npm run prebuild` from `frontend/`; the postprebuild script recreates `local.properties` automatically. See [Prebuild and local.properties](#prebuild-and-localproperties) above.
 
 ### Backend
 
@@ -205,8 +244,7 @@ The `models/` folder is a placeholder for ML model files (e.g. TensorFlow, ONNX)
 ## 7. Production (future)
 
 - **Backend**: Use a production WSGI/ASGI server (e.g. Gunicorn), PostgreSQL, and env-based config.
-- **Frontend**: Use EAS Build or equivalent for production builds:  
-  `npx expo build:android` / `npx expo build:ios` (or EAS CLI).
+- **Frontend**: Use `npm run android:apk` for release APK, or configure Android Studio / Xcode for production builds.
 - **API**: Point the app to the production API URL via environment or config.
 
 ---
@@ -217,10 +255,10 @@ The `models/` folder is a placeholder for ML model files (e.g. TensorFlow, ONNX)
 |-------------------|------------------------------|
 | Install frontend  | `cd frontend && npm install`  |
 | Start app         | `npm start`                   |
-| Android (Expo Go) | `npm run android`             |
+| Android (dev build) | `npm run android`             |
 | Android dev build | `cd frontend && npm run android:install-dev` |
+| Prebuild (clean)  | `cd frontend && npm run prebuild -- --clean` |
 | iOS               | `npm run ios`                 |
-| Web               | `npm run web`                 |
 | Git hooks         | `git config core.hooksPath .githooks` |
 
 For more on the project and branching workflow, see [README.md](README.md).

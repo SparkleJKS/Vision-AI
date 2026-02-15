@@ -1,29 +1,27 @@
 {
   "name": "visionai-frontend",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "index.js",
   "scripts": {
     "type-check": "tsc --noEmit",
-    "start": "expo start",
-    "android": "expo run:android",
+    "start": "react-native start",
+    "android": "react-native run-android --mode=devDebug",
     "android:install-dev": "node scripts/install-dev-debug.js",
     "android:apk": "node scripts/assemble-dev-release.js",
-    "ios": "expo run:ios",
+    "ios": "react-native run-ios",
     "postinstall": "patch-package",
-    "web": "expo start --web"
+    "prebuild": "node scripts/setup-local-properties.js",
+    "postprebuild": "node scripts/setup-local-properties.js"
   },
   "dependencies": {
-    "@expo/vector-icons": "^15.0.3",
     "@lottiefiles/dotlottie-react": "^0.13.5",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-firebase/app": "^23.8.6",
+    "@react-native-firebase/crashlytics": "^23.8.6",
+    "@react-native-vector-icons/ionicons": "^12.3.0",
     "@react-navigation/bottom-tabs": "^7.12.0",
     "@react-navigation/native": "^7.1.28",
     "@react-navigation/native-stack": "^7.12.0",
-    "babel-preset-expo": "~54.0.10",
-    "expo": "~54.0.33",
-    "expo-build-properties": "~1.0.10",
-    "expo-camera": "~17.0.8",
-    "expo-status-bar": "~3.0.9",
     "lottie-react-native": "^7.3.5",
     "nativewind": "^4.2.1",
     "react": "19.1.0",
@@ -41,6 +39,10 @@
     "tailwindcss": "^3.4.17"
   },
   "devDependencies": {
+    "@react-native-community/cli": "^20.0.0",
+    "@react-native-community/cli-platform-android": "^20.0.0",
+    "@react-native/babel-preset": "^0.81.6",
+    "@react-native/metro-config": "^0.81.0",
     "@types/react": "~19.1.0",
     "patch-package": "^8.0.0",
     "typescript": "~5.9.2"

@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import type { DimensionValue } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useIsFocused } from '@react-navigation/native';
 
@@ -47,10 +47,10 @@ export function ExploreScreen() {
 
   const [facing, setFacing] = useState<'back' | 'front'>('back');
   const [selectedRuntime, setSelectedRuntime] = useState<ModelRuntime>('tflite');
-  const [confidenceThreshold, setConfidenceThreshold] = useState(DEFAULT_CONFIDENCE);
-  const [nmsEnabled, setNmsEnabled] = useState(true);
+  const [confidenceThreshold, setConfidenceThreshold] = useState<number>(DEFAULT_CONFIDENCE);
+  const [nmsEnabled, setNmsEnabled] = useState<boolean>(true);
   const [tfliteDelegate, setTfliteDelegate] = useState<TfliteDelegate>('gpu');
-  const [showDebugOverlay, setShowDebugOverlay] = useState(false);
+  const [showDebugOverlay, setShowDebugOverlay] = useState<boolean>(false);
   const [snapshotInfo, setSnapshotInfo] = useState<string | null>(null);
 
   const detection = useExploreDetection({
@@ -65,7 +65,9 @@ export function ExploreScreen() {
   const flashAnim = useRef(new Animated.Value(0)).current;
 
   const detectionEnabled = detection.isDetecting && isFocused;
+
   const statusColor = useMemo(() => getStatusColor(detection.runtimeStatus), [detection.runtimeStatus]);
+
   const statusText = useMemo(() => {
     if (detection.runtimeStatus === 'running') return `Live (${formatRuntime(detection.activeRuntime)})`;
     if (detection.runtimeStatus === 'loading') return 'Loading runtime';
@@ -73,7 +75,9 @@ export function ExploreScreen() {
     if (detection.runtimeStatus === 'error') return 'Runtime error';
     return 'Ready';
   }, [detection.activeRuntime, detection.runtimeStatus]);
+
   const fpsDisplay = useMemo(() => (detection.fps != null ? `${detection.fps.toFixed(1)} FPS` : '-- FPS'), [detection.fps]);
+
   const inferDisplay = useMemo(
     () =>
       detection.inferMs != null && Number.isFinite(detection.inferMs)
@@ -81,6 +85,7 @@ export function ExploreScreen() {
         : '-- ms',
     [detection.inferMs],
   );
+
   const metricsSummary = useMemo(
     () =>
       detection.preprocessMs != null && Number.isFinite(detection.preprocessMs)
@@ -122,6 +127,7 @@ export function ExploreScreen() {
     }),
     [pulseAnim, statusColor],
   );
+
   const panelAnimatedStyle = useMemo(
     () => ({
       opacity: panelAnim,
@@ -292,7 +298,7 @@ export function ExploreScreen() {
               </View>
             </View>
 
-            {showDebugOverlay ? (
+            {showDebugOverlay && (
               <View style={styles.debugOverlay} pointerEvents="none">
                 <Text style={styles.debugTitle}>Debug</Text>
                 <Text style={styles.debugText}>
@@ -318,7 +324,7 @@ export function ExploreScreen() {
                   ))}
                 </View>
               </View>
-            ) : null}
+            )}
 
             <Animated.View pointerEvents="none" style={[styles.snapshotFlash, { opacity: flashAnim }]} />
           </>
@@ -390,7 +396,7 @@ export function ExploreScreen() {
           </View>
         </View>
 
-        {selectedRuntime === 'tflite' ? (
+        {selectedRuntime === 'tflite' && (
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>TFLite Delegate</Text>
             <View style={styles.delegateRow}>
@@ -420,7 +426,7 @@ export function ExploreScreen() {
               ))}
             </View>
           </View>
-        ) : null}
+        )}
 
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Confidence Threshold</Text>
@@ -455,8 +461,8 @@ export function ExploreScreen() {
           </View>
         </View>
 
-        {detection.statusMessage ? <Text style={styles.errorText}>{detection.statusMessage}</Text> : null}
-        {snapshotInfo ? <Text style={styles.snapshotText}>{snapshotInfo}</Text> : null}
+        {detection.statusMessage && (<Text style={styles.errorText}>{detection.statusMessage}</Text>)}
+        {snapshotInfo && (<Text style={styles.snapshotText}>{snapshotInfo}</Text>)}
       </Animated.View>
     </View>
   );

@@ -1,4 +1,3 @@
-import React from 'react';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { Tabs } from './Tabs';
 import { colors } from '../../theme/colors';
