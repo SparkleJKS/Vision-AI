@@ -20,7 +20,9 @@ import java.nio.ByteOrder
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
+import java.util.Locale
 
 class YoloInferenceModule(
   reactContext: ReactApplicationContext
@@ -41,6 +43,11 @@ class YoloInferenceModule(
   private val interpreterLock = Any()
   private val latestDetectionsRef: AtomicReference<List<DecodedDetection>> =
     AtomicReference(emptyList())
+  private val latestMetricsRef: AtomicReference<PipelineMetrics> =
+    AtomicReference(PipelineMetrics())
+  private val skippedFramesDueCadence = AtomicLong(0L)
+  private val completedInferenceCount = AtomicLong(0L)
+  @Volatile private var firstInferenceCompletionTimeMs: Long = 0L
 
   @ReactMethod
   fun initializeModel(promise: Promise) {
@@ -95,12 +102,32 @@ class YoloInferenceModule(
     return result
   }
 
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  fun getLatestMetrics(): com.facebook.react.bridge.WritableMap {
+    val metrics = latestMetricsRef.get()
+    val result = Arguments.createMap()
+    result.putInt("preprocessMs", metrics.preprocessMs.toInt())
+    result.putInt("inferenceMs", metrics.inferenceMs.toInt())
+    result.putInt("decodeMs", metrics.decodeMs.toInt())
+    result.putInt("nmsMs", metrics.nmsMs.toInt())
+    result.putInt("totalMs", metrics.totalMs.toInt())
+    result.putInt("skippedFrames", skippedFramesDueCadence.get().toInt())
+    result.putDouble("effectiveFps", metrics.effectiveFps)
+    return result
+  }
+
   override fun invalidate() {
     synchronized(interpreterLock) {
       interpreter?.close()
       interpreter = null
     }
     latestDetectionsRef.set(emptyList())
+    latestMetricsRef.set(PipelineMetrics())
+    skippedFramesDueCadence.set(0L)
+    completedInferenceCount.set(0L)
+    firstInferenceCompletionTimeMs = 0L
+    lastInferenceTimeMs = 0L
+    inferenceInProgress.set(false)
     if (moduleInstance === this) moduleInstance = null
     super.invalidate()
   }
@@ -132,9 +159,19 @@ class YoloInferenceModule(
     val y2: Float
   )
 
+  private data class PipelineMetrics(
+    val preprocessMs: Long = 0L,
+    val inferenceMs: Long = 0L,
+    val decodeMs: Long = 0L,
+    val nmsMs: Long = 0L,
+    val totalMs: Long = 0L,
+    val effectiveFps: Double = 0.0
+  )
+
   private fun processFrame(frame: Frame, facing: CameraFacing) {
     val image = frame.image
     val rotation = orientationToRotationDegrees(frame.orientation)
+    val preprocessStartMs = SystemClock.elapsedRealtime()
 
     synchronized(preprocessLock) {
       if (loggedIngress.compareAndSet(false, true)) {
@@ -152,13 +189,15 @@ class YoloInferenceModule(
       }
     }
 
-    maybeRunInference()
+    val preprocessMs = SystemClock.elapsedRealtime() - preprocessStartMs
+    maybeRunInference(preprocessMs)
   }
 
-  private fun maybeRunInference() {
+  private fun maybeRunInference(preprocessMs: Long) {
     val nowMs = SystemClock.elapsedRealtime()
     val elapsedSinceLast = nowMs - lastInferenceTimeMs
     if (elapsedSinceLast < MIN_INFERENCE_INTERVAL_MS) {
+      skippedFramesDueCadence.incrementAndGet()
       Log.d(TAG, "Inference skipped (cadence): ${elapsedSinceLast}ms since last run")
       return
     }
@@ -171,6 +210,7 @@ class YoloInferenceModule(
       val guardedNowMs = SystemClock.elapsedRealtime()
       val guardedElapsedSinceLast = guardedNowMs - lastInferenceTimeMs
       if (guardedElapsedSinceLast < MIN_INFERENCE_INTERVAL_MS) {
+        skippedFramesDueCadence.incrementAndGet()
         Log.d(TAG, "Inference skipped (cadence): ${guardedElapsedSinceLast}ms since last run")
         return
       }
@@ -181,12 +221,12 @@ class YoloInferenceModule(
         return
       }
 
+      lastInferenceTimeMs = guardedNowMs
       Log.d(TAG, "Inference started")
+
       val inferenceStartMs = SystemClock.elapsedRealtime()
       localInterpreter.run(inputBuffer, outputBuffer)
-
       val inferenceDurationMs = SystemClock.elapsedRealtime() - inferenceStartMs
-      lastInferenceTimeMs = SystemClock.elapsedRealtime()
       Log.d(TAG, "Inference completed in ${inferenceDurationMs}ms")
 
       val x = outputBuffer[0][0][0]
@@ -199,14 +239,48 @@ class YoloInferenceModule(
       Log.d(TAG, "Inference run complete: output shape [1,84,8400]")
       Log.d(TAG, "Output sample: x=$x, y=$y, w=$w, h=$h, cls0=$cls0, cls1=$cls1")
 
+      val decodeStartMs = SystemClock.elapsedRealtime()
       val decodedDetections = decodeDetections(outputBuffer)
+      val decodeMs = SystemClock.elapsedRealtime() - decodeStartMs
       Log.d(TAG, "Decoded detections before NMS: ${decodedDetections.size}")
 
+      val nmsStartMs = SystemClock.elapsedRealtime()
       val nmsDetections = applyNms(decodedDetections, IOU_THRESHOLD, MAX_DETECTIONS)
+      val nmsMs = SystemClock.elapsedRealtime() - nmsStartMs
       latestDetectionsRef.set(nmsDetections)
 
       Log.d(TAG, "Detections after NMS: ${nmsDetections.size}")
       logTopDecodedDetections(nmsDetections)
+
+      val completionTimeMs = SystemClock.elapsedRealtime()
+      if (firstInferenceCompletionTimeMs == 0L) {
+        firstInferenceCompletionTimeMs = completionTimeMs
+      }
+      val completedCount = completedInferenceCount.incrementAndGet()
+      val elapsedForFps = (completionTimeMs - firstInferenceCompletionTimeMs).coerceAtLeast(1L)
+      val effectiveFpsRaw =
+        if (completedCount <= 1L) 0.0 else completedCount.toDouble() * 1000.0 / elapsedForFps.toDouble()
+      val effectiveFps = String.format(Locale.US, "%.1f", effectiveFpsRaw).toDouble()
+
+      val totalMs = preprocessMs + inferenceDurationMs + decodeMs + nmsMs
+      latestMetricsRef.set(
+        PipelineMetrics(
+          preprocessMs = preprocessMs,
+          inferenceMs = inferenceDurationMs,
+          decodeMs = decodeMs,
+          nmsMs = nmsMs,
+          totalMs = totalMs,
+          effectiveFps = effectiveFps
+        )
+      )
+
+      Log.d(TAG, "preprocess: ${preprocessMs}ms")
+      Log.d(TAG, "inference: ${inferenceDurationMs}ms")
+      Log.d(TAG, "decode: ${decodeMs}ms")
+      Log.d(TAG, "nms: ${nmsMs}ms")
+      Log.d(TAG, "total: ${totalMs}ms")
+      Log.d(TAG, "skipped frames: ${skippedFramesDueCadence.get()}")
+      Log.d(TAG, "effective fps: ${String.format(Locale.US, "%.1f", effectiveFps)}")
     } catch (e: Exception) {
       Log.e(TAG, "Inference run failed", e)
     } finally {
