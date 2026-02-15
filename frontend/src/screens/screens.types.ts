@@ -12,6 +12,12 @@ import type {
 } from '@react-navigation/native';
 import { ScreenNames } from '../configs/navigation';
 
+// ── Auth Stack Param List ────────────────────────────────────────────
+export type IAuthStackParamList = {
+  [ScreenNames.SignIn]: undefined;
+  [ScreenNames.SignUp]: undefined;
+};
+
 // ── Home Tab Param List ──────────────────────────────────────────────
 export type IHomeTabParamList = {
   [ScreenNames.Home]: undefined;

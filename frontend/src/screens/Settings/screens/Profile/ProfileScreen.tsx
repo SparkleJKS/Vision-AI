@@ -1,14 +1,18 @@
+import { useState } from 'react';
 import {
   Text,
   View,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { colors } from '../../../../theme';
 import { useBackHandler } from '../../../../navigators';
+import { useAuth } from '../../../../auth/AuthContext';
+import { logEvent } from '../../../../utils/logger';
 
 const PROFILE_OPTIONS = [
   {
@@ -28,16 +32,32 @@ const PROFILE_OPTIONS = [
   },
 ];
 
-const USER_NAME = 'Alex Johnson';
-const USER_STATUS = 'Vision Premium User';
-
 export function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
+  const { user, signOut, authAvailable } = useAuth();
+  const [isSigningOut, setIsSigningOut] = useState<boolean>(false);
+
+  const handleSignOut = async () => {
+    if (isSigningOut) return;
+    setIsSigningOut(true);
+    try {
+      await signOut();
+      logEvent('Profile:SignOutComplete');
+      // MainContainer switches to AuthStack (SignIn) when user becomes null
+    } catch (err) {
+      logEvent('Profile:SignOutError', { error: String(err) });
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
 
   useBackHandler({
     onBack: () => navigation.goBack(),
   });
+
+  const displayName = user?.displayName ?? user?.email?.split('@')[0] ?? 'Guest';
+  const displayInitial = displayName[0]?.toUpperCase() ?? '?';
 
   return (
     <View
@@ -62,10 +82,14 @@ export function ProfileScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View className="w-24 h-24 rounded-full bg-accent items-center justify-center my-6">
-          <Text className="text-black text-3xl font-bold">{USER_NAME[0]}</Text>
+          <Text className="text-black text-3xl font-bold">{displayInitial}</Text>
         </View>
-        <Text className="text-white text-2xl font-bold">{USER_NAME}</Text>
-        <Text className="text-grey text-sm mt-1">{USER_STATUS}</Text>
+        <Text className="text-white text-2xl font-bold">{displayName}</Text>
+        {user?.email ? (
+          <Text className="text-grey text-sm mt-1">{user.email}</Text>
+        ) : authAvailable ? null : (
+          <Text className="text-grey text-sm mt-1">Auth not available</Text>
+        )}
 
         <View className="w-full mt-8">
           {PROFILE_OPTIONS.map((item) => (
@@ -88,22 +112,32 @@ export function ProfileScreen() {
             </TouchableOpacity>
           ))}
 
-          <TouchableOpacity
-            className="bg-card rounded-2xl p-4 flex-row items-center border border-warning"
-            activeOpacity={0.8}
-          >
-            <View className="w-12 h-12 rounded-full bg-card-light items-center justify-center mr-4">
-              <Ionicons
-                name="log-out-outline"
-                size={24}
-                color={colors.warning}
-              />
-            </View>
-            <Text className="text-warning text-lg font-bold flex-1">
-              Sign Out
-            </Text>
-            <Ionicons name="chevron-forward" size={20} color={colors.warning} />
-          </TouchableOpacity>
+          {authAvailable && (
+            <TouchableOpacity
+              className="bg-card rounded-2xl p-4 flex-row items-center border border-warning"
+              activeOpacity={0.8}
+              onPress={handleSignOut}
+              disabled={isSigningOut}
+            >
+              <View className="w-12 h-12 rounded-full bg-card-light items-center justify-center mr-4">
+                {isSigningOut ? (
+                  <ActivityIndicator size="small" color={colors.warning} />
+                ) : (
+                  <Ionicons
+                    name="log-out-outline"
+                    size={24}
+                    color={colors.warning}
+                  />
+                )}
+              </View>
+              <Text className="text-warning text-lg font-bold flex-1">
+                {isSigningOut ? 'Signing out...' : 'Sign Out'}
+              </Text>
+              {!isSigningOut && (
+                <Ionicons name="chevron-forward" size={20} color={colors.warning} />
+              )}
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
     </View>

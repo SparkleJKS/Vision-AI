@@ -1,0 +1,47 @@
+---
+description: Add logging for new features - app events, API calls, user actions
+globs: frontend/src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Logging for New Features
+
+When implementing new features, add logging so activity shows up in Reactotron.
+
+## Logger Location
+
+```ts
+import { logEvent, logApi, log, logApp } from '../utils/logger';
+// or
+import { logEvent, logApi, log } from '../../utils/logger';
+```
+
+## When to Log
+
+| Scenario | Use | Example |
+|----------|-----|---------|
+| User clicks / taps | `logEvent` | `logEvent('Screen:ButtonClicked', { button: 'submit' })` |
+| API request/response | `logApi` | `logApi('request', endpoint, { method })` |
+| API error | `logApi` | `logApi('error', endpoint, { status, detail })` |
+| Screen focus / navigation | `logEvent` | `logEvent('Navigation:ScreenFocus', { screen })` |
+| App lifecycle | `logApp` | `logApp('ready', { feature: 'xyz' })` |
+| General debug | `log` / `info` / `debug` | `log('Feature', 'message', data)` |
+
+## Examples
+
+```ts
+// New API service
+logApi('request', '/v1/new-endpoint', { method: 'POST' });
+// ... fetch ...
+logApi('response', '/v1/new-endpoint', { status, duration });
+
+// New screen / user action
+logEvent('NewFeature:ActionTaken', { param: value });
+
+// New auth flow
+logEvent('Auth:NewFlowStarted');
+logEvent('Auth:NewFlowSuccess');
+logEvent('Auth:NewFlowError', { error });
+```
+
+Logging is dev-only (no-op in production). Add it for key user flows, API calls, and errors.

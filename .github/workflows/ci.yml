@@ -6,6 +6,7 @@ on:
     branches: [main, development]
   pull_request:
     branches: [main, development]
+  workflow_dispatch:  # Manual trigger from Actions tab
 
 jobs:
   backend:
@@ -63,6 +64,11 @@ jobs:
   android-build:
     name: Android APK Build
     runs-on: ubuntu-latest
+    # Run sparingly: only on main (push/PR) or when manually triggered
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.ref == 'refs/heads/main' ||
+      (github.event_name == 'pull_request' && github.base_ref == 'main')
     defaults:
       run:
         working-directory: frontend

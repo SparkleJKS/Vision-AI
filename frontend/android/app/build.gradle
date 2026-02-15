@@ -1,5 +1,8 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
+// react-native-config: point to .env in project root (where package.json lives)
+project.ext.defaultEnvFile = "${rootProject.projectDir.parent}/.env"
+apply from: "${rootProject.projectDir.parent}/node_modules/react-native-config/android/dotenv.gradle"
 apply plugin: "com.facebook.react"
 apply plugin: "com.google.gms.google-services"
 
@@ -110,6 +113,8 @@ android {
         versionName "1.0.0"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
+        // react-native-config: BuildConfig lives in namespace package, not applicationId
+        resValue "string", "build_config_package", "com.anonymous.VisionAI"
     }
     // Add patched header dir in same phase as React plugin (finalizeDsl) so CMake receives it
     project.pluginManager.withPlugin("com.android.application") {
