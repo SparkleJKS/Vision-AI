@@ -1,10 +1,14 @@
 package com.anonymous.VisionAI.yolo
 
 import android.media.Image
+import android.os.SystemClock
 import android.util.Log
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.WritableArray
 import com.mrousavy.camera.core.types.Orientation
 import com.mrousavy.camera.frameprocessors.Frame
 import com.mrousavy.camera.frameprocessors.FrameProcessorPlugin
@@ -16,6 +20,7 @@ import java.nio.ByteOrder
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 
 class YoloInferenceModule(
   reactContext: ReactApplicationContext
@@ -34,9 +39,11 @@ class YoloInferenceModule(
 
   @Volatile private var interpreter: Interpreter? = null
   private val interpreterLock = Any()
+  private val latestDetectionsRef: AtomicReference<List<DecodedDetection>> =
+    AtomicReference(emptyList())
 
   @ReactMethod
-  fun initializeModel(promise: com.facebook.react.bridge.Promise) {
+  fun initializeModel(promise: Promise) {
     if (interpreter != null) {
       promise.resolve("already_initialized")
       return
@@ -69,11 +76,31 @@ class YoloInferenceModule(
   @ReactMethod fun startDetection() {}
   @ReactMethod fun stopDetection() {}
 
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  fun getLatestDetections(): WritableArray {
+    val result = Arguments.createArray()
+    val snapshot = latestDetectionsRef.get()
+
+    for (detection in snapshot) {
+      val item = Arguments.createMap()
+      item.putInt("classId", detection.classIndex)
+      item.putDouble("confidence", detection.confidence.toDouble())
+      item.putDouble("x1", detection.x1.toDouble())
+      item.putDouble("y1", detection.y1.toDouble())
+      item.putDouble("x2", detection.x2.toDouble())
+      item.putDouble("y2", detection.y2.toDouble())
+      result.pushMap(item)
+    }
+
+    return result
+  }
+
   override fun invalidate() {
     synchronized(interpreterLock) {
       interpreter?.close()
       interpreter = null
     }
+    latestDetectionsRef.set(emptyList())
     if (moduleInstance === this) moduleInstance = null
     super.invalidate()
   }
@@ -85,7 +112,8 @@ class YoloInferenceModule(
   private val preprocessLock = Any()
   private val loggedIngress = AtomicBoolean(false)
   private val loggedPreprocess = AtomicBoolean(false)
-  private val ranOneShotInference = AtomicBoolean(false)
+  private val inferenceInProgress = AtomicBoolean(false)
+  @Volatile private var lastInferenceTimeMs: Long = 0L
 
   private val inputBuffer: ByteBuffer =
     ByteBuffer.allocateDirect(
@@ -124,23 +152,42 @@ class YoloInferenceModule(
       }
     }
 
-    runOneShotInference()
+    maybeRunInference()
   }
 
-  private fun runOneShotInference() {
-    if (!ranOneShotInference.compareAndSet(false, true)) return
-
-    val localInterpreter = synchronized(interpreterLock) { interpreter }
-    if (localInterpreter == null) {
-      ranOneShotInference.set(false)
-      Log.d(TAG, "Skipping inference: interpreter is not initialized")
+  private fun maybeRunInference() {
+    val nowMs = SystemClock.elapsedRealtime()
+    val elapsedSinceLast = nowMs - lastInferenceTimeMs
+    if (elapsedSinceLast < MIN_INFERENCE_INTERVAL_MS) {
+      Log.d(TAG, "Inference skipped (cadence): ${elapsedSinceLast}ms since last run")
       return
     }
 
-    inputBuffer.rewind()
+    if (!inferenceInProgress.compareAndSet(false, true)) {
+      return
+    }
 
     try {
+      val guardedNowMs = SystemClock.elapsedRealtime()
+      val guardedElapsedSinceLast = guardedNowMs - lastInferenceTimeMs
+      if (guardedElapsedSinceLast < MIN_INFERENCE_INTERVAL_MS) {
+        Log.d(TAG, "Inference skipped (cadence): ${guardedElapsedSinceLast}ms since last run")
+        return
+      }
+
+      val localInterpreter = synchronized(interpreterLock) { interpreter }
+      if (localInterpreter == null) {
+        Log.d(TAG, "Skipping inference: interpreter is not initialized")
+        return
+      }
+
+      Log.d(TAG, "Inference started")
+      val inferenceStartMs = SystemClock.elapsedRealtime()
       localInterpreter.run(inputBuffer, outputBuffer)
+
+      val inferenceDurationMs = SystemClock.elapsedRealtime() - inferenceStartMs
+      lastInferenceTimeMs = SystemClock.elapsedRealtime()
+      Log.d(TAG, "Inference completed in ${inferenceDurationMs}ms")
 
       val x = outputBuffer[0][0][0]
       val y = outputBuffer[0][1][0]
@@ -151,10 +198,19 @@ class YoloInferenceModule(
 
       Log.d(TAG, "Inference run complete: output shape [1,84,8400]")
       Log.d(TAG, "Output sample: x=$x, y=$y, w=$w, h=$h, cls0=$cls0, cls1=$cls1")
-      logTopDecodedDetections(decodeDetections(outputBuffer))
+
+      val decodedDetections = decodeDetections(outputBuffer)
+      Log.d(TAG, "Decoded detections before NMS: ${decodedDetections.size}")
+
+      val nmsDetections = applyNms(decodedDetections, IOU_THRESHOLD, MAX_DETECTIONS)
+      latestDetectionsRef.set(nmsDetections)
+
+      Log.d(TAG, "Detections after NMS: ${nmsDetections.size}")
+      logTopDecodedDetections(nmsDetections)
     } catch (e: Exception) {
-      ranOneShotInference.set(false)
       Log.e(TAG, "Inference run failed", e)
+    } finally {
+      inferenceInProgress.set(false)
     }
   }
 
@@ -216,6 +272,55 @@ class YoloInferenceModule(
           "box=[x1=${d.x1.toInt()},y1=${d.y1.toInt()},x2=${d.x2.toInt()},y2=${d.y2.toInt()}]"
       )
     }
+  }
+
+  private fun applyNms(
+    detections: List<DecodedDetection>,
+    iouThreshold: Float,
+    maxDetections: Int
+  ): List<DecodedDetection> {
+    if (detections.isEmpty()) return emptyList()
+
+    val sorted = detections.sortedByDescending { it.confidence }
+    val selected = ArrayList<DecodedDetection>(minOf(maxDetections, sorted.size))
+    val suppressed = BooleanArray(sorted.size)
+
+    for (i in sorted.indices) {
+      if (suppressed[i]) continue
+
+      val candidate = sorted[i]
+      selected.add(candidate)
+      if (selected.size >= maxDetections) break
+
+      for (j in i + 1 until sorted.size) {
+        if (suppressed[j]) continue
+        if (computeIoU(candidate, sorted[j]) > iouThreshold) {
+          suppressed[j] = true
+        }
+      }
+    }
+
+    return selected
+  }
+
+  private fun computeIoU(a: DecodedDetection, b: DecodedDetection): Float {
+    val interLeft = maxOf(a.x1, b.x1)
+    val interTop = maxOf(a.y1, b.y1)
+    val interRight = minOf(a.x2, b.x2)
+    val interBottom = minOf(a.y2, b.y2)
+
+    val interWidth = maxOf(0f, interRight - interLeft)
+    val interHeight = maxOf(0f, interBottom - interTop)
+    val intersection = interWidth * interHeight
+
+    if (intersection <= 0f) return 0f
+
+    val areaA = maxOf(0f, a.x2 - a.x1) * maxOf(0f, a.y2 - a.y1)
+    val areaB = maxOf(0f, b.x2 - b.x1) * maxOf(0f, b.y2 - b.y1)
+    val union = areaA + areaB - intersection
+
+    if (union <= 0f) return 0f
+    return intersection / union
   }
 
   private fun preprocessYuv(
@@ -340,6 +445,10 @@ class YoloInferenceModule(
     private const val MODEL_OUTPUT_CHANNELS = 84
     private const val MODEL_OUTPUT_BOXES = 8400
     private const val MIN_CONFIDENCE = 0.25f
+    private const val IOU_THRESHOLD = 0.45f
+    private const val MAX_DETECTIONS = 10
+    private const val TARGET_MAX_FPS = 5
+    private const val MIN_INFERENCE_INTERVAL_MS = 1000L / TARGET_MAX_FPS
     private const val MAX_LOGGED_DETECTIONS = 5
     private const val INV_255 = 1f / 255f
 

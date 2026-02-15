@@ -28,16 +28,30 @@ export interface UseExploreDetectionOptions {
   nmsEnabled: boolean;
 }
 
+type NativeYoloDetection = {
+  classId: number;
+  confidence: number;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+};
+
+type NativeYoloModule = {
+  initializeModel?: () => Promise<string>;
+  getLatestDetections?: () => NativeYoloDetection[];
+};
+
 export function useExploreDetection({
   isFocused,
   selectedRuntime,
   tfliteDelegate,
   nmsEnabled,
 }: UseExploreDetectionOptions) {
+  const nativeYoloModule = NativeModules?.YoloInferenceModule as NativeYoloModule | undefined;
   const hasNativeAndroidYoloModule =
     Platform.OS === 'android' &&
-    typeof (NativeModules?.YoloInferenceModule as { initializeModel?: unknown } | undefined)
-      ?.initializeModel === 'function';
+    typeof nativeYoloModule?.initializeModel === 'function';
 
   const lastFrameAtRef = useRef<number | null>(null);
 
@@ -174,6 +188,26 @@ export function useExploreDetection({
     },
     [applyRuntimePreference, hasNativeAndroidYoloModule],
   );
+
+  useEffect(() => {
+    if (!isDetecting || !hasNativeAndroidYoloModule) return;
+    if (typeof nativeYoloModule?.getLatestDetections !== 'function') return;
+
+    const pullLatestDetections = () => {
+      try {
+        const detections = nativeYoloModule.getLatestDetections?.();
+        if (Array.isArray(detections) && detections.length > 0) {
+          console.log('[Explore] Latest detections:', detections);
+        }
+      } catch (error) {
+        console.warn('[Explore] Failed to pull latest detections:', formatError(error));
+      }
+    };
+
+    pullLatestDetections();
+    const intervalId = setInterval(pullLatestDetections, 500);
+    return () => clearInterval(intervalId);
+  }, [hasNativeAndroidYoloModule, isDetecting, nativeYoloModule]);
 
   const latencyBars = useMemo(() => {
     if (latencyHistory.length === 0) return [];
