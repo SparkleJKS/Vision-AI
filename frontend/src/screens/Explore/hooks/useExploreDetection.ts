@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Easing } from 'react-native';
+import { Animated, Easing, NativeModules, Platform } from 'react-native';
 import modelManager from '../../../lib/modelManager';
 import { formatError } from '../utils';
 import type {
@@ -34,6 +34,11 @@ export function useExploreDetection({
   tfliteDelegate,
   nmsEnabled,
 }: UseExploreDetectionOptions) {
+  const hasNativeAndroidYoloModule =
+    Platform.OS === 'android' &&
+    typeof (NativeModules?.YoloInferenceModule as { initializeModel?: unknown } | undefined)
+      ?.initializeModel === 'function';
+
   const lastFrameAtRef = useRef<number | null>(null);
 
   const [isDetecting, setIsDetecting] = useState(false);
@@ -159,9 +164,15 @@ export function useExploreDetection({
       setCurrentStride(1);
       setTotalMs(null);
       const ok = await applyRuntimePreference(runtime);
-      if (ok) setIsDetecting(true);
+      if (ok || hasNativeAndroidYoloModule) {
+        setIsDetecting(true);
+      }
+      if (!ok && hasNativeAndroidYoloModule) {
+        setRuntimeStatus('fallback');
+        setStatusMessage('Using Android native YOLO frame-processor fallback.');
+      }
     },
-    [applyRuntimePreference],
+    [applyRuntimePreference, hasNativeAndroidYoloModule],
   );
 
   const latencyBars = useMemo(() => {

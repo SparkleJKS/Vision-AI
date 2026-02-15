@@ -56,11 +56,22 @@ export function CameraView({
   const plugin = useMemo(
     () => {
       if (!pluginBootstrapped) return null
-      return VisionCameraProxy.initFrameProcessorPlugin('yoloFramePreprocess', {
-        facing: cameraFacing,
-      })
+      try {
+        const initializedPlugin = VisionCameraProxy.initFrameProcessorPlugin('yoloFramePreprocess', {
+          facing: cameraFacing,
+        })
+        if (initializedPlugin == null && Platform.OS === 'android') {
+          console.warn('[CameraView] yoloFramePreprocess plugin is not registered on Android')
+        }
+        return initializedPlugin
+      } catch (error) {
+        if (Platform.OS === 'android') {
+          console.warn('[CameraView] failed to initialize yoloFramePreprocess plugin', error)
+        }
+        return null
+      }
     },
-    [cameraFacing, pluginBootstrapped],
+    [cameraFacing, enabled, pluginBootstrapped],
   )
 
   const frameProcessor = useFrameProcessor(
