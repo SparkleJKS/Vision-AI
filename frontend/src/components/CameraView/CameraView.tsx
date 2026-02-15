@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react'
-import { StyleSheet } from 'react-native'
+import React, { useEffect, useMemo, useState } from 'react'
+import { NativeModules, Platform, StyleSheet } from 'react-native'
 import {
   Camera,
   VisionCameraProxy,
@@ -20,25 +20,53 @@ export function CameraView({
   const active = isActive ?? false
   const enabled = detectionEnabled ?? false
   const cameraFacing = facing ?? 'back'
+  const [pluginBootstrapped, setPluginBootstrapped] = useState(Platform.OS !== 'android')
   const inferenceFps = typeof maxInferenceFps === 'number' && Number.isFinite(maxInferenceFps)
     ? Math.max(1, Math.trunc(maxInferenceFps))
     : 8
 
   const device = useCameraDevice(cameraFacing)
 
+  useEffect(() => {
+    if (Platform.OS !== 'android') return
+
+    let cancelled = false
+    const yoloModule = NativeModules?.YoloInferenceModule as
+      | { initializeModel?: () => Promise<unknown> | unknown }
+      | undefined
+
+    const bootstrap = async () => {
+      try {
+        if (typeof yoloModule?.initializeModel === 'function') {
+          await yoloModule.initializeModel()
+        }
+      } catch {
+        // Keep bootstrapping even if model init fails so plugin registration still proceeds.
+      } finally {
+        if (!cancelled) setPluginBootstrapped(true)
+      }
+    }
+
+    void bootstrap()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   const plugin = useMemo(
-    () =>
-      VisionCameraProxy.initFrameProcessorPlugin('yoloFramePreprocess', {
+    () => {
+      if (!pluginBootstrapped) return null
+      return VisionCameraProxy.initFrameProcessorPlugin('yoloFramePreprocess', {
         facing: cameraFacing,
-      }),
-    [cameraFacing],
+      })
+    },
+    [cameraFacing, pluginBootstrapped],
   )
 
   const frameProcessor = useFrameProcessor(
     (frame: Frame) => {
       'worklet'
-      // if (!enabled || plugin == null) return
-      if (plugin == null) return
+      if (!enabled || plugin == null) return
       runAtTargetFps(inferenceFps, () => {
         'worklet'
         plugin.call(frame)

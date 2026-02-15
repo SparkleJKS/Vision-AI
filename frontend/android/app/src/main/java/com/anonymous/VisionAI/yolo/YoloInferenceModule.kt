@@ -92,9 +92,6 @@ class YoloInferenceModule(
     ).order(ByteOrder.nativeOrder())
 
   private fun processFrame(frame: Frame, facing: CameraFacing) {
-    // 🔴 REQUIRED GUARD
-    if (interpreter == null) return
-
     val image = frame.image
     val rotation = orientationToRotationDegrees(frame.orientation)
 
