@@ -81,7 +81,6 @@ Or run frontend commands from root (no need to `cd frontend` for install if you 
 npm start          # same as: cd frontend && npm start
 npm run android
 npm run ios
-npm run web
 ```
 
 First time you should run `npm install` inside `frontend/` so `node_modules` is created there.
@@ -167,16 +166,38 @@ The app uses **Firebase Auth** with email/password and Google Sign-In.
 - Firebase Console → Project Settings → **Your apps** → select your Android app
 - Under "SDK setup and configuration", if you have a **Web app** in the project, copy its **Web client ID** (format: `XXXXX-xxx.apps.googleusercontent.com`)
 - If you don't have a Web app: **Add app** → **Web** → register, then copy the Web client ID
-- Create `frontend/.env` (or set `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` in your environment):
+- Copy `frontend/.env.example` to `frontend/.env` and add:
   ```
-  EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=YOUR_WEB_CLIENT_ID_HERE
+  GOOGLE_WEB_CLIENT_ID=YOUR_WEB_CLIENT_ID_HERE
   ```
 - Rebuild the app after adding the env var
 
-**3. Add both package names to Firebase:**
+**3. Debug SHA-1 for Google Sign-In:** If you get `DEVELOPER_ERROR`, add your debug SHA-1 to Firebase. See [frontend/docs/GOOGLE_SIGNIN_SETUP.md](frontend/docs/GOOGLE_SIGNIN_SETUP.md).
+
+**4. Add both package names to Firebase:**
 
 - Add Android apps for both `com.anonymous.VisionAI` and `com.anonymous.VisionAI.dev` (dev flavor)
 - The `google-services.json` should include clients for both (see Firebase Crashlytics section)
+
+#### Release APK (shareable build)
+
+To build a release APK for distribution (real devices only, arm64):
+
+```bash
+cd frontend
+npm run android:apk
+```
+
+Output: `frontend/android/app/build/outputs/apk/dev/release/app-dev-release.apk`. The script builds for **arm64 only** to reduce size (~15–25 MB). For emulator testing, use `npm run android:install-dev` (includes x86).
+
+### Frontend environment variables
+
+Create `frontend/.env` from `frontend/.env.example`. Required for Google Sign-In:
+
+| Variable | Description |
+|----------|-------------|
+| `GOOGLE_WEB_CLIENT_ID` | Web client ID from Firebase (format: `XXXXX-xxx.apps.googleusercontent.com`) |
+| `API_URL` | (Optional) Backend API URL. Default: `http://10.0.2.2:8000` (Android emulator) or `http://127.0.0.1:8000` (iOS) |
 
 ### Frontend tech stack
 
@@ -249,7 +270,7 @@ The `models/` folder is a placeholder for ML model files (e.g. TensorFlow, ONNX)
   Ensure phone/emulator and computer are on the same Wi‑Fi (for wireless debugging) or use USB debugging. Check that no firewall is blocking the Metro port (default 8081).
 
 - **Android native build: undefined C++ symbols or std::format / graphicsConversions errors**  
-  The project is pinned to **NDK 26.1.10909125**. Install it in **Android Studio → SDK Manager → SDK Tools** → "Show Package Details" → **NDK** → **26.1.10909125** → Apply. Ensure patches are applied: from `frontend/` run `npm install` (this runs `patch-package` and applies the React Native header patch). Then from `frontend/android` run `gradlew.bat clean` (Windows) or `./gradlew clean`, and build again (e.g. `gradlew.bat installDevDebug` or `./gradlew installDevDebug`).
+  The project is pinned to **NDK 26.1.10909125**. Install it in **Android Studio → SDK Manager → SDK Tools** → "Show Package Details" → **NDK** → **26.1.10909125** → Apply. Ensure patches are applied: from `frontend/` run `npm install` (this runs `patch-package` and applies the React Native header patch). Then build again (e.g. `gradlew.bat installDevDebug` or `./gradlew installDevDebug`). Avoid `gradlew clean` before build unless necessary—it can cause longer rebuilds.
 
 - **SDK location not found / `local.properties` missing**  
   Run `npm run prebuild` from `frontend/`; the postprebuild script recreates `local.properties` automatically. See [Prebuild and local.properties](#prebuild-and-localproperties) above.
@@ -270,8 +291,8 @@ The `models/` folder is a placeholder for ML model files (e.g. TensorFlow, ONNX)
 ## 7. Production (future)
 
 - **Backend**: Use a production WSGI/ASGI server (e.g. Gunicorn), PostgreSQL, and env-based config.
-- **Frontend**: Use `npm run android:apk` for release APK, or configure Android Studio / Xcode for production builds.
-- **API**: Point the app to the production API URL via environment or config.
+- **Frontend**: Use `npm run android:apk` from `frontend/` for release APK. Output: `android/app/build/outputs/apk/dev/release/app-dev-release.apk`.
+- **API**: Set `API_URL` in `frontend/.env` to point the app to the production API (e.g. `https://api.example.com`).
 
 ---
 
@@ -280,10 +301,11 @@ The `models/` folder is a placeholder for ML model files (e.g. TensorFlow, ONNX)
 | Task              | Command (from repo root)     |
 |-------------------|------------------------------|
 | Install frontend  | `cd frontend && npm install`  |
-| Start app         | `npm start`                   |
-| Android (dev build) | `npm run android`             |
-| Android dev build | `cd frontend && npm run android:install-dev` |
-| Prebuild (clean)  | `cd frontend && npm run prebuild -- --clean` |
+| Start Metro       | `npm start`                   |
+| Android (dev)     | `npm run android`             |
+| Android install dev | `npm run android:install-dev` (from root) |
+| Android release APK | `npm run android:apk` (from root) |
+| Prebuild          | `cd frontend && npm run prebuild` |
 | iOS               | `npm run ios`                 |
 | Git hooks         | `git config core.hooksPath .githooks` |
 

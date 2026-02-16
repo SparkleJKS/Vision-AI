@@ -6,6 +6,8 @@
   "scripts": {
     "start": "npm run start --prefix frontend",
     "android": "npm run android --prefix frontend",
+    "android:install-dev": "npm run android:install-dev --prefix frontend",
+    "android:apk": "npm run android:apk --prefix frontend",
     "ios": "npm run ios --prefix frontend",
     "frontend": "npm run start --prefix frontend"
   }

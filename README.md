@@ -4,12 +4,11 @@ A prototype application that helps blind and visually impaired individuals by pr
 
 ## Features
 
-- Real-time camera object detection (planned)
-- Offline ML model processing (planned)
-- Text-to-speech audio feedback (planned)
+- **Real-time camera object detection** — on-device (TFLite/ONNX) or server fallback
+- **Firebase Auth** — email/password and Google Sign-In
 - **React Native CLI** mobile app with **TypeScript** and **Tailwind (NativeWind)**
-- **FastAPI** backend API (Python)
-- **ML models** in a dedicated `models/` folder (planned)
+- **FastAPI** backend API (Python) — `POST /v1/detect` for server-side inference
+- **Reactotron** — dev logging and debugging
 
 ## Project Structure
 
@@ -58,11 +57,22 @@ npm start
 To build and install the **dev debug** app on a connected Android device or emulator:
 
 ```bash
-cd frontend
 npm run android:install-dev
 ```
 
+(From repo root; or `cd frontend && npm run android:install-dev`)
+
 Or from the Android project directory: `cd frontend/android` then `./gradlew installDevDebug` (macOS/Linux) or `gradlew.bat installDevDebug` (Windows). That builds and installs the dev variant (app id: `com.anonymous.VisionAI.dev`). If the build fails with "SDK location not found", run `npm run prebuild` from `frontend/`—the postprebuild script recreates `local.properties` automatically. See [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md#prebuild-and-localproperties) for details.
+
+### Android release APK (shareable build)
+
+To build a **release APK** for real devices (arm64 only, smaller size):
+
+```bash
+npm run android:apk
+```
+
+(From repo root; or `cd frontend && npm run android:apk`). Output: `frontend/android/app/build/outputs/apk/dev/release/app-dev-release.apk`. Use `android:install-dev` for emulator (includes x86).
 
 **NDK:** The project is pinned to **NDK 26.1.10909125**. Install it via **Android Studio -> SDK Manager -> SDK Tools** -> "Show Package Details" -> **NDK** -> **26.1.10909125** -> Apply. If only NDK 27 is installed, the native build can fail with undefined C++ symbol errors. A patched React Native header (`graphicsConversions.h`) is applied automatically (via `patch-package` and the app's Gradle/CMake setup) for NDK 26 compatibility.
 
