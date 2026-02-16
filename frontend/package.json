@@ -5,6 +5,7 @@
   "scripts": {
     "type-check": "tsc --noEmit",
     "start": "react-native start",
+    "start:reset": "react-native start --reset-cache",
     "android": "react-native run-android --mode=devDebug",
     "android:install-dev": "node scripts/install-dev-debug.js",
     "android:apk": "node scripts/assemble-dev-release.js",
