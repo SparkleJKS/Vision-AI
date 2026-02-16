@@ -5,8 +5,11 @@ const androidDir = path.join(__dirname, '..', 'android');
 const isWin = process.platform === 'win32';
 const gradlew = isWin ? 'gradlew.bat' : './gradlew';
 
-console.log('Building dev release APK (assembleDevRelease)...\n');
-execSync(`${gradlew} assembleDevRelease`, {
+// arm64 only - covers most phones (2017+). Saves ~15MB vs armeabi-v7a+arm64
+const architectures = 'arm64-v8a';
+
+console.log('Building dev release APK (assembleDevRelease) for real devices only...\n');
+execSync(`${gradlew} assembleDevRelease -PreactNativeArchitectures=${architectures}`, {
   cwd: androidDir,
   stdio: 'inherit',
 });
