@@ -1,13 +1,13 @@
-import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { Component, type ErrorInfo, type ReactNode } from "react";
 import {
   ActivityIndicator,
   useWindowDimensions,
   View,
   Text,
-  StyleSheet,
-} from 'react-native';
-import { Lottie } from '../../animations/components';
-import { AppInit } from '../../animations/assets';
+} from "react-native";
+import { Lottie } from "../../animations/components";
+import { AppInit } from "../../animations/assets";
+import tokens from "../../theme/tokens";
 
 type Props = { children: ReactNode };
 
@@ -17,7 +17,7 @@ class SplashErrorBoundary extends Component<Props, { hasError: boolean }> {
   static getDerivedStateFromError = () => ({ hasError: true });
 
   componentDidCatch(error: Error, _info: ErrorInfo) {
-    if (__DEV__) console.warn('[Splash] Lottie failed:', error?.message);
+    if (__DEV__) console.warn("[Splash] Lottie failed:", error?.message);
   }
 
   render() {
@@ -29,9 +29,16 @@ class SplashErrorBoundary extends Component<Props, { hasError: boolean }> {
 function FallbackSplash() {
   const { width, height } = useWindowDimensions();
   return (
-    <View style={[styles.container, { width, height }]}>
-      <Text style={styles.title}>VisionAI</Text>
-      <ActivityIndicator size="large" color="#2563eb" style={styles.spinner} />
+    <View
+      className={`justify-center items-center bg-${tokens.screenBg}`}
+      style={{ width, height }}
+    >
+      <Text className="mb-6 font-semibold text-3xl text-white">VisionAI</Text>
+      <ActivityIndicator
+        size="large"
+        color={tokens.accentYellow}
+        className="mt-2"
+      />
     </View>
   );
 }
@@ -41,7 +48,10 @@ export function Splash() {
 
   return (
     <SplashErrorBoundary>
-      <View style={[styles.container, { width, height }]}>
+      <View
+        className={`justify-center items-center bg-${tokens.screenBg}`}
+        style={{ width, height }}
+      >
         <Lottie
           source={AppInit}
           width={width}
@@ -54,20 +64,3 @@ export function Splash() {
     </SplashErrorBoundary>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#0f172a',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '600',
-    color: '#f8fafc',
-    marginBottom: 24,
-  },
-  spinner: {
-    marginTop: 8,
-  },
-});
