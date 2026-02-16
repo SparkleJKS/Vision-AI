@@ -1,6 +1,16 @@
-# VisionAI - Assistive Technology for the Visually Impaired
+<p align="center">
+  <img src="frontend/assets/icon-readme.png" alt="VisionAI Logo" width="128" />
+</p>
 
-A prototype application that helps blind and visually impaired individuals by providing real-time object descriptions through camera input and text-to-speech output.
+<h1 align="center">VisionAI</h1>
+<p align="center"><strong>Assistive Technology for the Visually Impaired</strong></p>
+
+<p align="center">
+  A prototype application that helps blind and visually impaired individuals by providing<br/>
+  real-time object descriptions through camera input and text-to-speech output.
+</p>
+
+---
 
 ## Features
 
