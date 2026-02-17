@@ -9,7 +9,7 @@ import { navigationRef } from '@/navigators';
 import { colors } from '@/theme/colors';
 import { logEvent } from '@/utils/logger';
 
-const SPLASH_DURATION_MS = 11_000;
+const SPLASH_DURATION_MS = 6_300;
 
 const darkTheme = {
   ...DefaultTheme,
