@@ -71,8 +71,8 @@ models/**
 # typescript
 *.tsbuildinfo
 
-# generated native folders
-**/ios
+# generated native folders (ios is committed for RN CLI; run pod install on Mac)
+# **/ios
 # **/android
 **/node_modules
 
