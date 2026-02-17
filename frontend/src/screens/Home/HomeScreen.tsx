@@ -5,15 +5,14 @@ import {
   TouchableOpacity,
   useWindowDimensions,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import type { IHomeTabParamList } from '../screens.types';
+import { useDispatch } from 'react-redux';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors } from '../../theme/colors';
-import { useBackHandler } from '../../navigators';
-import { useAuth } from '../../auth/AuthContext';
-import { ScreenNames } from '../../configs/navigation';
+import { colors } from '@/theme/colors';
+import { useBackHandler } from '@/navigators';
+import { useAuth } from '@/auth/AuthContext';
+import { navigationActions } from '@/store/actions/navigation';
+import type { AppDispatch } from '@/store';
 
 const FEATURE_CARDS = [
   {
@@ -51,13 +50,15 @@ const RECENT_ITEMS = [
   { id: '2', title: 'Read Menu', icon: 'book' },
 ];
 
-type HomeNavProp = BottomTabNavigationProp<IHomeTabParamList, ScreenNames.Home>;
-
 export function HomeScreen() {
+  const dispatch = useDispatch<AppDispatch>();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const navigation = useNavigation<HomeNavProp>();
   const { user } = useAuth();
+
+  const handlePressProfile = () => {
+    dispatch(navigationActions.toProfile());
+  };
   const displayName = user?.displayName ?? user?.email?.split('@')[0] ?? 'User';
 
   useBackHandler({
@@ -88,11 +89,7 @@ export function HomeScreen() {
           <TouchableOpacity
             className="w-11 h-11 rounded-full bg-accent items-center justify-center"
             activeOpacity={0.8}
-            onPress={() =>
-              navigation.navigate(ScreenNames.Settings, {
-                screen: ScreenNames.Profile,
-              })
-            }
+            onPress={handlePressProfile}
           >
             <Text className="text-black text-lg font-bold">{displayName[0]?.toUpperCase() ?? 'U'}</Text>
           </TouchableOpacity>

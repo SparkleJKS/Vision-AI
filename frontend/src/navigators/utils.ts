@@ -1,16 +1,28 @@
+import { CommonActions } from '@react-navigation/native';
 import { navigationRef } from './navigationRef';
 
 /**
  * Navigate to a screen from outside React components.
- * Waits until the navigation container is ready.
+ * Supports both (name, params) and { name, params } for nested navigation.
  */
-export function navigate<RouteName extends string>(
-  name: RouteName,
+export function navigate(
+  nameOrPayload: string | { name: string; params?: Record<string, unknown> },
   params?: Record<string, unknown>,
 ): void {
-  if (navigationRef.isReady()) {
-    (navigationRef.navigate as Function)(name, params);
+  if (!navigationRef.isReady()) return;
+  if (typeof nameOrPayload === 'object') {
+    const { name, params: p } = nameOrPayload;
+    navigationRef.dispatch(CommonActions.navigate({ name, params: p }));
+  } else {
+    (navigationRef.navigate as (n: string, p?: object) => void)(nameOrPayload, params);
   }
+}
+
+/**
+ * Get the navigation ref for use in sagas (e.g. canGoBack).
+ */
+export function getNavigationRef() {
+  return navigationRef;
 }
 
 /**

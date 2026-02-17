@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { FirebaseAuthTypes } from '@react-native-firebase/auth';
-import { AUTH_CONFIG } from '../configs/auth';
-import { logEvent, logApp } from '../utils/logger';
+import { AUTH_CONFIG } from '@/configs/auth';
+import { logEvent, logApp, error } from '@/utils/logger';
 import { getAuthErrorMessage } from './authErrors';
 
 type User = FirebaseAuthTypes.User;
@@ -64,6 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await auth().signInWithEmailAndPassword(email, password);
     } catch (e: unknown) {
       setAuthError(getAuthErrorMessage(e));
+      error('Auth:SignInWithEmailError', { error: String(e) });
       throw e;
     }
   }, []);
@@ -75,6 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await auth().createUserWithEmailAndPassword(email, password);
     } catch (e: unknown) {
       setAuthError(getAuthErrorMessage(e));
+      error('Auth:SignUpWithEmailError', { error: String(e) });
       throw e;
     }
   }, []);

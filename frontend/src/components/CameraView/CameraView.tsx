@@ -11,8 +11,8 @@ import {
 } from 'react-native-vision-camera';
 import type { Frame } from 'react-native-vision-camera';
 
-import { createInferenceWorker } from '../../workers/inferenceWorker';
-import type { InferenceWorker } from '../../workers/inferenceWorker';
+import { createInferenceWorker } from '@/workers/inferenceWorker';
+import type { InferenceWorker } from '@/workers/inferenceWorker';
 import { DEFAULT_MAX_INFERENCE_FPS, DEFAULT_INPUT_RESOLUTION, DEFAULT_ONNX_PROVIDERS } from './config';
 import { normalizeMaxInferenceFps, normalizeInputResolution, normalizeExecutionProviders } from './utils';
 import type { CameraViewRef, CameraViewProps, FramePacket } from './types';

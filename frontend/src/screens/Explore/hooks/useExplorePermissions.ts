@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import { Camera } from 'react-native-vision-camera';
 import { useFocusEffect } from '@react-navigation/native';
-import { ensureCameraPermission, statusToPermission } from '../../../permissions';
+import { ensureCameraPermission, statusToPermission } from '@/permissions';
 
 type PermissionState = {
   granted: boolean;

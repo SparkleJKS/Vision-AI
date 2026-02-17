@@ -1,16 +1,20 @@
 import { Text, View, TouchableOpacity } from 'react-native';
+import { useDispatch } from 'react-redux';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { colors } from '../../../../theme';
-import { useBackHandler } from '../../../../navigators';
+import { colors } from '@/theme';
+import { useBackHandler } from '@/navigators';
+import { navigationActions } from '@/store/actions/navigation';
+import type { AppDispatch } from '@/store';
 
-export function AccessibilityScreen() {
+export function VoiceAndAudioScreen() {
+  const dispatch = useDispatch<AppDispatch>();
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation();
+
+  const handleBack = () => dispatch(navigationActions.toBack());
 
   useBackHandler({
-    onBack: () => navigation.goBack(),
+    onBack: handleBack,
   });
 
   return (
@@ -20,7 +24,7 @@ export function AccessibilityScreen() {
     >
       <TouchableOpacity
         className="flex-row items-center px-4 pt-4 pb-2"
-        onPress={() => navigation.goBack()}
+        onPress={handleBack}
         activeOpacity={0.8}
       >
         <Ionicons name="arrow-back" size={24} color={colors.white} />
@@ -29,7 +33,7 @@ export function AccessibilityScreen() {
 
       <View className="flex-1 px-4 items-center justify-center">
         <Text className="text-white text-lg text-center">
-          Accessibility settings — coming soon
+          Voice & Audio settings — coming soon
         </Text>
       </View>
     </View>

@@ -6,13 +6,15 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
+import { useDispatch } from 'react-redux';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { colors } from '../../../../theme';
-import { useBackHandler } from '../../../../navigators';
-import { useAuth } from '../../../../auth/AuthContext';
-import { logEvent } from '../../../../utils/logger';
+import { colors } from '@/theme';
+import { useBackHandler } from '@/navigators';
+import { useAuth } from '@/auth/AuthContext';
+import { logEvent } from '@/utils/logger';
+import { navigationActions } from '@/store/actions/navigation';
+import type { AppDispatch } from '@/store';
 
 const PROFILE_OPTIONS = [
   {
@@ -33,9 +35,11 @@ const PROFILE_OPTIONS = [
 ];
 
 export function ProfileScreen() {
+  const dispatch = useDispatch<AppDispatch>();
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation();
   const { user, signOut, authAvailable } = useAuth();
+
+  const handleBack = () => dispatch(navigationActions.toBack());
   const [isSigningOut, setIsSigningOut] = useState<boolean>(false);
 
   const handleSignOut = async () => {
@@ -53,7 +57,7 @@ export function ProfileScreen() {
   };
 
   useBackHandler({
-    onBack: () => navigation.goBack(),
+    onBack: handleBack,
   });
 
   const displayName = user?.displayName ?? user?.email?.split('@')[0] ?? 'Guest';
@@ -66,7 +70,7 @@ export function ProfileScreen() {
     >
       <TouchableOpacity
         className="flex-row items-center px-4 pt-4 pb-2"
-        onPress={() => navigation.goBack()}
+        onPress={handleBack}
         activeOpacity={0.8}
       >
         <Ionicons name="arrow-back" size={24} color={colors.white} />

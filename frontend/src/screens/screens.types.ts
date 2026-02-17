@@ -10,7 +10,7 @@ import type {
   CompositeScreenProps,
   NavigatorScreenParams,
 } from '@react-navigation/native';
-import { ScreenNames } from '../configs/navigation';
+import { ScreenNames } from '@/configs/navigation';
 
 // ── Auth Stack Param List ────────────────────────────────────────────
 export type IAuthStackParamList = {

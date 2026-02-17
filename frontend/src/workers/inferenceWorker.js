@@ -1,4 +1,4 @@
-import modelManager from '../lib/modelManager';
+import modelManager from '@/lib/modelManager';
 
 const DEFAULT_CONFIG = Object.freeze({
   maxInferenceFps: 8,

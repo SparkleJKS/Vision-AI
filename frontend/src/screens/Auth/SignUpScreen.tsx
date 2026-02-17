@@ -9,20 +9,17 @@ import {
   ActivityIndicator,
   ScrollView,
 } from "react-native";
+import { useDispatch } from "react-redux";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
-import { useNavigation } from "@react-navigation/native";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { colors } from "../../theme/colors";
-import { useAuth } from "../../auth/AuthContext";
-import { ScreenNames } from "../../configs/navigation";
-import type { IAuthStackParamList } from "../screens.types";
-
-type NavProp = NativeStackNavigationProp<IAuthStackParamList>;
+import { colors } from "@/theme/colors";
+import { useAuth } from "@/auth/AuthContext";
+import { navigationActions } from "@/store/actions/navigation";
+import type { AppDispatch } from "@/store";
 
 export function SignUpScreen() {
+  const dispatch = useDispatch<AppDispatch>();
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation<NavProp>();
   const { signUpWithEmail, signInWithGoogle, authError, clearAuthError } =
     useAuth();
 
@@ -191,7 +188,7 @@ export function SignUpScreen() {
         <View className="flex-row justify-center mt-6">
           <Text className="text-grey text-sm">Already have an account? </Text>
           <TouchableOpacity
-            onPress={() => navigation.navigate(ScreenNames.SignIn)}
+            onPress={() => dispatch(navigationActions.toSignIn())}
             disabled={loading}
           >
             <Text className="text-accent text-sm font-semibold">Sign In</Text>

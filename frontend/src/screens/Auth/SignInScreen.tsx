@@ -9,20 +9,17 @@ import {
   ActivityIndicator,
   ScrollView,
 } from "react-native";
+import { useDispatch } from "react-redux";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
-import { useNavigation } from "@react-navigation/native";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { colors } from "../../theme/colors";
-import { useAuth } from "../../auth/AuthContext";
-import { ScreenNames } from "../../configs/navigation";
-import type { IAuthStackParamList } from "../screens.types";
-
-type NavProp = NativeStackNavigationProp<IAuthStackParamList>;
+import { colors } from "@/theme/colors";
+import { useAuth } from "@/auth/AuthContext";
+import { navigationActions } from "@/store/actions/navigation";
+import type { AppDispatch } from "@/store";
 
 export function SignInScreen() {
+  const dispatch = useDispatch<AppDispatch>();
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation<NavProp>();
   const { signInWithEmail, signInWithGoogle, authError, clearAuthError } =
     useAuth();
 
@@ -93,7 +90,11 @@ export function SignInScreen() {
 
         {errorMessage ? (
           <View className="bg-card rounded-xl p-3 mb-4 flex-row items-center border-l-4 border-warning">
-            <Ionicons name="information-circle" size={20} color={colors.warning} />
+            <Ionicons
+              name="information-circle"
+              size={20}
+              color={colors.warning}
+            />
             <Text className="text-white text-sm ml-3 flex-1">
               {errorMessage}
             </Text>
@@ -169,7 +170,7 @@ export function SignInScreen() {
         <View className="flex-row justify-center mt-6">
           <Text className="text-grey text-sm">Don't have an account? </Text>
           <TouchableOpacity
-            onPress={() => navigation.navigate(ScreenNames.SignUp)}
+            onPress={() => dispatch(navigationActions.toSignUp())}
             disabled={loading}
           >
             <Text className="text-accent text-sm font-semibold">Sign Up</Text>

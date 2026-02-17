@@ -1,1 +1,1 @@
-export * from '../types/inferenceWorker';
+export * from '@/types/inferenceWorker';

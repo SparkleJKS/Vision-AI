@@ -1,5 +1,5 @@
-import { API_BASE_URL } from '../configs/rest/api';
-import { logApi } from '../utils/logger';
+import { API_BASE_URL } from '@/configs/rest/api';
+import { logApi } from '@/utils/logger';
 
 export interface DetectedObject {
   label: string;
