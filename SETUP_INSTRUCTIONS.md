@@ -102,7 +102,7 @@ npm start
 
 ### Run the app
 
-- **Android emulator**: Run `npm run android` (requires Android Studio).
+- **Android emulator**: Run `npm run android` (requires Android Studio). Or use the two-step flow: start Metro with `npm run start`, then in another terminal run `npm run android:install-dev` (this script forwards port 8081 so the app can reach Metro).
 - **iOS simulator** (macOS only): Run `npm run ios` (requires Xcode).
 - **Physical device**: Run `npm run android:install-dev` for a dev build, then connect via USB and ensure USB debugging is enabled.
 
@@ -267,7 +267,12 @@ The `models/` folder is a placeholder for ML model files (e.g. TensorFlow, ONNX)
   Use Node 18+ and ensure `node` and `npm` are on your PATH.
 
 - **Dev server not connecting to device**  
-  Ensure phone/emulator and computer are on the same Wi‑Fi (for wireless debugging) or use USB debugging. Check that no firewall is blocking the Metro port (default 8081).
+  Ensure phone/emulator and computer are on the same Wi‑Fi (for wireless debugging) or use USB debugging. Check that no firewall is blocking the Metro port (default 8081). For emulator, run `adb reverse tcp:8081 tcp:8081` so the app can reach Metro on the host (this is done automatically by `npm run android:install-dev`).
+
+- **App crashes on startup / closes immediately on emulator**  
+  1. Start Metro first: `npm run start` (or `npm run start:reset` if you suspect cache issues).  
+  2. Run `npm run android:install-dev` — it forwards port 8081 and installs the app.  
+  3. Launch the app from the emulator. If it still crashes, check `adb logcat` for native errors. Crashlytics is disabled in dev to avoid crash loops.
 
 - **Android native build: undefined C++ symbols or std::format / graphicsConversions errors**  
   The project is pinned to **NDK 26.1.10909125**. Install it in **Android Studio → SDK Manager → SDK Tools** → "Show Package Details" → **NDK** → **26.1.10909125** → Apply. Ensure patches are applied: from `frontend/` run `npm install` (this runs `patch-package` and applies the React Native header patch). Then build again (e.g. `gradlew.bat installDevDebug` or `./gradlew installDevDebug`). Avoid `gradlew clean` before build unless necessary—it can cause longer rebuilds.
