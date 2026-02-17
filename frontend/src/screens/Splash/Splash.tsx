@@ -59,6 +59,7 @@ export function Splash() {
           loop={false}
           autoPlay
           resizeMode="contain"
+          speed={1.75}
         />
       </View>
     </SplashErrorBoundary>
