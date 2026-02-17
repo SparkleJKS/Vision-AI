@@ -1,12 +1,12 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { ScreenNames } from '../../configs/navigation';
-import type { ISettingsStackParamList } from '../screens.types';
+import { ScreenNames } from '@/configs/navigation';
+import type { ISettingsStackParamList } from '@/screens/screens.types';
 import { SettingsListScreen } from './SettingsListScreen';
-import { ProfileScreen } from '../Profile';
-import { VoiceAndAudioScreen } from '../VoiceAndAudio';
-import { VisionSettingsScreen } from '../VisionSettings';
-import { ConnectedDevicesScreen } from '../ConnectedDevices';
-import { AccessibilityScreen } from '../Accessibility';
+import { ProfileScreen } from '@/screens/Profile';
+import { VoiceAndAudioScreen } from '@/screens/VoiceAndAudio';
+import { VisionSettingsScreen } from '@/screens/VisionSettings';
+import { ConnectedDevicesScreen } from '@/screens/ConnectedDevices';
+import { AccessibilityScreen } from '@/screens/Accessibility';
 
 const Stack = createNativeStackNavigator<ISettingsStackParamList>();
 

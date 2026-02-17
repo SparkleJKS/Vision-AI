@@ -5,9 +5,9 @@ import {
   View,
   Text,
 } from "react-native";
-import { Lottie } from "../../animations/components";
-import { AppInit } from "../../animations/assets";
-import tokens from "../../theme/tokens";
+import { Lottie } from "@/animations/components";
+import { AppInit } from "@/animations/assets";
+import tokens from "@/theme/tokens";
 
 type Props = { children: ReactNode };
 

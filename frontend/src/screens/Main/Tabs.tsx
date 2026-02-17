@@ -1,13 +1,13 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
-import { ScreenNames } from '../../configs/navigation';
-import type { IHomeTabParamList } from '../screens.types';
-import { HomeScreen } from '../Home';
-import { ExploreScreen } from '../Explore';
-import { VoiceScreen } from '../Voice';
-import { AlertsScreen } from '../Alerts';
-import { SettingsStack } from '../Settings/SettingsStack';
-import { colors } from '../../theme/colors';
+import { ScreenNames } from '@/configs/navigation';
+import type { IHomeTabParamList } from '@/screens/screens.types';
+import { HomeScreen } from '@/screens/Home';
+import { ExploreScreen } from '@/screens/Explore';
+import { VoiceScreen } from '@/screens/Voice';
+import { AlertsScreen } from '@/screens/Alerts';
+import { SettingsStack } from '@/screens/Settings/SettingsStack';
+import { colors } from '@/theme/colors';
 
 const Tab = createBottomTabNavigator<IHomeTabParamList>();
 

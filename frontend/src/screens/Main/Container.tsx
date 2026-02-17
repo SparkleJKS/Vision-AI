@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
-import { Splash } from '../Splash';
+import { Splash } from '@/screens/Splash';
 import { Navigation } from './Navigation';
-import { AuthStack } from '../Auth/AuthStack';
-import { useAuth } from '../../auth/AuthContext';
-import { navigationRef } from '../../navigators';
-import { colors } from '../../theme/colors';
-import { logEvent } from '../../utils/logger';
+import { AuthStack } from '@/screens/Auth/AuthStack';
+import { useAuth } from '@/auth/AuthContext';
+import { navigationRef } from '@/navigators';
+import { colors } from '@/theme/colors';
+import { logEvent } from '@/utils/logger';
 
 const SPLASH_DURATION_MS = 11_000;
 

@@ -1,4 +1,4 @@
-import { ScreenNames } from '../../configs/navigation';
+import { ScreenNames } from '@/configs/navigation';
 
 export const SETTINGS_ITEMS = [
   {

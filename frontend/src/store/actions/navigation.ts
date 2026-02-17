@@ -1,5 +1,5 @@
 import { createAction } from '@reduxjs/toolkit';
-import { ScreenNames } from '../../configs/navigation';
+import { ScreenNames } from '@/configs/navigation';
 
 const NAV_PREFIX = 'navigation/';
 

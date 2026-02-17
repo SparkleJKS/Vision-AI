@@ -8,11 +8,11 @@ import {
 import { useDispatch } from 'react-redux';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors } from '../../theme/colors';
-import { useBackHandler } from '../../navigators';
-import { useAuth } from '../../auth/AuthContext';
-import { navigationActions } from '../../store/actions/navigation';
-import type { AppDispatch } from '../../store';
+import { colors } from '@/theme/colors';
+import { useBackHandler } from '@/navigators';
+import { useAuth } from '@/auth/AuthContext';
+import { navigationActions } from '@/store/actions/navigation';
+import type { AppDispatch } from '@/store';
 
 const FEATURE_CARDS = [
   {

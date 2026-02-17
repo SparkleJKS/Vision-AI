@@ -1,5 +1,5 @@
 import { createNavigationContainerRef } from '@react-navigation/native';
-import type { IHomeTabParamList } from '../screens/screens.types';
+import type { IHomeTabParamList } from '@/screens/screens.types';
 
 /**
  * Typed navigation container ref.

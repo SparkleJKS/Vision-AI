@@ -1,7 +1,7 @@
 import { call, takeLatest } from 'redux-saga/effects';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { ScreenNames } from '../../configs/navigation';
-import { getNavigationRef, navigate } from '../../navigators';
+import { ScreenNames } from '@/configs/navigation';
+import { getNavigationRef, navigate } from '@/navigators';
 import { navigationActions } from '../actions/navigation';
 
 type NavPayload = { name: string; params?: Record<string, unknown> };

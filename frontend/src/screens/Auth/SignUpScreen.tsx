@@ -12,10 +12,10 @@ import {
 import { useDispatch } from "react-redux";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
-import { colors } from "../../theme/colors";
-import { useAuth } from "../../auth/AuthContext";
-import { navigationActions } from "../../store/actions/navigation";
-import type { AppDispatch } from "../../store";
+import { colors } from "@/theme/colors";
+import { useAuth } from "@/auth/AuthContext";
+import { navigationActions } from "@/store/actions/navigation";
+import type { AppDispatch } from "@/store";
 
 export function SignUpScreen() {
   const dispatch = useDispatch<AppDispatch>();

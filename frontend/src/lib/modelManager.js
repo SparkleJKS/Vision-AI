@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '../configs/rest/api';
+import { API_BASE_URL } from '@/configs/rest/api';
 
 // Runtime preference is on-device first for latency and privacy.
 // TFLite is prioritized because mobile delegates (GPU/NNAPI/XNNPACK) generally

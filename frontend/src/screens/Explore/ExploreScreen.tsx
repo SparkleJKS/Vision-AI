@@ -14,11 +14,11 @@ import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useIsFocused } from '@react-navigation/native';
 
-import CameraView from '../../components/CameraView';
-import BoxOverlay from '../../components/BoxOverlay';
-import modelManager from '../../lib/modelManager';
-import { ConfidenceSlider } from '../../components/ConfidenceSlider';
-import { ensureCameraPermission } from '../../permissions';
+import CameraView from '@/components/CameraView';
+import BoxOverlay from '@/components/BoxOverlay';
+import modelManager from '@/lib/modelManager';
+import { ConfidenceSlider } from '@/components/ConfidenceSlider';
+import { ensureCameraPermission } from '@/permissions';
 import { useExploreDetection, useExplorePermissions } from './hooks';
 import { formatError, formatRuntime, getStatusColor } from './utils';
 import { MODEL_OPTIONS, TFLITE_DELEGATE_OPTIONS } from './config';
@@ -34,7 +34,7 @@ import {
 } from './config';
 import { exploreStyles } from './styles';
 import type { CameraViewRef, CameraViewProps, ModelRuntime, TfliteDelegate } from './types';
-import { logEvent } from '../../utils/logger';
+import { logEvent } from '@/utils/logger';
 
 const styles = exploreStyles;
 const { white, accent } = EXPLORE_COLORS;

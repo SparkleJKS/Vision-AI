@@ -1,7 +1,7 @@
 import { Text, View, ScrollView } from 'react-native';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors } from '../../theme/colors';
+import { colors } from '@/theme/colors';
 
 const ALERTS = [
   {

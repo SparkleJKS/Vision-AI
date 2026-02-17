@@ -8,9 +8,9 @@ import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { colors } from '../../theme/colors';
+import { colors } from '@/theme/colors';
 import { SETTINGS_ITEMS } from './config';
-import type { ISettingsStackParamList } from '../screens.types';
+import type { ISettingsStackParamList } from '@/screens/screens.types';
 
 type NavProp = NativeStackNavigationProp<ISettingsStackParamList>;
 

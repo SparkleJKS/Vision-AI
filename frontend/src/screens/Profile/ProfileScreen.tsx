@@ -9,12 +9,12 @@ import {
 import { useDispatch } from 'react-redux';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors } from '../../theme';
-import { useBackHandler } from '../../navigators';
-import { useAuth } from '../../auth/AuthContext';
-import { logEvent } from '../../utils/logger';
-import { navigationActions } from '../../store/actions/navigation';
-import type { AppDispatch } from '../../store';
+import { colors } from '@/theme';
+import { useBackHandler } from '@/navigators';
+import { useAuth } from '@/auth/AuthContext';
+import { logEvent } from '@/utils/logger';
+import { navigationActions } from '@/store/actions/navigation';
+import type { AppDispatch } from '@/store';
 
 const PROFILE_OPTIONS = [
   {
