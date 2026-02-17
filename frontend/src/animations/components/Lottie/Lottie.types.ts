@@ -10,4 +10,5 @@ export interface LottieProps {
   style?: ViewStyle;
   width?: number;
   height?: number;
+  speed?: number;
 }

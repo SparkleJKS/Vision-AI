@@ -11,6 +11,7 @@ export function Lottie({
   style,
   width,
   height,
+  speed,
   ...props
 }: LottieProps) {
   return (
@@ -20,6 +21,7 @@ export function Lottie({
       loop={loop}
       resizeMode={resizeMode}
       onAnimationFinish={onAnimationFinish}
+      speed={speed}
       style={[{ zIndex: 20 }, width && height ? { width, height } : undefined, style]}
       {...props}
     />
