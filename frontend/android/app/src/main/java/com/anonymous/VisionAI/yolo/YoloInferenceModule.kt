@@ -176,10 +176,10 @@ class YoloInferenceModule(
      Frame preprocessing (STEP 4)
      ========================= */
 
-  private val preprocessLock = Any()
   private val loggedIngress = AtomicBoolean(false)
   private val loggedPreprocess = AtomicBoolean(false)
   private val inferenceInProgress = AtomicBoolean(false)
+  private val preprocessInProgress = AtomicBoolean(false)
   @Volatile private var lastInferenceTimeMs: Long = 0L
 
   private val inputBuffer: ByteBuffer =
@@ -209,28 +209,29 @@ class YoloInferenceModule(
   )
 
   private fun processFrame(frame: Frame, facing: CameraFacing) {
+    if (!preprocessInProgress.compareAndSet(false, true)) return
+
     val image = frame.image
     val rotation = orientationToRotationDegrees(frame.orientation)
     val preprocessStartMs = SystemClock.elapsedRealtime()
 
-    synchronized(preprocessLock) {
+    try {
       if (loggedIngress.compareAndSet(false, true)) {
         Log.d(TAG, "Frame received: ${frame.width}x${frame.height}, rotation=$rotation, facing=$facing")
       }
-
       preprocessYuv(
         image = image,
         rotationDegrees = rotation,
         mirror = facing == CameraFacing.FRONT
       )
-
       if (loggedPreprocess.compareAndSet(false, true)) {
-        Log.d(TAG, "Preprocessed tensor ready: [1,640,640,3]")
+        Log.d(TAG, "Preprocessed tensor ready")
       }
+      val preprocessMs = SystemClock.elapsedRealtime() - preprocessStartMs
+      maybeRunInference(preprocessMs)
+    } finally {
+      preprocessInProgress.set(false)
     }
-
-    val preprocessMs = SystemClock.elapsedRealtime() - preprocessStartMs
-    maybeRunInference(preprocessMs)
   }
 
   private fun maybeRunInference(preprocessMs: Long) {
