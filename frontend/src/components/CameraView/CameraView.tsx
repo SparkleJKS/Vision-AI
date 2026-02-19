@@ -5,6 +5,7 @@ import {
   VisionCameraProxy,
   runAtTargetFps,
   useCameraDevice,
+  useCameraFormat,
   useFrameProcessor,
 } from 'react-native-vision-camera'
 import type { Frame } from 'react-native-vision-camera'
@@ -26,6 +27,10 @@ export function CameraView({
     : 8
 
   const device = useCameraDevice(cameraFacing)
+  const format = useCameraFormat(device, [
+    { videoResolution: { width: 640, height: 480 } },
+    { fps: 30 }
+  ])
 
   useEffect(() => {
     if (Platform.OS !== 'android') return
@@ -92,6 +97,7 @@ export function CameraView({
     <Camera
       style={[StyleSheet.absoluteFill, style]}
       device={device}
+      format={format}
       isActive={active}
       pixelFormat="yuv"
       frameProcessor={frameProcessor}
@@ -102,3 +108,4 @@ export function CameraView({
 }
 
 export default CameraView
+

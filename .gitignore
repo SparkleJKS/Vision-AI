@@ -82,6 +82,7 @@ models/**
 docs/
 android_app/
 runs/
+a.py
 
 # Mit PC
 batman-development/

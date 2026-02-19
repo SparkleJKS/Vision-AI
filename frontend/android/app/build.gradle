@@ -197,6 +197,8 @@ dependencies {
 
     // TensorFlow Lite CPU runtime
     implementation("org.tensorflow:tensorflow-lite:2.14.0")
+    implementation("org.tensorflow:tensorflow-lite-gpu:2.14.0")
+    implementation("org.tensorflow:tensorflow-lite-gpu-api:2.14.0")
 
     // GIF and WebP support
     implementation("com.facebook.fresco:animated-gif:3.4.0")
@@ -210,3 +212,4 @@ dependencies {
 }
 
 apply plugin: 'com.google.firebase.crashlytics'
+
