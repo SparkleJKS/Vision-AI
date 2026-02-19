@@ -60,7 +60,6 @@ models/**
 *.weights
 *.engine
 *.onnx
-*.tflite
 *.mlmodel
 *.pb
 *.pbtxt
