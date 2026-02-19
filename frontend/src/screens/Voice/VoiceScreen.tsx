@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  Text,
-  View,
-  StyleSheet,
-  TouchableOpacity,
   Animated,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors } from '@/theme/colors';
 
 const BAR_COUNT = 8;
 const BAR_MIN = 0.15;
@@ -63,7 +62,7 @@ function SoundWaveBars({ isActive }: { isActive: boolean }) {
   }, [isActive]);
 
   return (
-    <View className="flex-row items-center justify-center gap-1.5 mb-4 h-7">
+    <View style={styles.waveContainer}>
       {bars.map((bar, i) => {
         const scaleY = bar.interpolate({
           inputRange: [0, 1],
@@ -74,7 +73,7 @@ function SoundWaveBars({ isActive }: { isActive: boolean }) {
           outputRange: [11, 0],
         });
         return (
-          <View key={`bar-${i}`} className="w-1 h-6 items-center justify-end">
+          <View key={`bar-${i}`} style={styles.waveBarWrapper}>
             <Animated.View
               style={[
                 styles.waveBar,
@@ -89,11 +88,119 @@ function SoundWaveBars({ isActive }: { isActive: boolean }) {
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: '#080B10',
+    alignItems: 'center',
+  },
+  headerSection: {
+    alignItems: 'center',
+  },
+  headerBadge: {
+    alignSelf: 'center',
+    backgroundColor: '#6366F118',
+    borderWidth: 1,
+    borderColor: '#6366F135',
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    marginTop: 24,
+    marginBottom: 8,
+  },
+  headerBadgeText: {
+    color: '#6366F1',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 2,
+  },
+  headerTitle: {
+    color: '#F1F5F9',
+    fontSize: 28,
+    fontWeight: '800',
+    letterSpacing: -0.5,
+    marginBottom: 8,
+  },
+  centerSection: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  micButton: {
+    width: 160,
+    height: 160,
+    borderRadius: 999,
+    marginBottom: 28,
+    borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  micButtonIdle: {
+    backgroundColor: '#0F1620',
+    borderColor: '#6366F135',
+  },
+  micButtonListening: {
+    backgroundColor: '#6366F112',
+    borderColor: '#6366F1',
+  },
+  waveContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginBottom: 4,
+    height: 28,
+  },
+  waveBarWrapper: {
+    width: 4,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
   waveBar: {
     width: 4,
     height: 24,
-    backgroundColor: colors.accentYellow,
+    backgroundColor: '#6366F1',
     borderRadius: 2,
+  },
+  statusText: {
+    color: '#F1F5F9',
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 2,
+    marginBottom: 32,
+  },
+  statusTextListening: {
+    color: '#6366F1',
+  },
+  ctaButton: {
+    borderRadius: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 28,
+    minWidth: 260,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    borderWidth: 1,
+  },
+  ctaButtonIdle: {
+    backgroundColor: '#0F1620',
+    borderColor: '#6366F140',
+  },
+  ctaButtonListening: {
+    backgroundColor: '#6366F1',
+    borderWidth: 0,
+  },
+  ctaText: {
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  ctaTextIdle: {
+    color: '#6366F1',
+  },
+  ctaTextListening: {
+    color: '#FFFFFF',
   },
 });
 
@@ -102,46 +209,46 @@ export function VoiceScreen() {
   const [isListening, setIsListening] = useState<boolean>(false);
 
   return (
-    <View
-      className="flex-1 bg-screen items-center"
-      style={{ paddingTop: insets.top }}
-    >
-      <Text className="text-white text-[28px] font-bold mt-6 mb-8">
-        Voice Mode
-      </Text>
+    <View style={[styles.screen, { paddingTop: insets.top }]}>
+      <View style={styles.headerSection}>
+        <View style={styles.headerBadge}>
+          <Text style={styles.headerBadgeText}>VOICE MODE</Text>
+        </View>
+        <Text style={styles.headerTitle}>Voice Mode</Text>
+      </View>
 
-      <View className="flex-1 items-center justify-center px-6">
+      <View style={styles.centerSection}>
         <TouchableOpacity
-          className="w-40 h-40 rounded-full bg-dark border-[3px] border-accent items-center justify-center mb-6"
+          style={[
+            styles.micButton,
+            isListening ? styles.micButtonListening : styles.micButtonIdle,
+          ]}
           activeOpacity={0.9}
           onPress={() => setIsListening((p) => !p)}
         >
-          <Ionicons name="mic" size={64} color={colors.accentYellow} />
+          <Ionicons name="mic" size={64} color="#6366F1" />
         </TouchableOpacity>
 
         <SoundWaveBars isActive={isListening} />
 
-        <Text className="text-white text-base font-semibold tracking-[2px] mb-8">
+        <Text style={[styles.statusText, isListening && styles.statusTextListening]}>
           {isListening ? 'LISTENING...' : 'TAP TO START'}
         </Text>
 
         <TouchableOpacity
-          className={`flex-row items-center justify-center py-4 px-7 rounded-xl gap-3 min-w-[260px] ${
-            isListening ? 'bg-accent' : 'bg-card border-2 border-accent'
-          }`}
+          style={[
+            styles.ctaButton,
+            isListening ? styles.ctaButtonListening : styles.ctaButtonIdle,
+          ]}
           activeOpacity={0.8}
           onPress={() => setIsListening((p) => !p)}
         >
           <Ionicons
             name={isListening ? 'stop-circle' : 'mic'}
             size={24}
-            color={isListening ? '#000000' : colors.white}
+            color={isListening ? '#FFFFFF' : '#6366F1'}
           />
-          <Text
-            className={`text-base font-bold ${
-              isListening ? 'text-black' : 'text-accent'
-            }`}
-          >
+          <Text style={[styles.ctaText, isListening ? styles.ctaTextListening : styles.ctaTextIdle]}>
             {isListening ? 'Stop Listening' : 'Start Listening'}
           </Text>
         </TouchableOpacity>
