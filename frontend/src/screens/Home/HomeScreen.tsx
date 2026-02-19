@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useRef } from 'react';
 import {
   Animated,
   Pressable,
@@ -15,46 +16,71 @@ import { useAuth } from '@/auth/AuthContext';
 import { navigationActions } from '@/store/actions/navigation';
 import type { AppDispatch } from '@/store';
 
-const FEATURE_CARDS = [
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good Morning';
+  if (hour < 17) return 'Good Afternoon';
+  return 'Good Evening';
+}
+
+const QUICK_ACTIONS = [
   {
-    id: 'describe',
-    title: 'Describe Object',
-    subtitle: 'Identify items around you',
-    icon: 'camera',
-    accentColor: '#22C55E',
-  },
-  {
-    id: 'scene',
-    title: 'Scene Summary',
-    subtitle: 'Get a full room overview',
-    icon: 'eye',
-    accentColor: '#A855F7',
+    id: 'detect',
+    label: 'Detect',
+    sublabel: 'Objects',
+    icon: 'scan',
+    accent: '#22C55E',
   },
   {
     id: 'read',
-    title: 'Read Text',
-    subtitle: 'Scan documents & signs',
+    label: 'Read',
+    sublabel: 'Text & Docs',
     icon: 'document-text',
-    accentColor: '#38BDF8',
+    accent: '#38BDF8',
   },
   {
-    id: 'navigation',
-    title: 'Navigation',
-    subtitle: 'Find your way safely',
-    icon: 'locate',
-    accentColor: '#06B6D4',
+    id: 'scene',
+    label: 'Describe',
+    sublabel: 'Scene',
+    icon: 'eye',
+    accent: '#A855F7',
   },
-];
+  {
+    id: 'navigate',
+    label: 'Navigate',
+    sublabel: 'Safely',
+    icon: 'navigate',
+    accent: '#06B6D4',
+  },
+] as const;
 
-const RECENT_ITEMS = [
-  { id: '1', title: 'Find Keys', icon: 'search', accentColor: '#06B6D4' },
-  { id: '2', title: 'Read Menu', icon: 'book', accentColor: '#38BDF8' },
-];
+const STATS = [
+  { id: 'sessions', label: 'Sessions', value: '12', icon: 'flash', accent: '#22C55E' },
+  { id: 'detected', label: 'Detected', value: '284', icon: 'cube', accent: '#38BDF8' },
+  { id: 'accuracy', label: 'Accuracy', value: '97%', icon: 'checkmark-done', accent: '#A855F7' },
+] as const;
+
+const RECENT_ACTIVITY = [
+  { id: '1', action: 'Detected', object: '6 objects', timeAgo: '2m ago', accent: '#22C55E' },
+  { id: '2', action: 'Read', object: 'Restaurant menu', timeAgo: '18m ago', accent: '#38BDF8' },
+  { id: '3', action: 'Described', object: 'Living room', timeAgo: '1h ago', accent: '#A855F7' },
+] as const;
+
+const AI_TIP = {
+  text: 'Point camera at any object and tap Detect for instant AI identification.',
+  accent: '#6366F1',
+} as const;
 
 export function HomeScreen() {
   const dispatch = useDispatch<AppDispatch>();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
+  const greeting = useMemo(() => getGreeting(), []);
+
+  const headerAnim = useRef(new Animated.Value(0)).current;
+  const statsAnim = useRef(new Animated.Value(0)).current;
+  const gridAnim = useRef(new Animated.Value(0)).current;
+  const activityAnim = useRef(new Animated.Value(0)).current;
 
   const handlePressProfile = () => {
     dispatch(navigationActions.toProfile());
@@ -65,87 +91,138 @@ export function HomeScreen() {
     showExitPrompt: true,
   });
 
+  useEffect(() => {
+    const animateIn = (value: Animated.Value, delay: number) =>
+      Animated.timing(value, {
+        toValue: 1,
+        duration: 400,
+        delay,
+        useNativeDriver: true,
+      });
+
+    Animated.parallel([
+      animateIn(headerAnim, 0),
+      animateIn(statsAnim, 100),
+      animateIn(gridAnim, 200),
+      animateIn(activityAnim, 320),
+    ]).start();
+  }, [activityAnim, gridAnim, headerAnim, statsAnim]);
+
+  const sectionAnimStyle = (value: Animated.Value) => ({
+    opacity: value,
+    transform: [
+      {
+        translateY: value.interpolate({
+          inputRange: [0, 1],
+          outputRange: [20, 0],
+        }),
+      },
+    ],
+  });
+
   return (
     <View style={[styles.screen, { paddingTop: insets.top }]}>
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 80 }]}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 90 }]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.headerRow}>
+        <Animated.View style={[styles.headerSection, sectionAnimStyle(headerAnim)]}>
           <View style={styles.headerLeft}>
-            <View style={styles.visionBadge}>
-              <Text style={styles.visionBadgeText}>VISION AI</Text>
+            <Text style={styles.greetingText}>{greeting},</Text>
+            <Text style={styles.displayNameText}>{displayName}</Text>
+            <View style={styles.activeRow}>
+              <View style={styles.activeDot} />
+              <Text style={styles.activeText}>Vision AI Active</Text>
             </View>
-            <Text style={styles.greetingText}>
-              Hello, <Text style={styles.greetingName}>{displayName}</Text>
-            </Text>
           </View>
-          <Pressable
-            style={styles.profileButton}
-            onPress={handlePressProfile}
-          >
-            <Text style={styles.profileInitial}>{displayName[0]?.toUpperCase() ?? 'U'}</Text>
-          </Pressable>
-        </View>
-
-        <Animated.View style={styles.statusCard}>
-          <View style={styles.statusAccentLine} />
-          <View style={styles.statusRow}>
-            <View style={styles.statusLeft}>
-              <Text style={styles.statusLabel}>SYSTEM STATUS</Text>
-              <View style={styles.statusOnlineRow}>
-                <View style={styles.statusDot} />
-                <Text style={styles.statusText}>Online & Ready</Text>
-              </View>
+          <Pressable style={styles.profileButton} onPress={handlePressProfile}>
+            <View style={styles.profileInner}>
+              <Text style={styles.profileInitial}>{displayName[0]?.toUpperCase() ?? 'U'}</Text>
+              <View style={styles.profileOnlineDot} />
             </View>
-            <View style={styles.statusPill}>
-              <Text style={styles.statusPillText}>ACTIVE</Text>
+          </Pressable>
+        </Animated.View>
+
+        <Animated.View style={[styles.statsSection, sectionAnimStyle(statsAnim)]}>
+          <View style={styles.statsRow}>
+            {STATS.map((stat) => (
+              <View key={stat.id} style={styles.statCard}>
+                <View style={[styles.statAccentLine, { backgroundColor: stat.accent }]} />
+                <Ionicons name={stat.icon as any} size={16} color={stat.accent} style={styles.statIcon} />
+                <Text style={styles.statValue}>{stat.value}</Text>
+                <Text style={styles.statLabel}>{stat.label}</Text>
+              </View>
+            ))}
+          </View>
+        </Animated.View>
+
+        <Animated.View style={[styles.quickActionsSection, sectionAnimStyle(gridAnim)]}>
+          <View style={styles.sectionHeaderRow}>
+            <Text style={styles.sectionHeaderLabel}>QUICK ACTIONS</Text>
+            <Text style={styles.sectionHeaderLink}>See all →</Text>
+          </View>
+
+          <View style={styles.actionsGrid}>
+            {QUICK_ACTIONS.map((action) => (
+              <TouchableOpacity key={action.id} activeOpacity={0.85} style={styles.actionCard} onPress={() => {}}>
+                <View style={[styles.actionGlow, { backgroundColor: `${action.accent}18` }]} />
+                <View style={[styles.actionAccentLine, { backgroundColor: action.accent }]} />
+                <View
+                  style={[
+                    styles.actionIconContainer,
+                    {
+                      backgroundColor: `${action.accent}15`,
+                      borderColor: `${action.accent}30`,
+                    },
+                  ]}
+                >
+                  <Ionicons name={action.icon as any} size={20} color={action.accent} />
+                </View>
+                <Text style={styles.actionLabel}>{action.label}</Text>
+                <Text style={styles.actionSublabel}>{action.sublabel}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <View style={styles.tipCard}>
+            <View style={[styles.tipAccentBar, { backgroundColor: AI_TIP.accent }]} />
+            <View
+              style={[
+                styles.tipIconContainer,
+                {
+                  backgroundColor: `${AI_TIP.accent}18`,
+                  borderColor: `${AI_TIP.accent}35`,
+                },
+              ]}
+            >
+              <Ionicons name="sparkles" size={18} color={AI_TIP.accent} />
+            </View>
+            <View style={styles.tipTextContent}>
+              <Text style={[styles.tipLabel, { color: AI_TIP.accent }]}>AI TIP</Text>
+              <Text style={styles.tipText}>{AI_TIP.text}</Text>
             </View>
           </View>
         </Animated.View>
 
-        <Text style={styles.sectionLabel}>FEATURES</Text>
+        <Animated.View style={[styles.activitySection, sectionAnimStyle(activityAnim)]}>
+          <Text style={styles.activityHeader}>RECENT ACTIVITY</Text>
 
-        {FEATURE_CARDS.map((card) => (
-          <TouchableOpacity
-            key={card.id}
-            style={styles.featureCard}
-            activeOpacity={0.8}
-          >
-            <View style={[styles.featureAccentLine, { backgroundColor: card.accentColor }]} />
-            <View style={styles.featureRow}>
-              <View
-                style={[styles.featureIconContainer, { borderColor: `${card.accentColor}40` }]}
-              >
-                <Ionicons name={card.icon as any} size={24} color={card.accentColor} />
+          {RECENT_ACTIVITY.map((item, index) => (
+            <View key={item.id} style={styles.activityItemBlock}>
+              <View style={styles.activityRow}>
+                <View style={[styles.activityDot, { backgroundColor: item.accent }]} />
+                <View style={styles.activityTextWrap}>
+                  <Text style={styles.activityActionText}>
+                    {item.action}
+                    <Text style={styles.activityObjectText}> {item.object}</Text>
+                  </Text>
+                </View>
+                <Text style={styles.activityTimeText}>{item.timeAgo}</Text>
               </View>
-              <View style={styles.featureTextBlock}>
-                <Text style={styles.featureTitle}>{card.title}</Text>
-                <Text style={styles.featureSubtitle}>{card.subtitle}</Text>
-              </View>
-              <Text style={[styles.featureArrow, { color: card.accentColor }]}>→</Text>
+              {index < RECENT_ACTIVITY.length - 1 && <View style={styles.activitySeparator} />}
             </View>
-          </TouchableOpacity>
-        ))}
-
-        <Text style={styles.sectionLabel}>RECENT</Text>
-        <View style={styles.recentRow}>
-          {RECENT_ITEMS.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.recentCard}
-              activeOpacity={0.8}
-            >
-              <Ionicons
-                name={item.icon as any}
-                size={26}
-                color={item.accentColor}
-                style={styles.recentIcon}
-              />
-              <Text style={styles.recentTitle}>{item.title}</Text>
-            </TouchableOpacity>
           ))}
-        </View>
+        </Animated.View>
       </ScrollView>
     </View>
   );
@@ -158,196 +235,271 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 16,
-    paddingTop: 8,
+    paddingTop: 12,
   },
-  headerRow: {
+  headerSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 24,
+    alignItems: 'flex-start',
+    marginBottom: 28,
   },
   headerLeft: {
     flex: 1,
   },
-  visionBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#22C55E18',
-    borderWidth: 1,
-    borderColor: '#22C55E35',
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginBottom: 6,
-  },
-  visionBadgeText: {
-    color: '#22C55E',
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 2,
-  },
   greetingText: {
+    color: '#64748B',
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  displayNameText: {
     color: '#F1F5F9',
     fontSize: 30,
-    fontWeight: '800',
-    letterSpacing: -0.5,
+    fontWeight: '900',
+    letterSpacing: -0.8,
   },
-  greetingName: {
-    color: '#22C55E',
-  },
-  profileButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 999,
-    backgroundColor: '#22C55E15',
-    borderWidth: 1,
-    borderColor: '#22C55E40',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  profileInitial: {
-    color: '#22C55E',
-    fontSize: 16,
-    fontWeight: '800',
-  },
-  statusCard: {
-    backgroundColor: '#0F1620',
-    borderWidth: 1,
-    borderColor: '#1E2D3D',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    overflow: 'hidden',
-  },
-  statusAccentLine: {
-    position: 'absolute',
-    top: 0,
-    left: 16,
-    right: 16,
-    height: 1,
-    backgroundColor: '#22C55E',
-  },
-  statusRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  statusLeft: {
-    flex: 1,
-  },
-  statusLabel: {
-    color: '#64748B',
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 2,
-    marginBottom: 6,
-  },
-  statusOnlineRow: {
+  activeRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 6,
   },
-  statusDot: {
+  activeDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
     backgroundColor: '#22C55E',
-    marginRight: 8,
   },
-  statusText: {
-    color: '#F1F5F9',
-    fontSize: 17,
-    fontWeight: '700',
-  },
-  statusPill: {
-    backgroundColor: '#22C55E18',
-    borderWidth: 1,
-    borderColor: '#22C55E35',
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
-  statusPillText: {
+  activeText: {
     color: '#22C55E',
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 1.5,
+    fontSize: 12,
+    fontWeight: '600',
+    marginLeft: 6,
   },
-  sectionLabel: {
-    color: '#475569',
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 2,
-    marginBottom: 12,
-    marginTop: 8,
-  },
-  featureCard: {
+  profileButton: {
+    width: 46,
+    height: 46,
+    borderRadius: 14,
     backgroundColor: '#0F1620',
     borderWidth: 1,
     borderColor: '#1E2D3D',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileInner: {
+    alignItems: 'center',
+  },
+  profileInitial: {
+    color: '#F1F5F9',
+    fontSize: 17,
+    fontWeight: '800',
+  },
+  profileOnlineDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 999,
+    backgroundColor: '#22C55E',
+    marginTop: 3,
+  },
+  statsSection: {
+    marginBottom: 24,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: '#0F1620',
+    borderWidth: 1,
+    borderColor: '#1E2D3D',
+    borderRadius: 14,
+    padding: 14,
+    alignItems: 'flex-start',
     overflow: 'hidden',
   },
-  featureAccentLine: {
+  statAccentLine: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     height: 2,
   },
-  featureRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  statIcon: {
+    marginBottom: 8,
   },
-  featureIconContainer: {
-    width: 46,
-    height: 46,
-    borderRadius: 12,
-    borderWidth: 1,
-    backgroundColor: '#0A0F18',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  featureTextBlock: {
-    flex: 1,
-  },
-  featureTitle: {
+  statValue: {
     color: '#F1F5F9',
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 2,
+    fontSize: 22,
+    fontWeight: '900',
+    letterSpacing: -0.5,
   },
-  featureSubtitle: {
+  statLabel: {
     color: '#475569',
-    fontSize: 12,
-    fontWeight: '500',
+    fontSize: 10,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    marginTop: 2,
+    textTransform: 'uppercase',
   },
-  featureArrow: {
-    fontSize: 16,
-    fontWeight: '700',
+  quickActionsSection: {
+    marginBottom: 0,
   },
-  recentRow: {
+  sectionHeaderRow: {
     flexDirection: 'row',
-    gap: 12,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
   },
-  recentCard: {
-    flex: 1,
+  sectionHeaderLabel: {
+    color: '#475569',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 2,
+  },
+  sectionHeaderLink: {
+    color: '#334155',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  actionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 24,
+  },
+  actionCard: {
+    width: '47.5%',
     backgroundColor: '#0F1620',
     borderWidth: 1,
     borderColor: '#1E2D3D',
     borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
+    padding: 18,
+    overflow: 'hidden',
     minHeight: 110,
   },
-  recentIcon: {
-    marginBottom: 10,
+  actionGlow: {
+    position: 'absolute',
+    top: -20,
+    right: -20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
   },
-  recentTitle: {
+  actionAccentLine: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 2,
+  },
+  actionIconContainer: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  actionLabel: {
+    color: '#F1F5F9',
+    fontSize: 15,
+    fontWeight: '800',
+    letterSpacing: -0.3,
+  },
+  actionSublabel: {
+    color: '#475569',
+    fontSize: 11,
+    fontWeight: '500',
+    marginTop: 2,
+  },
+  tipCard: {
+    marginBottom: 24,
+    backgroundColor: '#0F1620',
+    borderWidth: 1,
+    borderColor: '#6366F135',
+    borderRadius: 16,
+    padding: 18,
+    overflow: 'hidden',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  tipAccentBar: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 3,
+  },
+  tipIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tipTextContent: {
+    flex: 1,
+  },
+  tipLabel: {
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 2,
+    marginBottom: 5,
+  },
+  tipText: {
+    color: '#94A3B8',
+    fontSize: 12,
+    fontWeight: '500',
+    lineHeight: 18,
+  },
+  activitySection: {
+    marginBottom: 0,
+  },
+  activityHeader: {
+    color: '#475569',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 2,
+    marginBottom: 14,
+  },
+  activityItemBlock: {
+    marginBottom: 16,
+  },
+  activityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  activityDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 12,
+  },
+  activityTextWrap: {
+    flex: 1,
+  },
+  activityActionText: {
+    color: '#64748B',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  activityObjectText: {
     color: '#F1F5F9',
     fontSize: 13,
     fontWeight: '700',
-    textAlign: 'center',
+  },
+  activityTimeText: {
+    color: '#334155',
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  activitySeparator: {
+    height: 1,
+    backgroundColor: '#0F1620',
+    marginLeft: 20,
+    marginTop: 16,
   },
 });
