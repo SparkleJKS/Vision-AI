@@ -1,1 +1,1 @@
-export { ConnectedDevicesScreen } from './ConnectedDevicesScreen';
+export { default as ConnectedDevicesScreen } from './ConnectedDevicesScreen';

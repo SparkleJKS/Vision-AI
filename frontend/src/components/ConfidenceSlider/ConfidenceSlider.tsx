@@ -11,12 +11,12 @@ import type { DimensionValue } from 'react-native';
 import { clamp } from './utils';
 import type { ConfidenceSliderProps } from './types';
 
-export function ConfidenceSlider({
+const ConfidenceSlider = ({
   value,
   onChange,
   min = 0.05,
   max = 0.95,
-}: ConfidenceSliderProps) {
+}: ConfidenceSliderProps) => {
   const [trackWidth, setTrackWidth] = useState(0);
 
   const normalizedValue = clamp(value, min, max);
@@ -90,7 +90,9 @@ export function ConfidenceSlider({
       <Text style={styles.sliderValue}>{Math.round(normalizedValue * 100)}%</Text>
     </View>
   );
-}
+};
+
+export default ConfidenceSlider;
 
 const styles = StyleSheet.create({
   sliderSection: {

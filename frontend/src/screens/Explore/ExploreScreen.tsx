@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme } from '@/theme';
 import CameraView from '../../components/CameraView';
 import DetectionOverlay from '../../components/DetectionOverlay';
 import { useExplorePermissions } from './hooks';
@@ -122,65 +123,77 @@ function FeatureCard({
 
   return (
     <Animated.View
-      style={[
-        styles.cardWrapper,
-        { opacity: fadeAnim, transform: [{ translateY }, { scale: scaleAnim }] },
-      ]}
+      className="rounded-2xl overflow-hidden"
+      style={{ opacity: fadeAnim, transform: [{ translateY }, { scale: scaleAnim }] }}
     >
       <Pressable
         onPress={() => isActive && onSelect(feature.id)}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        style={[styles.card, !isActive && styles.cardDisabled]}
+        className={`bg-[#0F1620] border border-[#1E2D3D] rounded-2xl p-5 overflow-hidden ${!isActive ? 'opacity-65' : ''}`}
       >
-        {/* Accent line */}
-        <View style={[styles.cardAccent, { backgroundColor: feature.accentColor }]} />
-
-        <View style={styles.cardHeader}>
-          <View style={[styles.iconContainer, { borderColor: feature.accentColor + '40' }]}>
-            <Text style={[styles.icon, { color: feature.accentColor }]}>{feature.icon}</Text>
+        <View
+          className="absolute top-0 left-5 right-5 h-px"
+          style={{ backgroundColor: feature.accentColor }}
+        />
+        <View className="flex-row justify-between items-center">
+          <View
+            className="w-11 h-11 rounded-xl border bg-[#0A0F18] justify-center items-center"
+            style={{ borderColor: feature.accentColor + '40' }}
+          >
+            <Text className="text-[22px]" style={{ color: feature.accentColor }}>
+              {feature.icon}
+            </Text>
           </View>
           <View
-            style={[
-              styles.statusBadge,
-              { backgroundColor: isActive ? feature.accentColor + '20' : '#1E293B' },
-            ]}
+            className="flex-row items-center gap-1.5 px-2.5 py-1.5 rounded-full"
+            style={{ backgroundColor: isActive ? feature.accentColor + '20' : '#1E293B' }}
           >
-            {!isActive && <View style={styles.statusDot} />}
+            {!isActive && (
+              <View className="w-1.5 h-1.5 rounded-full bg-[#64748B]" />
+            )}
             <Text
-              style={[
-                styles.statusText,
-                { color: isActive ? feature.accentColor : '#64748B' },
-              ]}
+              className="text-[10px] font-bold tracking-wider"
+              style={{ color: isActive ? feature.accentColor : '#64748B' }}
             >
               {isActive ? 'LIVE' : 'SOON'}
             </Text>
           </View>
         </View>
-
-        <Text style={styles.cardTitle}>{feature.title}</Text>
-        <Text style={styles.cardSubtitle}>{feature.subtitle}</Text>
-        <Text style={styles.cardDescription}>{feature.description}</Text>
-
+        <Text className="text-[#F1F5F9] text-xl font-bold tracking-tight mt-1">
+          {feature.title}
+        </Text>
+        <Text className="text-[#475569] text-xs font-medium tracking-wide -mt-1.5">
+          {feature.subtitle}
+        </Text>
+        <Text className="text-[#64748B] text-[13px] leading-5 mt-0.5">
+          {feature.description}
+        </Text>
         {feature.stats && (
-          <View style={styles.statsRow}>
+          <View className="flex-row gap-0 mt-1 border-t border-[#1E2D3D] pt-3.5">
             {feature.stats.map((stat, i) => (
-              <View key={i} style={styles.statItem}>
-                <Text style={[styles.statValue, { color: feature.accentColor }]}>{stat.value}</Text>
-                <Text style={styles.statLabel}>{stat.label}</Text>
+              <View key={i} className="flex-1 items-center gap-0.5">
+                <Text className="text-[15px] font-bold" style={{ color: feature.accentColor }}>
+                  {stat.value}
+                </Text>
+                <Text className="text-[#475569] text-[10px] font-medium tracking-wider">
+                  {stat.label}
+                </Text>
               </View>
             ))}
           </View>
         )}
-
         {isActive && (
           <View
-            style={[
-              styles.launchButton,
-              { backgroundColor: feature.accentColor + '15', borderColor: feature.accentColor + '40' },
-            ]}
+            className="border rounded-[10px] py-2.5 items-center mt-1"
+            style={{
+              backgroundColor: feature.accentColor + '15',
+              borderColor: feature.accentColor + '40',
+            }}
           >
-            <Text style={[styles.launchText, { color: feature.accentColor }]}>Launch →</Text>
+            <Text className="text-[13px] font-bold tracking-wide" style={{ color: feature.accentColor }}>
+              Launch →
+            </Text>
           </View>
         )}
       </Pressable>
@@ -191,9 +204,11 @@ function FeatureCard({
 function ObjectDetectionView({
   onBack,
   isFocused,
+  theme,
 }: {
   onBack: () => void;
   isFocused: boolean;
+  theme: import('@/theme/tokens').ThemeTokens;
 }) {
   const { permission, handlePermissionButtonPress } = useExplorePermissions();
   const [isLiveDetectionEnabled, setIsLiveDetectionEnabled] = useState(false);
@@ -224,46 +239,64 @@ function ObjectDetectionView({
 
   return (
     <Animated.View
-      style={[styles.detectionView, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}
+      className="flex-1 gap-3 px-4 pt-2"
+      style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}
     >
-      {/* Header */}
-      <View style={styles.detectionHeader}>
-        <Pressable onPress={onBack} style={styles.backButton}>
-          <Text style={styles.backArrow}>←</Text>
+      <View className="flex-row items-center gap-3 py-2">
+        <Pressable
+          onPress={onBack}
+          className="w-10 h-10 rounded-[10px] bg-[#0F1620] border border-[#1E2D3D] justify-center items-center"
+        >
+          <Text className="text-[#94A3B8] text-lg font-light">←</Text>
         </Pressable>
-        <View style={styles.detectionHeaderText}>
-          <Text style={styles.detectionTitle}>Object Detection</Text>
-          <Text style={styles.detectionSubtitle}>YOLOv8n · 80 Classes</Text>
+        <View className="flex-1 gap-0.5">
+          <Text className="text-[#F1F5F9] text-[17px] font-bold">Object Detection</Text>
+          <Text className="text-[#475569] text-[11px] font-medium tracking-wide">
+            YOLOv8n · 80 Classes
+          </Text>
         </View>
-        <View style={[styles.liveIndicator, isModelActive && styles.liveIndicatorActive]}>
-          <View style={[styles.liveDot, isModelActive && styles.liveDotActive]} />
-          <Text style={[styles.liveText, isModelActive && styles.liveTextActive]}>
+        <View
+          className={`flex-row items-center gap-1.5 px-2.5 py-1.5 rounded-lg border ${
+            isModelActive ? 'bg-[#22C55E15] border-[#22C55E35]' : 'bg-[#0F1620] border-[#1E2D3D]'
+          }`}
+        >
+          <View
+            className={`w-1.5 h-1.5 rounded-full ${
+              isModelActive ? 'bg-[#22C55E]' : 'bg-[#334155]'
+            }`}
+          />
+          <Text
+            className={`text-[10px] font-bold tracking-wider ${
+              isModelActive ? 'text-[#22C55E]' : 'text-[#475569]'
+            }`}
+          >
             {isModelActive ? 'LIVE' : 'OFF'}
           </Text>
         </View>
       </View>
 
-      {/* Camera */}
-      <View style={styles.cameraCard}>
+      <View className="flex-1 rounded-2xl border border-[#1E2D3D] bg-black overflow-hidden">
         {permission === null ? (
-          <View style={styles.centerContent}>
-            <ActivityIndicator size="large" color="#22C55E" />
+          <View className="flex-1 justify-center items-center gap-3.5 p-6">
+            <ActivityIndicator size="large" color={theme.primary} />
           </View>
         ) : !permission.granted ? (
-          <View style={styles.centerContent}>
-            <Text style={styles.permissionIcon}>⬡</Text>
-            <Text style={styles.permissionText}>Camera access required</Text>
+          <View className="flex-1 justify-center items-center gap-3.5 p-6">
+            <Text className="text-4xl text-[#1E2D3D]">⬡</Text>
+            <Text className="text-[#94A3B8] text-[15px] font-semibold text-center">
+              Camera access required
+            </Text>
             <Pressable
-              style={styles.permissionButton}
+              className="px-5 py-2.5 rounded-[10px] bg-[#22C55E]"
               onPress={() => void handlePermissionButtonPress()}
             >
-              <Text style={styles.permissionButtonText}>
+              <Text className="text-black text-[13px] font-bold">
                 {permission.canAskAgain ? 'Enable Camera' : 'Open Settings'}
               </Text>
             </Pressable>
           </View>
         ) : (
-          <View style={styles.cameraContainer}>
+          <View className="flex-1 relative">
             <CameraView
               style={StyleSheet.absoluteFill}
               isActive={isFocused}
@@ -272,40 +305,39 @@ function ObjectDetectionView({
             />
             <DetectionOverlay enabled={isModelActive} />
             {!isModelActive && (
-              <View style={styles.cameraOverlayHint}>
-                <Text style={styles.cameraHintText}>Press Start to begin detection</Text>
+              <View className="absolute bottom-4 left-0 right-0 items-center">
+                <Text className="text-[#475569] text-xs font-medium bg-[#080B10CC] px-3.5 py-1.5 rounded-full overflow-hidden">
+                  Press Start to begin detection
+                </Text>
               </View>
             )}
           </View>
         )}
       </View>
 
-      {/* Controls */}
-      <View style={styles.controlsRow}>
+      <View className="flex-row gap-2.5 pb-2">
         <Pressable
-          style={[
-            styles.controlButton,
-            styles.flipControlButton,
-            !canUseCamera && styles.controlButtonDisabled,
-          ]}
+          className={`w-[60px] py-2.5 rounded-xl justify-center items-center border gap-0.5 ${
+            !canUseCamera ? 'opacity-40' : ''
+          } bg-[#0F1620] border-[#1E2D3D]`}
           onPress={() => setFacing((f) => (f === 'back' ? 'front' : 'back'))}
           disabled={!canUseCamera}
         >
-          <Text style={styles.controlButtonIcon}>⟳</Text>
-          <Text style={styles.controlButtonLabel}>Flip</Text>
+          <Text className="text-[#94A3B8] text-xl">⟳</Text>
+          <Text className="text-[#475569] text-[10px] font-semibold">Flip</Text>
         </Pressable>
-
         <Pressable
-          style={[
-            styles.controlButton,
-            styles.mainControlButton,
-            isModelActive ? styles.stopControlButton : styles.startControlButton,
-            !canUseCamera && styles.controlButtonDisabled,
-          ]}
+          className={`flex-1 py-3.5 rounded-xl justify-center items-center border ${
+            !canUseCamera ? 'opacity-40' : ''
+          } ${
+            isModelActive
+              ? 'bg-[#0F1620] border-[#F59E0B50]'
+              : 'bg-[#22C55E] border-[#22C55E]'
+          }`}
           onPress={() => setIsLiveDetectionEnabled((v) => !v)}
           disabled={!canUseCamera}
         >
-          <Text style={styles.mainControlButtonText}>
+          <Text className="text-[#F1F5F9] text-sm font-bold tracking-wide">
             {isModelActive ? '◼ Stop Detection' : '▶ Start Detection'}
           </Text>
         </Pressable>
@@ -314,9 +346,10 @@ function ObjectDetectionView({
   );
 }
 
-export function ExploreScreen() {
+const ExploreScreen = () => {
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
   const [selectedFeature, setSelectedFeature] = useState<FeatureId | null>(null);
   useEffect(() => {
     if (!isFocused) setSelectedFeature(null);
@@ -324,29 +357,49 @@ export function ExploreScreen() {
 
   if (selectedFeature === 'objectDetection') {
     return (
-      <View style={[styles.screen, { paddingTop: insets.top, paddingBottom: insets.bottom }]}> 
-        <ObjectDetectionView onBack={() => setSelectedFeature(null)} isFocused={isFocused} />
+      <View
+        className="flex-1"
+        style={{
+          backgroundColor: theme.screenBg,
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+        }}
+      >
+        <ObjectDetectionView
+          onBack={() => setSelectedFeature(null)}
+          isFocused={isFocused}
+          theme={theme}
+        />
       </View>
     );
   }
 
   return (
-    <View style={[styles.screen, { paddingTop: insets.top }]}> 
+    <View
+      className="flex-1"
+      style={{ backgroundColor: theme.screenBg, paddingTop: insets.top }}
+    >
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 24 }]}
+        contentContainerStyle={{
+          paddingHorizontal: 16,
+          paddingTop: 8,
+          paddingBottom: insets.bottom + 24,
+        }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.headerBadge}>
-            <Text style={styles.headerBadgeText}>VISION AI</Text>
+        <View className="py-6 gap-2">
+          <View className="self-start border border-[#22C55E35] rounded-md px-2.5 py-1 mb-1 bg-[#22C55E18]">
+            <Text className="text-[#22C55E] text-[10px] font-bold tracking-widest">
+              VISION AI
+            </Text>
           </View>
-          <Text style={styles.headerTitle}>AI Tools</Text>
-          <Text style={styles.headerSubtitle}>Select a feature to get started</Text>
+          <Text className="text-[#F1F5F9] text-3xl font-extrabold tracking-tight">
+            AI Tools
+          </Text>
+          <Text className="text-[#475569] text-sm">Select a feature to get started</Text>
         </View>
 
-        {/* Feature Cards */}
-        <View style={styles.cardsContainer}>
+        <View className="gap-3.5">
           {FEATURES.map((feature, index) => (
             <FeatureCard
               key={feature.id}
@@ -357,363 +410,12 @@ export function ExploreScreen() {
           ))}
         </View>
 
-        {/* Footer note */}
-        <Text style={styles.footerNote}>More AI capabilities coming soon</Text>
+        <Text className="text-[#1E2D3D] text-xs text-center mt-6 tracking-wide">
+          More AI capabilities coming soon
+        </Text>
       </ScrollView>
     </View>
   );
-}
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: '#080B10',
-  },
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-  },
-
-  // Header
-  header: {
-    paddingVertical: 24,
-    gap: 8,
-  },
-  headerBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#22C55E18',
-    borderWidth: 1,
-    borderColor: '#22C55E35',
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginBottom: 4,
-  },
-  headerBadgeText: {
-    color: '#22C55E',
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 2,
-  },
-  headerTitle: {
-    color: '#F1F5F9',
-    fontSize: 32,
-    fontWeight: '800',
-    letterSpacing: -0.5,
-  },
-  headerSubtitle: {
-    color: '#475569',
-    fontSize: 14,
-    fontWeight: '400',
-  },
-
-  // Cards
-  cardsContainer: {
-    gap: 14,
-  },
-  cardWrapper: {
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  card: {
-    backgroundColor: '#0F1620',
-    borderWidth: 1,
-    borderColor: '#1E2D3D',
-    borderRadius: 16,
-    padding: 20,
-    gap: 10,
-    overflow: 'hidden',
-  },
-  cardDisabled: {
-    opacity: 0.65,
-  },
-  cardAccent: {
-    position: 'absolute',
-    top: 0,
-    left: 20,
-    right: 20,
-    height: 1,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  iconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    borderWidth: 1,
-    backgroundColor: '#0A0F18',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  icon: {
-    fontSize: 22,
-  },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 999,
-  },
-  statusDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 999,
-    backgroundColor: '#64748B',
-  },
-  statusText: {
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 1.5,
-  },
-  cardTitle: {
-    color: '#F1F5F9',
-    fontSize: 20,
-    fontWeight: '700',
-    letterSpacing: -0.3,
-    marginTop: 4,
-  },
-  cardSubtitle: {
-    color: '#475569',
-    fontSize: 12,
-    fontWeight: '500',
-    letterSpacing: 0.3,
-    marginTop: -6,
-  },
-  cardDescription: {
-    color: '#64748B',
-    fontSize: 13,
-    lineHeight: 20,
-    marginTop: 2,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    gap: 0,
-    marginTop: 4,
-    borderTopWidth: 1,
-    borderColor: '#1E2D3D',
-    paddingTop: 14,
-  },
-  statItem: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 3,
-  },
-  statValue: {
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  statLabel: {
-    color: '#475569',
-    fontSize: 10,
-    fontWeight: '500',
-    letterSpacing: 0.5,
-  },
-  launchButton: {
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingVertical: 10,
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  launchText: {
-    fontSize: 13,
-    fontWeight: '700',
-    letterSpacing: 0.5,
-  },
-  footerNote: {
-    color: '#1E2D3D',
-    fontSize: 12,
-    textAlign: 'center',
-    marginTop: 24,
-    letterSpacing: 0.5,
-  },
-
-  // Detection View
-  detectionView: {
-    flex: 1,
-    gap: 12,
-    paddingHorizontal: 16,
-    paddingTop: 8,
-  },
-  detectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 8,
-  },
-  backButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 10,
-    backgroundColor: '#0F1620',
-    borderWidth: 1,
-    borderColor: '#1E2D3D',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  backArrow: {
-    color: '#94A3B8',
-    fontSize: 18,
-    fontWeight: '300',
-  },
-  detectionHeaderText: {
-    flex: 1,
-    gap: 2,
-  },
-  detectionTitle: {
-    color: '#F1F5F9',
-    fontSize: 17,
-    fontWeight: '700',
-  },
-  detectionSubtitle: {
-    color: '#475569',
-    fontSize: 11,
-    fontWeight: '500',
-    letterSpacing: 0.3,
-  },
-  liveIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-    backgroundColor: '#0F1620',
-    borderWidth: 1,
-    borderColor: '#1E2D3D',
-  },
-  liveIndicatorActive: {
-    backgroundColor: '#22C55E15',
-    borderColor: '#22C55E35',
-  },
-  liveDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 999,
-    backgroundColor: '#334155',
-  },
-  liveDotActive: {
-    backgroundColor: '#22C55E',
-  },
-  liveText: {
-    color: '#475569',
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 1.5,
-  },
-  liveTextActive: {
-    color: '#22C55E',
-  },
-  cameraCard: {
-    flex: 1,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#1E2D3D',
-    backgroundColor: '#000',
-    overflow: 'hidden',
-  },
-  cameraContainer: {
-    flex: 1,
-    position: 'relative',
-  },
-  cameraOverlayHint: {
-    position: 'absolute',
-    bottom: 16,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-  },
-  cameraHintText: {
-    color: '#475569',
-    fontSize: 12,
-    fontWeight: '500',
-    backgroundColor: '#080B10CC',
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 999,
-    overflow: 'hidden',
-  },
-  centerContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 14,
-    padding: 24,
-  },
-  permissionIcon: {
-    fontSize: 40,
-    color: '#1E2D3D',
-  },
-  permissionText: {
-    color: '#94A3B8',
-    fontSize: 15,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  permissionButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 10,
-    backgroundColor: '#22C55E',
-  },
-  permissionButtonText: {
-    color: '#000',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  controlsRow: {
-    flexDirection: 'row',
-    gap: 10,
-    paddingBottom: 8,
-  },
-  controlButton: {
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-  },
-  flipControlButton: {
-    width: 60,
-    paddingVertical: 10,
-    backgroundColor: '#0F1620',
-    borderColor: '#1E2D3D',
-    gap: 2,
-  },
-  controlButtonIcon: {
-    color: '#94A3B8',
-    fontSize: 20,
-  },
-  controlButtonLabel: {
-    color: '#475569',
-    fontSize: 10,
-    fontWeight: '600',
-  },
-  controlButtonDisabled: {
-    opacity: 0.4,
-  },
-  mainControlButton: {
-    flex: 1,
-    paddingVertical: 14,
-  },
-  startControlButton: {
-    backgroundColor: '#22C55E',
-    borderColor: '#22C55E',
-  },
-  stopControlButton: {
-    backgroundColor: '#0F1620',
-    borderColor: '#F59E0B50',
-  },
-  mainControlButtonText: {
-    color: '#F1F5F9',
-    fontSize: 14,
-    fontWeight: '700',
-    letterSpacing: 0.3,
-  },
-});
+};
 
 export default ExploreScreen;

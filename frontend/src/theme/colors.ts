@@ -1,3 +1,4 @@
+/** @deprecated Use useTheme() for theme-aware colors. */
 export const colors = {
   // Backgrounds
   screenBg: '#080B10',
@@ -24,7 +25,6 @@ export const colors = {
   accentSky: '#38BDF8',
   accentTeal: '#14B8A6',
 
-  // Legacy aliases — do not remove, other screens depend on these
   accentYellow: '#22C55E',
   green: '#22C55E',
   warning: '#F59E0B',

@@ -7,18 +7,22 @@ import { HomeScreen } from '@/screens/Home';
 import { ExploreScreen } from '@/screens/Explore';
 import { VoiceScreen } from '@/screens/Voice';
 import { AlertsScreen } from '@/screens/Alerts';
-import { SettingsStack } from '@/screens/Settings/SettingsStack';
+import SettingsStack from '@/screens/Settings/SettingsStack';
+import { useTheme } from '@/theme/ThemeContext';
 
 const Tab = createBottomTabNavigator<IHomeTabParamList>();
 
-export function Tabs() {
+const Tabs = () => {
+  const { theme } = useTheme();
+  const inactiveColor = theme.tabInactive;
+
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#080B10',
-          borderTopColor: '#1E2D3D',
+          backgroundColor: theme.tabBarBg,
+          borderTopColor: theme.border,
           borderTopWidth: 1,
           elevation: 0,
           shadowOpacity: 0,
@@ -37,19 +41,13 @@ export function Tabs() {
             <Ionicons
               name={focused ? 'home' : 'home-outline'}
               size={22}
-              color={focused ? '#22C55E' : '#334155'}
+              color={focused ? theme.tabHome : inactiveColor}
             />
           ),
           tabBarLabel: ({ focused }) => (
             <Text
-              style={{
-                fontSize: 9,
-                fontWeight: '700',
-                letterSpacing: 1.5,
-                color: focused ? '#22C55E' : '#334155',
-                textTransform: 'uppercase',
-                marginTop: -2,
-              }}
+              className="text-[9px] font-bold tracking-widest uppercase -mt-0.5"
+              style={{ color: focused ? theme.tabHome : inactiveColor }}
             >
               HOME
             </Text>
@@ -65,19 +63,13 @@ export function Tabs() {
             <Ionicons
               name={focused ? 'compass' : 'compass-outline'}
               size={22}
-              color={focused ? '#22C55E' : '#334155'}
+              color={focused ? theme.tabExplore : inactiveColor}
             />
           ),
           tabBarLabel: ({ focused }) => (
             <Text
-              style={{
-                fontSize: 9,
-                fontWeight: '700',
-                letterSpacing: 1.5,
-                color: focused ? '#22C55E' : '#334155',
-                textTransform: 'uppercase',
-                marginTop: -2,
-              }}
+              className="text-[9px] font-bold tracking-widest uppercase -mt-0.5"
+              style={{ color: focused ? theme.tabExplore : inactiveColor }}
             >
               EXPLORE
             </Text>
@@ -93,19 +85,13 @@ export function Tabs() {
             <Ionicons
               name={focused ? 'mic' : 'mic-outline'}
               size={22}
-              color={focused ? '#6366F1' : '#334155'}
+              color={focused ? theme.tabVoice : inactiveColor}
             />
           ),
           tabBarLabel: ({ focused }) => (
             <Text
-              style={{
-                fontSize: 9,
-                fontWeight: '700',
-                letterSpacing: 1.5,
-                color: focused ? '#6366F1' : '#334155',
-                textTransform: 'uppercase',
-                marginTop: -2,
-              }}
+              className="text-[9px] font-bold tracking-widest uppercase -mt-0.5"
+              style={{ color: focused ? theme.tabVoice : inactiveColor }}
             >
               VOICE
             </Text>
@@ -121,19 +107,13 @@ export function Tabs() {
             <Ionicons
               name={focused ? 'notifications' : 'notifications-outline'}
               size={22}
-              color={focused ? '#F59E0B' : '#334155'}
+              color={focused ? theme.tabAlerts : inactiveColor}
             />
           ),
           tabBarLabel: ({ focused }) => (
             <Text
-              style={{
-                fontSize: 9,
-                fontWeight: '700',
-                letterSpacing: 1.5,
-                color: focused ? '#F59E0B' : '#334155',
-                textTransform: 'uppercase',
-                marginTop: -2,
-              }}
+              className="text-[9px] font-bold tracking-widest uppercase -mt-0.5"
+              style={{ color: focused ? theme.tabAlerts : inactiveColor }}
             >
               ALERTS
             </Text>
@@ -149,19 +129,13 @@ export function Tabs() {
             <Ionicons
               name={focused ? 'settings' : 'settings-outline'}
               size={22}
-              color={focused ? '#14B8A6' : '#334155'}
+              color={focused ? theme.tabSettings : inactiveColor}
             />
           ),
           tabBarLabel: ({ focused }) => (
             <Text
-              style={{
-                fontSize: 9,
-                fontWeight: '700',
-                letterSpacing: 1.5,
-                color: focused ? '#14B8A6' : '#334155',
-                textTransform: 'uppercase',
-                marginTop: -2,
-              }}
+              className="text-[9px] font-bold tracking-widest uppercase -mt-0.5"
+              style={{ color: focused ? theme.tabSettings : inactiveColor }}
             >
               SETTINGS
             </Text>
@@ -170,4 +144,6 @@ export function Tabs() {
       />
     </Tab.Navigator>
   );
-}
+};
+
+export default Tabs;

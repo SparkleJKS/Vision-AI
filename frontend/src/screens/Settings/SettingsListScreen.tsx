@@ -1,6 +1,5 @@
 import {
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -9,69 +8,120 @@ import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useTheme } from '@/theme';
 import { SETTINGS_ITEMS } from './config';
 import type { ISettingsStackParamList } from '@/screens/screens.types';
 
 type NavProp = NativeStackNavigationProp<ISettingsStackParamList>;
 
-const ITEM_ACCENT: Record<string, string> = {
-  profile: '#22C55E',
-  voiceAndAudio: '#6366F1',
-  visionSettings: '#38BDF8',
-  connectedDevices: '#14B8A6',
-  accessibility: '#A855F7',
+const ITEM_ACCENT_KEY: Record<
+  string,
+  | 'settingsProfile'
+  | 'settingsVoice'
+  | 'settingsVision'
+  | 'settingsDevices'
+  | 'settingsAccessibility'
+> = {
+  profile: 'settingsProfile',
+  voice: 'settingsVoice',
+  vision: 'settingsVision',
+  devices: 'settingsDevices',
+  accessibility: 'settingsAccessibility',
 };
 
-export function SettingsListScreen() {
+const SettingsListScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavProp>();
+  const { theme } = useTheme();
 
   return (
-    <View style={[styles.screen, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <View style={styles.headerBadge}>
-          <Text style={styles.headerBadgeText}>SETTINGS</Text>
+    <View
+      className="flex-1"
+      style={{ paddingTop: insets.top, backgroundColor: theme.screenBg }}
+    >
+      <View className="px-4 pt-6 pb-4">
+        <View
+          className="self-start border rounded-md px-2.5 py-1 mb-2"
+          style={{
+            backgroundColor: `${theme.tabSettings}18`,
+            borderColor: `${theme.tabSettings}35`,
+          }}
+        >
+          <Text
+            className="text-[10px] font-bold tracking-widest"
+            style={{ color: theme.tabSettings }}
+          >
+            SETTINGS
+          </Text>
         </View>
-        <Text style={styles.title}>Preferences</Text>
-        <Text style={styles.subtitle}>Configure your experience</Text>
+        <Text
+          className="text-3xl font-extrabold tracking-tight"
+          style={{ color: theme.white }}
+        >
+          Preferences
+        </Text>
+        <Text
+          className="text-[13px] mt-1"
+          style={{ color: theme.grey }}
+        >
+          Configure your experience
+        </Text>
       </View>
 
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 80 }]}
+        className="flex-1"
+        contentContainerStyle={{
+          paddingHorizontal: 16,
+          paddingBottom: insets.bottom + 80,
+        }}
         showsVerticalScrollIndicator={false}
       >
         {SETTINGS_ITEMS.map((item) => {
-          const accent =
-            ITEM_ACCENT[item.id] ??
-            ITEM_ACCENT[
-              `${item.screenName.charAt(0).toLowerCase()}${item.screenName.slice(1)}`
-            ] ??
-            '#475569';
+          const key = ITEM_ACCENT_KEY[item.id];
+          const accent = key ? theme[key] : theme.grey;
 
           return (
             <TouchableOpacity
               key={item.id}
-              style={styles.rowCard}
+              className="border rounded-2xl p-4 mb-3 overflow-hidden flex-row items-center"
+              style={{
+                backgroundColor: theme.cardBg,
+                borderColor: theme.border,
+              }}
               activeOpacity={0.8}
               onPress={() => navigation.navigate(item.screenName)}
             >
-              <View style={[styles.cardAccentLine, { backgroundColor: accent }]} />
-              <View style={[styles.iconContainer, { borderColor: `${accent}40` }]}>
-                <Ionicons
-                  name={item.icon}
-                  size={22}
-                  color={accent}
-                />
+              <View
+                className="absolute top-0 left-0 right-0 h-0.5"
+                style={{ backgroundColor: accent }}
+              />
+              <View
+                className="w-11 h-11 rounded-xl border justify-center items-center mr-3.5"
+                style={{
+                  borderColor: `${accent}40`,
+                  backgroundColor: theme.darkBg,
+                }}
+              >
+                <Ionicons name={item.icon} size={22} color={accent} />
               </View>
-              <View style={styles.textBlock}>
-                <Text style={styles.itemTitle}>{item.title}</Text>
-                <Text style={styles.itemSubtitle}>{item.subtitle}</Text>
+              <View className="flex-1">
+                <Text
+                  className="text-[15px] font-bold mb-0.5"
+                  style={{ color: theme.white }}
+                >
+                  {item.title}
+                </Text>
+                <Text
+                  className="text-xs font-medium"
+                  style={{ color: theme.grey }}
+                >
+                  {item.subtitle}
+                </Text>
               </View>
               <Ionicons
                 name="chevron-forward"
                 size={18}
-                color="#334155"
+                color={theme.tabInactive}
               />
             </TouchableOpacity>
           );
@@ -79,91 +129,6 @@ export function SettingsListScreen() {
       </ScrollView>
     </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: '#080B10',
-  },
-  header: {
-    paddingHorizontal: 16,
-    paddingTop: 24,
-    paddingBottom: 16,
-  },
-  headerBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#14B8A618',
-    borderWidth: 1,
-    borderColor: '#14B8A635',
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginBottom: 8,
-  },
-  headerBadgeText: {
-    color: '#14B8A6',
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 2,
-  },
-  title: {
-    color: '#F1F5F9',
-    fontSize: 32,
-    fontWeight: '800',
-    letterSpacing: -0.5,
-  },
-  subtitle: {
-    color: '#475569',
-    fontSize: 13,
-    marginTop: 4,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 16,
-  },
-  rowCard: {
-    backgroundColor: '#0F1620',
-    borderWidth: 1,
-    borderColor: '#1E2D3D',
-    borderRadius: 16,
-    padding: 18,
-    marginBottom: 12,
-    overflow: 'hidden',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cardAccentLine: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 2,
-  },
-  iconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    borderWidth: 1,
-    backgroundColor: '#0A0F18',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 14,
-  },
-  textBlock: {
-    flex: 1,
-  },
-  itemTitle: {
-    color: '#F1F5F9',
-    fontSize: 15,
-    fontWeight: '700',
-    marginBottom: 2,
-  },
-  itemSubtitle: {
-    color: '#475569',
-    fontSize: 12,
-    fontWeight: '500',
-  },
-});
+export default SettingsListScreen;

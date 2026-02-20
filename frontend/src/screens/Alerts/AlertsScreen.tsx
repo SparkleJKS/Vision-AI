@@ -32,7 +32,7 @@ const ALERTS = [
   },
 ];
 
-export function AlertsScreen() {
+const AlertsScreen = () => {
   const insets = useSafeAreaInsets();
 
   return (
@@ -82,7 +82,9 @@ export function AlertsScreen() {
       </ScrollView>
     </View>
   );
-}
+};
+
+export default AlertsScreen;
 
 const styles = StyleSheet.create({
   screen: {

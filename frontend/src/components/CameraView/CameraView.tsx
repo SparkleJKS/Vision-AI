@@ -11,13 +11,13 @@ import {
 import type { Frame } from 'react-native-vision-camera'
 import type { CameraViewProps } from './types'
 
-export function CameraView({
+const CameraView = ({
   style,
   isActive,
   detectionEnabled,
   facing,
   maxInferenceFps,
-}: CameraViewProps) {
+}: CameraViewProps) => {
   const active = isActive ?? false
   const enabled = detectionEnabled ?? false
   const cameraFacing = facing ?? 'back'
@@ -104,8 +104,8 @@ export function CameraView({
       video={false}
       audio={false}
     />
-  )
-}
+  );
+};
 
-export default CameraView
+export default CameraView;
 

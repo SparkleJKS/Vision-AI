@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { DeviceEventEmitter, StyleSheet, Text, type LayoutChangeEvent, View } from 'react-native';
+import { DeviceEventEmitter, Text, type LayoutChangeEvent, View } from 'react-native';
 
 const COCO_CLASSES: string[] = [
   'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat',
@@ -104,7 +104,7 @@ function useLatestDetectionsLoop(enabled: boolean) {
   return { latestDetectionsRef, detectionsVersionRef };
 }
 
-export function DetectionOverlay({ enabled = true }: DetectionOverlayProps) {
+const DetectionOverlay = ({ enabled = true }: DetectionOverlayProps) => {
   const { latestDetectionsRef, detectionsVersionRef } = useLatestDetectionsLoop(enabled);
   const viewSizeRef = useRef<ViewSize>({ width: 0, height: 0 });
   const boxRefs = useRef<Array<View | null>>([]);
@@ -214,52 +214,36 @@ export function DetectionOverlay({ enabled = true }: DetectionOverlayProps) {
   }, [detectionsVersionRef, enabled, hideAllBoxes, latestDetectionsRef]);
 
   return (
-    <View pointerEvents="none" style={styles.overlay} onLayout={handleLayout}>
+    <View
+      pointerEvents="none"
+      className="absolute inset-0 z-20"
+      onLayout={handleLayout}
+    >
       <>
         {Array.from({ length: MAX_RENDER_BOXES }, (_, i) => (
-          <View key={`box-${i}`} ref={boxRefCallbacks[i]} style={styles.box} />
+          <View
+            key={`box-${i}`}
+            ref={boxRefCallbacks[i]}
+            className="absolute left-0 top-0 w-0 h-0 opacity-0 border-[2.5px] border-[#00FF41]"
+          />
         ))}
         {labels.map((label, i) => (
           <View
             key={`label-${i}`}
-            style={[styles.labelContainer, { left: label.left, top: label.top, backgroundColor: label.color }]}
+            className="absolute px-1.5 py-0.5 rounded-[5px] max-w-[140px]"
+            style={{ left: label.left, top: label.top, backgroundColor: label.color }}
           >
-            <Text style={styles.labelText} numberOfLines={1}>{label.text}</Text>
+            <Text
+              className="text-black text-xs font-black tracking-wide"
+              numberOfLines={1}
+            >
+              {label.text}
+            </Text>
           </View>
         ))}
       </>
     </View>
   );
-}
-
-const styles = StyleSheet.create({
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 20,
-  },
-  box: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    width: 0,
-    height: 0,
-    opacity: 0,
-    borderWidth: 2.5,
-    borderColor: '#00FF41',
-  },
-  labelContainer: {
-    position: 'absolute',
-    paddingHorizontal: 7,
-    paddingVertical: 3,
-    borderRadius: 5,
-    maxWidth: 140,
-  },
-  labelText: {
-    color: '#000000',
-    fontSize: 12,
-    fontWeight: '900',
-    letterSpacing: 0.3,
-  },
-});
+};
 
 export default DetectionOverlay;

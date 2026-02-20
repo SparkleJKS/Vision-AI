@@ -1,3 +1,3 @@
-export { SignInScreen } from './SignInScreen';
-export { SignUpScreen } from './SignUpScreen';
-export { AuthStack } from './AuthStack';
+export { default as SignInScreen } from './SignInScreen';
+export { default as SignUpScreen } from './SignUpScreen';
+export { default as AuthStack } from './AuthStack';

@@ -24,7 +24,6 @@ export const ONNX_GRAPH_OPT_LEVEL = 'all';
 export const ONNX_INTRA_OP_THREADS = 2;
 export const ONNX_INTER_OP_THREADS = 1;
 
-// Theme colors for Explore screen
 export const EXPLORE_COLORS = {
   panelBg: '#16191F',
   surfaceBg: '#0E1015',

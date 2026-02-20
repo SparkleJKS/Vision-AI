@@ -1,13 +1,13 @@
-import { Component, type ErrorInfo, type ReactNode } from "react";
+import { Component, type ErrorInfo, type ReactNode } from 'react';
 import {
   ActivityIndicator,
   useWindowDimensions,
   View,
   Text,
-} from "react-native";
-import { Lottie } from "@/animations/components";
-import { AppInit } from "@/animations/assets";
-import tokens from "@/theme/tokens";
+} from 'react-native';
+import { Lottie } from '@/animations/components';
+import { AppInit } from '@/animations/assets';
+import { useTheme } from '@/theme/ThemeContext';
 
 type Props = { children: ReactNode };
 
@@ -17,7 +17,7 @@ class SplashErrorBoundary extends Component<Props, { hasError: boolean }> {
   static getDerivedStateFromError = () => ({ hasError: true });
 
   componentDidCatch(error: Error, _info: ErrorInfo) {
-    if (__DEV__) console.warn("[Splash] Lottie failed:", error?.message);
+    if (__DEV__) console.warn('[Splash] Lottie failed:', error?.message);
   }
 
   render() {
@@ -28,29 +28,32 @@ class SplashErrorBoundary extends Component<Props, { hasError: boolean }> {
 
 function FallbackSplash() {
   const { width, height } = useWindowDimensions();
+  const { theme } = useTheme();
   return (
     <View
-      className={`justify-center items-center bg-${tokens.screenBg}`}
-      style={{ width, height }}
+      className="justify-center items-center"
+      style={{ width, height, backgroundColor: theme.screenBg }}
     >
-      <Text className="mb-6 font-semibold text-3xl text-white">VisionAI</Text>
-      <ActivityIndicator
-        size="large"
-        color={tokens.accentYellow}
-        className="mt-2"
-      />
+      <Text
+        className="mb-6 text-3xl font-semibold"
+        style={{ color: theme.white }}
+      >
+        VisionAI
+      </Text>
+      <ActivityIndicator size="large" color={theme.primary} className="mt-2" />
     </View>
   );
 }
 
-export function Splash() {
+const Splash = () => {
   const { width, height } = useWindowDimensions();
+  const { theme } = useTheme();
 
   return (
     <SplashErrorBoundary>
       <View
-        className={`justify-center items-center bg-${tokens.screenBg}`}
-        style={{ width, height }}
+        className="justify-center items-center"
+        style={{ width, height, backgroundColor: theme.screenBg }}
       >
         <Lottie
           source={AppInit}
@@ -64,4 +67,6 @@ export function Splash() {
       </View>
     </SplashErrorBoundary>
   );
-}
+};
+
+export default Splash;

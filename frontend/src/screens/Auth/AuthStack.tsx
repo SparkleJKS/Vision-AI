@@ -6,17 +6,17 @@ import { SignInScreen, SignUpScreen } from './index';
 
 const Stack = createNativeStackNavigator<IAuthStackParamList>();
 
-export function AuthStack() {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-        animation: 'slide_from_right',
-        gestureEnabled: true,
-      }}
-    >
-      <Stack.Screen name={ScreenNames.SignIn} component={SignInScreen} />
-      <Stack.Screen name={ScreenNames.SignUp} component={SignUpScreen} />
-    </Stack.Navigator>
-  );
-}
+const AuthStack = () => (
+  <Stack.Navigator
+    screenOptions={{
+      headerShown: false,
+      animation: 'slide_from_right',
+      gestureEnabled: true,
+    }}
+  >
+    <Stack.Screen name={ScreenNames.SignIn} component={SignInScreen} />
+    <Stack.Screen name={ScreenNames.SignUp} component={SignUpScreen} />
+  </Stack.Navigator>
+);
+
+export default AuthStack;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Text,
   View,
@@ -8,25 +8,26 @@ import {
   Platform,
   ActivityIndicator,
   ScrollView,
-} from "react-native";
-import { useDispatch } from "react-redux";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Ionicons } from "@react-native-vector-icons/ionicons";
-import { colors } from "@/theme/colors";
-import { useAuth } from "@/auth/AuthContext";
-import { navigationActions } from "@/store/actions/navigation";
-import type { AppDispatch } from "@/store";
+} from 'react-native';
+import { useDispatch } from 'react-redux';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@react-native-vector-icons/ionicons';
+import { useTheme } from '@/theme';
+import { useAuth } from '@/auth/AuthContext';
+import { navigationActions } from '@/store/actions/navigation';
+import type { AppDispatch } from '@/store';
 
-export function SignUpScreen() {
+const SignUpScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
   const { signUpWithEmail, signInWithGoogle, authError, clearAuthError } =
     useAuth();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const errorMessage = validationError ?? authError;
@@ -37,15 +38,15 @@ export function SignUpScreen() {
 
   const handleSignUp = async () => {
     if (!email.trim() || !password || !confirmPassword) {
-      setValidationError("Please fill in all fields");
+      setValidationError('Please fill in all fields');
       return;
     }
     if (password !== confirmPassword) {
-      setValidationError("Passwords do not match");
+      setValidationError('Passwords do not match');
       return;
     }
     if (password.length < 6) {
-      setValidationError("Password must be at least 6 characters");
+      setValidationError('Password must be at least 6 characters');
       return;
     }
     setLoading(true);
@@ -73,34 +74,50 @@ export function SignUpScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-screen"
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
-      keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}
+      className="flex-1"
+      style={{
+        backgroundColor: theme.screenBg,
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+      }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : 0}
     >
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: 'center',
           paddingHorizontal: 24,
           paddingBottom: insets.bottom + 40,
-          flexGrow: 1,
-          justifyContent: "center",
         }}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         showsVerticalScrollIndicator={false}
       >
-        <Text className="text-white text-[28px] font-bold mb-2">
+        <Text
+          className="text-3xl font-bold mb-2"
+          style={{ color: theme.white }}
+        >
           Create account
         </Text>
-        <Text className="text-grey text-base mb-8">
+        <Text className="text-base mb-8" style={{ color: theme.grey }}>
           Sign up to get started with VisionAI
         </Text>
 
         {errorMessage ? (
-          <View className="bg-card rounded-xl p-3 mb-4 flex-row items-center border-l-4 border-warning">
-            <Ionicons name="information-circle" size={20} color={colors.warning} />
-            <Text className="text-white text-sm ml-3 flex-1">
+          <View
+            className="flex-row items-center p-3 rounded-xl mb-4 border-l-4"
+            style={{
+              backgroundColor: theme.cardBg,
+              borderLeftColor: theme.warning,
+            }}
+          >
+            <Ionicons name="information-circle" size={20} color={theme.warning} />
+            <Text
+              className="text-sm ml-3 flex-1"
+              style={{ color: theme.white }}
+            >
               {errorMessage}
             </Text>
             <TouchableOpacity
@@ -108,15 +125,16 @@ export function SignUpScreen() {
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
               className="p-1"
             >
-              <Ionicons name="close" size={20} color={colors.grey} />
+              <Ionicons name="close" size={20} color={theme.grey} />
             </TouchableOpacity>
           </View>
         ) : null}
 
         <TextInput
-          className="bg-card rounded-xl px-4 py-3.5 text-white text-base mb-3"
+          className="rounded-xl px-4 py-3.5 text-base mb-3"
+          style={{ backgroundColor: theme.cardBg, color: theme.white }}
           placeholder="Email"
-          placeholderTextColor={colors.grey}
+          placeholderTextColor={theme.grey}
           value={email}
           onChangeText={(v) => {
             setEmail(v);
@@ -128,9 +146,10 @@ export function SignUpScreen() {
           editable={!loading}
         />
         <TextInput
-          className="bg-card rounded-xl px-4 py-3.5 text-white text-base mb-3"
+          className="rounded-xl px-4 py-3.5 text-base mb-3"
+          style={{ backgroundColor: theme.cardBg, color: theme.white }}
           placeholder="Password (min 6 characters)"
-          placeholderTextColor={colors.grey}
+          placeholderTextColor={theme.grey}
           value={password}
           onChangeText={(v) => {
             setPassword(v);
@@ -141,9 +160,10 @@ export function SignUpScreen() {
           editable={!loading}
         />
         <TextInput
-          className="bg-card rounded-xl px-4 py-3.5 text-white text-base mb-6"
+          className="rounded-xl px-4 py-3.5 text-base mb-6"
+          style={{ backgroundColor: theme.cardBg, color: theme.white }}
           placeholder="Confirm password"
-          placeholderTextColor={colors.grey}
+          placeholderTextColor={theme.grey}
           value={confirmPassword}
           onChangeText={(v) => {
             setConfirmPassword(v);
@@ -155,7 +175,8 @@ export function SignUpScreen() {
         />
 
         <TouchableOpacity
-          className="bg-accent rounded-xl py-3.5 items-center mb-4"
+          className="rounded-xl py-3.5 items-center mb-4"
+          style={{ backgroundColor: theme.primary }}
           activeOpacity={0.8}
           onPress={handleSignUp}
           disabled={loading}
@@ -163,38 +184,62 @@ export function SignUpScreen() {
           {loading ? (
             <ActivityIndicator color="#000" />
           ) : (
-            <Text className="text-black text-base font-bold">Sign Up</Text>
+            <Text className="text-base font-bold text-black">Sign Up</Text>
           )}
         </TouchableOpacity>
 
         <View className="flex-row items-center mb-4">
-          <View className="flex-1 h-px bg-border" />
-          <Text className="text-grey text-sm mx-4">or</Text>
-          <View className="flex-1 h-px bg-border" />
+          <View
+            className="flex-1 h-px"
+            style={{ backgroundColor: theme.border }}
+          />
+          <Text className="text-sm mx-4" style={{ color: theme.grey }}>
+            or
+          </Text>
+          <View
+            className="flex-1 h-px"
+            style={{ backgroundColor: theme.border }}
+          />
         </View>
 
         <TouchableOpacity
-          className="bg-card rounded-xl py-3.5 flex-row items-center justify-center border border-border"
+          className="flex-row items-center justify-center rounded-xl py-3.5 border"
+          style={{
+            backgroundColor: theme.cardBg,
+            borderColor: theme.border,
+          }}
           activeOpacity={0.8}
           onPress={handleGoogleSignIn}
           disabled={loading}
         >
-          <Ionicons name="logo-google" size={22} color={colors.white} />
-          <Text className="text-white text-base font-semibold ml-3">
+          <Ionicons name="logo-google" size={22} color={theme.white} />
+          <Text
+            className="text-base font-semibold ml-3"
+            style={{ color: theme.white }}
+          >
             Continue with Google
           </Text>
         </TouchableOpacity>
 
         <View className="flex-row justify-center mt-6">
-          <Text className="text-grey text-sm">Already have an account? </Text>
+          <Text className="text-sm" style={{ color: theme.grey }}>
+            Already have an account?{' '}
+          </Text>
           <TouchableOpacity
             onPress={() => dispatch(navigationActions.toSignIn())}
             disabled={loading}
           >
-            <Text className="text-accent text-sm font-semibold">Sign In</Text>
+            <Text
+              className="text-sm font-semibold"
+              style={{ color: theme.primary }}
+            >
+              Sign In
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
-}
+};
+
+export default SignUpScreen;
