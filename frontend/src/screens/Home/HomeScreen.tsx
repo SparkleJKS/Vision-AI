@@ -10,6 +10,7 @@ import {
 import { useDispatch } from "react-redux";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTheme } from "@/theme";
 import { useBackHandler } from "@/navigators";
 import { useAuth } from "@/auth/AuthContext";
 import { navigationActions } from "@/store/actions/navigation";
@@ -109,6 +110,7 @@ const AI_TIP = {
 const HomeScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
   const { user } = useAuth();
   const greeting = useMemo(() => getGreeting(), []);
 
@@ -156,7 +158,7 @@ const HomeScreen = () => {
   });
 
   return (
-    <View className="flex-1 bg-[#080B10]" style={{ paddingTop: insets.top }}>
+    <View className="flex-1" style={{ paddingTop: insets.top, backgroundColor: theme.screenBg }}>
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: 16,
@@ -170,29 +172,27 @@ const HomeScreen = () => {
           style={sectionAnimStyle(headerAnim)}
         >
           <View className="flex-1">
-            <Text className="text-sm font-medium mb-1 text-[#64748B]">
+            <Text className="text-sm font-medium mb-1" style={{ color: theme.grey }}>
               {greeting},
             </Text>
-            <Text className="text-3xl font-black tracking-tight text-[#F1F5F9]">
+            <Text className="text-3xl font-black tracking-tight" style={{ color: theme.primary }}>
               {displayName}
             </Text>
             <View className="flex-row items-center mt-1.5">
-              <View className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" />
-              <Text className="text-xs font-semibold ml-1.5 text-[#22C55E]">
+              <View className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: theme.primary }} />
+              <Text className="text-xs font-semibold ml-1.5" style={{ color: theme.primary }}>
                 Vision AI Active
               </Text>
             </View>
           </View>
           <Pressable
-            className="w-12 h-12 rounded-[14px] justify-center items-center border border-[#1E2D3D] bg-[#0F1620]"
+            className="w-12 h-12 rounded-[14px] justify-center items-center"
+            style={{ backgroundColor: theme.primary }}
             onPress={handlePressProfile}
           >
-            <View className="items-center">
-              <Text className="text-[17px] font-extrabold text-[#F1F5F9]">
-                {displayName[0]?.toUpperCase() ?? "U"}
-              </Text>
-              <View className="w-1.5 h-1.5 rounded-full bg-[#22C55E] mt-0.5" />
-            </View>
+            <Text className="text-[17px] font-extrabold" style={{ color: theme.screenBg }}>
+              {displayName[0]?.toUpperCase() ?? "U"}
+            </Text>
           </Pressable>
         </Animated.View>
 
@@ -201,22 +201,23 @@ const HomeScreen = () => {
             {STATS.map((stat) => (
               <View
                 key={stat.id}
-                className="flex-1 bg-[#0F1620] border border-[#1E2D3D] rounded-[14px] p-3.5 items-start overflow-hidden"
+                className="flex-1 rounded-[14px] p-3.5 items-start overflow-hidden border"
+                style={{ backgroundColor: theme.cardBg, borderColor: theme.border }}
               >
                 <View
                   className="absolute top-0 left-0 right-0 h-0.5"
-                  style={{ backgroundColor: stat.accent }}
+                  style={{ backgroundColor: theme.primary }}
                 />
                 <Ionicons
                   name={stat.icon as any}
                   size={16}
-                  color={stat.accent}
+                  color={theme.primary}
                   className="mb-2"
                 />
-                <Text className="text-[22px] font-black tracking-tight text-[#F1F5F9]">
+                <Text className="text-[22px] font-black tracking-tight" style={{ color: theme.white }}>
                   {stat.value}
                 </Text>
-                <Text className="text-[10px] font-semibold tracking-wider uppercase mt-0.5 text-[#475569]">
+                <Text className="text-[10px] font-semibold tracking-wider uppercase mt-0.5" style={{ color: theme.grey }}>
                   {stat.label}
                 </Text>
               </View>
@@ -226,75 +227,90 @@ const HomeScreen = () => {
 
         <Animated.View style={sectionAnimStyle(gridAnim)}>
           <View className="flex-row justify-between items-center mb-3.5">
-            <Text className="text-[10px] font-bold tracking-widest text-[#475569]">
+            <Text className="text-[10px] font-bold tracking-widest" style={{ color: theme.grey }}>
               QUICK ACTIONS
             </Text>
-            <Text className="text-[11px] font-semibold text-[#334155]">
+            <Text className="text-[11px] font-semibold" style={{ color: theme.muted }}>
               See all →
             </Text>
           </View>
 
           <View className="flex-row flex-wrap gap-2.5 mb-6">
-            {QUICK_ACTIONS.map((action) => (
-              <TouchableOpacity
-                key={action.id}
-                className="w-[47.5%] bg-[#0F1620] border border-[#1E2D3D] rounded-2xl p-4 overflow-hidden min-h-[110px]"
-                activeOpacity={0.85}
-                onPress={() => {}}
-              >
-                <View
-                  className="absolute -top-5 -right-5 w-[60px] h-[60px] rounded-full"
-                  style={{ backgroundColor: `${action.accent}18` }}
-                />
-                <View
-                  className="absolute top-0 left-0 right-0 h-0.5"
-                  style={{ backgroundColor: action.accent }}
-                />
-                <View
-                  className="w-10 h-10 rounded-[10px] border justify-center items-center mb-3"
+            {QUICK_ACTIONS.map((action, index) => {
+              const isHighlighted = index === 0;
+              return (
+                <TouchableOpacity
+                  key={action.id}
+                  className="w-[47.5%] rounded-2xl p-4 overflow-hidden min-h-[110px] border"
                   style={{
-                    backgroundColor: `${action.accent}15`,
-                    borderColor: `${action.accent}30`,
+                    backgroundColor: isHighlighted ? theme.primary : theme.cardBg,
+                    borderColor: isHighlighted ? theme.primary : theme.border,
                   }}
+                  activeOpacity={0.85}
+                  onPress={() => {}}
                 >
-                  <Ionicons
-                    name={action.icon as any}
-                    size={20}
-                    color={action.accent}
+                  <View
+                    className="absolute -top-5 -right-5 w-[60px] h-[60px] rounded-full"
+                    style={{ backgroundColor: isHighlighted ? `${theme.primary}50` : `${theme.primary}18` }}
                   />
-                </View>
-                <Text className="text-[15px] font-extrabold tracking-tight text-[#F1F5F9]">
-                  {action.label}
-                </Text>
-                <Text className="text-[11px] font-medium mt-0.5 text-[#475569]">
-                  {action.sublabel}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                  {!isHighlighted && (
+                    <View
+                      className="absolute top-0 left-0 right-0 h-0.5"
+                      style={{ backgroundColor: theme.primary }}
+                    />
+                  )}
+                  <View
+                    className="w-10 h-10 rounded-[10px] border justify-center items-center mb-3"
+                    style={{
+                      backgroundColor: isHighlighted ? 'rgba(0,0,0,0.2)' : `${theme.primary}15`,
+                      borderColor: isHighlighted ? 'rgba(0,0,0,0.25)' : `${theme.primary}30`,
+                    }}
+                  >
+                    <Ionicons
+                      name={action.icon as any}
+                      size={20}
+                      color={isHighlighted ? theme.screenBg : theme.primary}
+                    />
+                  </View>
+                  <Text
+                    className="text-[15px] font-extrabold tracking-tight"
+                    style={{ color: isHighlighted ? theme.screenBg : theme.white }}
+                  >
+                    {action.label}
+                  </Text>
+                  <Text
+                    className="text-[11px] font-medium mt-0.5"
+                    style={{ color: isHighlighted ? 'rgba(0,0,0,0.7)' : theme.grey }}
+                  >
+                    {action.sublabel}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
-          <View className="mb-6 bg-[#0F1620] border border-[#6366F135] rounded-2xl p-4 overflow-hidden flex-row items-center gap-3.5">
+          <View
+            className="mb-6 rounded-2xl p-4 overflow-hidden flex-row items-center gap-3.5 border"
+            style={{ backgroundColor: theme.cardBg, borderColor: `${theme.primary}35` }}
+          >
             <View
               className="absolute left-0 top-0 bottom-0 w-0.5"
-              style={{ backgroundColor: AI_TIP.accent }}
+              style={{ backgroundColor: theme.primary }}
             />
             <View
               className="w-9 h-9 rounded-[10px] border justify-center items-center"
               style={{
-                backgroundColor: `${AI_TIP.accent}18`,
-                borderColor: `${AI_TIP.accent}35`,
+                backgroundColor: `${theme.primary}18`,
+                borderColor: `${theme.primary}35`,
               }}
             >
-              <Ionicons name="sparkles" size={18} color={AI_TIP.accent} />
+              <Ionicons name="sparkles" size={18} color={theme.primary} />
             </View>
             <View className="flex-1">
-              <Text
-                className="text-[9px] font-bold tracking-widest mb-1"
-                style={{ color: AI_TIP.accent }}
-              >
+              <Text className="text-[9px] font-bold tracking-widest mb-1" style={{ color: theme.primary }}>
                 AI TIP
               </Text>
-              <Text className="text-xs font-medium leading-[18px] text-[#94A3B8]">
+              <Text className="text-xs font-medium leading-[18px]" style={{ color: theme.grey }}>
                 {AI_TIP.text}
               </Text>
             </View>
@@ -302,7 +318,7 @@ const HomeScreen = () => {
         </Animated.View>
 
         <Animated.View style={sectionAnimStyle(activityAnim)}>
-          <Text className="text-[10px] font-bold tracking-widest text-[#475569] mb-3.5">
+          <Text className="text-[10px] font-bold tracking-widest mb-3.5" style={{ color: theme.grey }}>
             RECENT ACTIVITY
           </Text>
 
@@ -311,23 +327,23 @@ const HomeScreen = () => {
               <View className="flex-row items-center">
                 <View
                   className="w-2 h-2 rounded-full mr-3"
-                  style={{ backgroundColor: item.accent }}
+                  style={{ backgroundColor: theme.primary }}
                 />
                 <View className="flex-1">
-                  <Text className="text-[13px] font-medium text-[#64748B]">
+                  <Text className="text-[13px] font-medium" style={{ color: theme.grey }}>
                     {item.action}
-                    <Text className="text-[13px] font-bold text-[#F1F5F9]">
+                    <Text className="text-[13px] font-bold" style={{ color: theme.white }}>
                       {" "}
                       {item.object}
                     </Text>
                   </Text>
                 </View>
-                <Text className="text-[11px] font-medium text-[#334155]">
+                <Text className="text-[11px] font-medium" style={{ color: theme.muted }}>
                   {item.timeAgo}
                 </Text>
               </View>
               {index < RECENT_ACTIVITY.length - 1 && (
-                <View className="h-px bg-[#0F1620] ml-5 mt-4" />
+                <View className="h-px ml-5 mt-4" style={{ backgroundColor: theme.cardBg }} />
               )}
             </View>
           ))}

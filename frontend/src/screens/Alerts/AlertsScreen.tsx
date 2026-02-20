@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme } from '@/theme';
 
 const ALERTS = [
   {
@@ -34,16 +35,22 @@ const ALERTS = [
 
 const AlertsScreen = () => {
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
 
   return (
-    <View style={[styles.screen, { paddingTop: insets.top }]}>
+    <View style={[styles.screen, { paddingTop: insets.top, backgroundColor: theme.screenBg }]}>
       <View style={styles.header}>
-        <View style={styles.headerBadge}>
-          <Text style={styles.headerBadgeText}>ALERTS</Text>
+        <View
+          style={[
+            styles.headerBadge,
+            { backgroundColor: `${theme.tabAlerts}18`, borderColor: `${theme.tabAlerts}35` },
+          ]}
+        >
+          <Text style={[styles.headerBadgeText, { color: theme.tabAlerts }]}>ALERTS</Text>
         </View>
-        <Text style={styles.title}>Notifications</Text>
+        <Text style={[styles.title, { color: theme.white }]}>Notifications</Text>
         <View style={styles.countRow}>
-          <Text style={styles.countText}>3 recent alerts</Text>
+          <Text style={[styles.countText, { color: theme.grey }]}>3 recent alerts</Text>
         </View>
       </View>
 
@@ -55,13 +62,16 @@ const AlertsScreen = () => {
         {ALERTS.map((alert) => (
           <View
             key={alert.id}
-            style={styles.alertCard}
+            style={[
+              styles.alertCard,
+              { backgroundColor: theme.cardBg, borderColor: theme.border },
+            ]}
           >
             <View style={[styles.cardAccentLine, { backgroundColor: alert.accentColor }]} />
             <View
               style={[
                 styles.iconContainer,
-                { borderColor: `${alert.accentColor}40` },
+                { borderColor: `${alert.accentColor}40`, backgroundColor: theme.darkBg },
               ]}
             >
               <Ionicons
@@ -71,11 +81,11 @@ const AlertsScreen = () => {
               />
             </View>
             <View style={styles.textBlock}>
-              <Text style={styles.alertTitle}>{alert.title}</Text>
-              <Text style={styles.alertSubtitle}>{alert.subtitle}</Text>
+              <Text style={[styles.alertTitle, { color: theme.white }]}>{alert.title}</Text>
+              <Text style={[styles.alertSubtitle, { color: theme.grey }]}>{alert.subtitle}</Text>
             </View>
-            <View style={styles.timeBadge}>
-              <Text style={styles.timeText}>{alert.timeAgo}</Text>
+            <View style={[styles.timeBadge, { backgroundColor: theme.border }]}>
+              <Text style={[styles.timeText, { color: theme.muted }]}>{alert.timeAgo}</Text>
             </View>
           </View>
         ))}
@@ -89,7 +99,6 @@ export default AlertsScreen;
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#080B10',
   },
   header: {
     paddingHorizontal: 16,
@@ -98,22 +107,18 @@ const styles = StyleSheet.create({
   },
   headerBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#F59E0B18',
     borderWidth: 1,
-    borderColor: '#F59E0B35',
     borderRadius: 6,
     paddingHorizontal: 10,
     paddingVertical: 4,
     marginBottom: 8,
   },
   headerBadgeText: {
-    color: '#F59E0B',
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 2,
   },
   title: {
-    color: '#F1F5F9',
     fontSize: 32,
     fontWeight: '800',
     letterSpacing: -0.5,
@@ -122,7 +127,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   countText: {
-    color: '#475569',
     fontSize: 13,
   },
   scrollView: {
@@ -132,9 +136,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   alertCard: {
-    backgroundColor: '#0F1620',
     borderWidth: 1,
-    borderColor: '#1E2D3D',
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
@@ -154,7 +156,6 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 12,
     borderWidth: 1,
-    backgroundColor: '#0A0F18',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 14,
@@ -163,24 +164,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   alertTitle: {
-    color: '#F1F5F9',
     fontSize: 15,
     fontWeight: '700',
     marginBottom: 2,
   },
   alertSubtitle: {
-    color: '#475569',
     fontSize: 12,
     fontWeight: '500',
   },
   timeBadge: {
-    backgroundColor: '#1E2D3D',
     borderRadius: 999,
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
   timeText: {
-    color: '#64748B',
     fontSize: 10,
     fontWeight: '600',
   },

@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import { Animated, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme } from '@/theme';
 
 const BAR_COUNT = 8;
 const BAR_MIN = 0.15;
 const BAR_MAX = 1;
 
-function SoundWaveBars({ isActive }: { isActive: boolean }) {
+type SoundWaveBarsProps = { isActive: boolean; barColor?: string };
+function SoundWaveBars({ isActive, barColor = '#6366F1' }: SoundWaveBarsProps) {
   const bars = useRef(
     Array.from({ length: BAR_COUNT }, () => new Animated.Value(BAR_MIN)),
   ).current;
@@ -72,8 +74,8 @@ function SoundWaveBars({ isActive }: { isActive: boolean }) {
             className="w-1 h-6 items-center justify-end"
           >
             <Animated.View
-              className="w-1 h-6 rounded-sm bg-[#6366F1]"
-              style={{ transform: [{ scaleY }, { translateY }] }}
+              className="w-1 h-6 rounded-sm"
+              style={[{ backgroundColor: barColor, transform: [{ scaleY }, { translateY }] }]}
             />
           </View>
         );
@@ -84,63 +86,68 @@ function SoundWaveBars({ isActive }: { isActive: boolean }) {
 
 const VoiceScreen = () => {
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
   const [isListening, setIsListening] = useState<boolean>(false);
+  const accent = theme.tabVoice;
 
   return (
     <View
-      className="flex-1 bg-[#080B10] items-center"
-      style={{ paddingTop: insets.top }}
+      className="flex-1 items-center"
+      style={{ paddingTop: insets.top, backgroundColor: theme.screenBg }}
     >
       <View className="items-center">
-        <View className="self-center border border-[#6366F135] rounded-md px-3 py-1 mt-6 mb-2 bg-[#6366F118]">
-          <Text className="text-[#6366F1] text-[10px] font-bold tracking-widest">
+        <View
+          className="self-center border rounded-md px-3 py-1 mt-6 mb-2"
+          style={{ borderColor: `${accent}35`, backgroundColor: `${accent}18` }}
+        >
+          <Text className="text-[10px] font-bold tracking-widest" style={{ color: accent }}>
             VOICE MODE
           </Text>
         </View>
-        <Text className="text-[#F1F5F9] text-[28px] font-extrabold tracking-tight mb-2">
+        <Text className="text-[28px] font-extrabold tracking-tight mb-2" style={{ color: theme.white }}>
           Voice Mode
         </Text>
       </View>
 
       <View className="flex-1 items-center justify-center px-6">
         <TouchableOpacity
-          className={`w-40 h-40 rounded-full mb-7 border-2 justify-center items-center ${
-            isListening ? 'bg-[#6366F112] border-[#6366F1]' : 'bg-[#0F1620] border-[#6366F135]'
-          }`}
+          className="w-40 h-40 rounded-full mb-7 border-2 justify-center items-center"
+          style={{
+            backgroundColor: isListening ? `${accent}12` : theme.cardBg,
+            borderColor: isListening ? accent : `${accent}35`,
+          }}
           activeOpacity={0.9}
           onPress={() => setIsListening((p) => !p)}
         >
-          <Ionicons name="mic" size={64} color="#6366F1" />
+          <Ionicons name="mic" size={64} color={accent} />
         </TouchableOpacity>
 
-        <SoundWaveBars isActive={isListening} />
+        <SoundWaveBars isActive={isListening} barColor={accent} />
 
         <Text
-          className={`text-[13px] font-bold tracking-widest mb-8 ${
-            isListening ? 'text-[#6366F1]' : 'text-[#F1F5F9]'
-          }`}
+          className="text-[13px] font-bold tracking-widest mb-8"
+          style={{ color: isListening ? accent : theme.white }}
         >
           {isListening ? 'LISTENING...' : 'TAP TO START'}
         </Text>
 
         <TouchableOpacity
-          className={`rounded-[14px] py-4 px-7 min-w-[260px] flex-row items-center justify-center gap-2.5 border ${
-            isListening
-              ? 'bg-[#6366F1] border-0'
-              : 'bg-[#0F1620] border-[#6366F140]'
-          }`}
+          className="rounded-[14px] py-4 px-7 min-w-[260px] flex-row items-center justify-center gap-2.5 border"
+          style={{
+            backgroundColor: isListening ? accent : theme.cardBg,
+            borderColor: isListening ? 'transparent' : `${accent}40`,
+          }}
           activeOpacity={0.8}
           onPress={() => setIsListening((p) => !p)}
         >
           <Ionicons
             name={isListening ? 'stop-circle' : 'mic'}
             size={24}
-            color={isListening ? '#FFFFFF' : '#6366F1'}
+            color={isListening ? theme.white : accent}
           />
           <Text
-            className={`text-[15px] font-bold ${
-              isListening ? 'text-white' : 'text-[#6366F1]'
-            }`}
+            className="text-[15px] font-bold"
+            style={{ color: isListening ? theme.white : accent }}
           >
             {isListening ? 'Stop Listening' : 'Start Listening'}
           </Text>
