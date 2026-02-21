@@ -4,7 +4,7 @@ import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { ScreenNames } from '@/configs/navigation';
 import type { IHomeTabParamList } from '@/screens/screens.types';
 import { HomeScreen } from '@/screens/Home';
-import { ExploreScreen } from '@/screens/Explore';
+import ExploreStack from '@/screens/Explore/ExploreStack';
 import { VoiceScreen } from '@/screens/Voice';
 import { AlertsScreen } from '@/screens/Alerts';
 import SettingsStack from '@/screens/Settings/SettingsStack';
@@ -56,7 +56,7 @@ const Tabs = () => {
       />
       <Tab.Screen
         name={ScreenNames.Explore}
-        component={ExploreScreen}
+        component={ExploreStack}
         options={{
           title: 'EXPLORE',
           tabBarIcon: ({ focused }) => (
