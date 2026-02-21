@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
@@ -7,15 +7,15 @@ import {
   StyleSheet,
   Text,
   View,
-} from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTheme } from '@/theme';
-import CameraView from '../../components/CameraView';
-import DetectionOverlay from '../../components/DetectionOverlay';
-import { useExplorePermissions } from './hooks';
+} from "react-native";
+import { useIsFocused } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTheme } from "@/theme";
+import CameraView from "../../components/CameraView";
+import DetectionOverlay from "../../components/DetectionOverlay";
+import { useExplorePermissions } from "./hooks";
 
-type FeatureId = 'objectDetection' | 'ocr' | 'tts';
+type FeatureId = "objectDetection" | "ocr" | "tts";
 
 type Feature = {
   id: FeatureId;
@@ -23,52 +23,55 @@ type Feature = {
   subtitle: string;
   description: string;
   icon: string;
-  status: 'active' | 'coming_soon';
+  status: "active" | "coming_soon";
   accentColor: string;
   stats?: { label: string; value: string }[];
 };
 
 const FEATURES: Feature[] = [
   {
-    id: 'objectDetection',
-    title: 'Object Detection',
-    subtitle: 'Real-time AI Vision',
-    description: 'Detect and identify objects in your environment instantly using YOLOv8 neural network.',
-    icon: '⬡',
-    status: 'active',
-    accentColor: '#22C55E',
+    id: "objectDetection",
+    title: "Object Detection",
+    subtitle: "Real-time AI Vision",
+    description:
+      "Detect and identify objects in your environment instantly using YOLOv8 neural network.",
+    icon: "⬡",
+    status: "active",
+    accentColor: "#22C55E",
     stats: [
-      { label: 'Model', value: 'YOLOv8n' },
-      { label: 'Classes', value: '80' },
-      { label: 'Input', value: '320px' },
+      { label: "Model", value: "YOLOv8n" },
+      { label: "Classes", value: "80" },
+      { label: "Input", value: "320px" },
     ],
   },
   {
-    id: 'ocr',
-    title: 'Photo to Text',
-    subtitle: 'Optical Character Recognition',
-    description: 'Extract and digitize text from images, documents, signs, and handwriting with high accuracy.',
-    icon: '◈',
-    status: 'coming_soon',
-    accentColor: '#6366F1',
+    id: "ocr",
+    title: "Photo to Text",
+    subtitle: "Optical Character Recognition",
+    description:
+      "Extract and digitize text from images, documents, signs, and handwriting with high accuracy.",
+    icon: "◈",
+    status: "coming_soon",
+    accentColor: "#6366F1",
     stats: [
-      { label: 'Languages', value: '50+' },
-      { label: 'Mode', value: 'Offline' },
-      { label: 'Format', value: 'PDF/IMG' },
+      { label: "Languages", value: "50+" },
+      { label: "Mode", value: "Offline" },
+      { label: "Format", value: "PDF/IMG" },
     ],
   },
   {
-    id: 'tts',
-    title: 'Text to Speech',
-    subtitle: 'Neural Voice Synthesis',
-    description: 'Convert any text into natural-sounding speech with multiple voice profiles and languages.',
-    icon: '◎',
-    status: 'coming_soon',
-    accentColor: '#F59E0B',
+    id: "tts",
+    title: "Text to Speech",
+    subtitle: "Neural Voice Synthesis",
+    description:
+      "Convert any text into natural-sounding speech with multiple voice profiles and languages.",
+    icon: "◎",
+    status: "coming_soon",
+    accentColor: "#F59E0B",
     stats: [
-      { label: 'Voices', value: '12' },
-      { label: 'Languages', value: '30+' },
-      { label: 'Quality', value: 'Neural' },
+      { label: "Voices", value: "12" },
+      { label: "Languages", value: "30+" },
+      { label: "Quality", value: "Neural" },
     ],
   },
 ];
@@ -82,7 +85,7 @@ function FeatureCard({
   feature: Feature;
   onSelect: (id: FeatureId) => void;
   index: number;
-  theme: import('@/theme/tokens').ThemeTokens;
+  theme: import("@/theme/tokens").ThemeTokens;
 }) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(24)).current;
@@ -121,18 +124,21 @@ function FeatureCard({
     }).start();
   };
 
-  const isActive = feature.status === 'active';
+  const isActive = feature.status === "active";
 
   return (
     <Animated.View
       className="rounded-2xl overflow-hidden"
-      style={{ opacity: fadeAnim, transform: [{ translateY }, { scale: scaleAnim }] }}
+      style={{
+        opacity: fadeAnim,
+        transform: [{ translateY }, { scale: scaleAnim }],
+      }}
     >
       <Pressable
         onPress={() => isActive && onSelect(feature.id)}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        className={`rounded-2xl p-5 overflow-hidden border ${!isActive ? 'opacity-65' : ''}`}
+        className={`rounded-2xl p-5 overflow-hidden border ${!isActive ? "opacity-65" : ""}`}
         style={{ backgroundColor: theme.cardBg, borderColor: theme.border }}
       >
         <View
@@ -142,44 +148,75 @@ function FeatureCard({
         <View className="flex-row justify-between items-center">
           <View
             className="w-11 h-11 rounded-xl border justify-center items-center"
-            style={{ borderColor: feature.accentColor + '40', backgroundColor: theme.darkBg }}
+            style={{
+              borderColor: feature.accentColor + "40",
+              backgroundColor: theme.darkBg,
+            }}
           >
-            <Text className="text-[22px]" style={{ color: feature.accentColor }}>
+            <Text
+              className="text-[22px]"
+              style={{ color: feature.accentColor }}
+            >
               {feature.icon}
             </Text>
           </View>
           <View
             className="flex-row items-center gap-1.5 px-2.5 py-1.5 rounded-full"
-            style={{ backgroundColor: isActive ? feature.accentColor + '20' : theme.cardBg }}
+            style={{
+              backgroundColor: isActive
+                ? feature.accentColor + "20"
+                : theme.cardBg,
+            }}
           >
             {!isActive && (
-              <View className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: theme.muted }} />
+              <View
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ backgroundColor: theme.muted }}
+              />
             )}
             <Text
               className="text-[10px] font-bold tracking-wider"
               style={{ color: isActive ? feature.accentColor : theme.muted }}
             >
-              {isActive ? 'LIVE' : 'SOON'}
+              {isActive ? "LIVE" : "SOON"}
             </Text>
           </View>
         </View>
-        <Text className="text-xl font-bold tracking-tight mt-1" style={{ color: theme.white }}>
+        <Text
+          className="text-xl font-bold tracking-tight mt-1"
+          style={{ color: theme.white }}
+        >
           {feature.title}
         </Text>
-        <Text className="text-xs font-medium tracking-wide -mt-1.5" style={{ color: theme.grey }}>
+        <Text
+          className="text-xs font-medium tracking-wide -mt-1.5"
+          style={{ color: theme.grey }}
+        >
           {feature.subtitle}
         </Text>
-        <Text className="text-[13px] leading-5 mt-0.5" style={{ color: theme.muted }}>
+        <Text
+          className="text-[13px] leading-5 mt-0.5"
+          style={{ color: theme.muted }}
+        >
           {feature.description}
         </Text>
         {feature.stats && (
-          <View className="flex-row gap-0 mt-1 border-t pt-3.5" style={{ borderColor: theme.border }}>
+          <View
+            className="flex-row gap-0 mt-1 border-t pt-3.5"
+            style={{ borderColor: theme.border }}
+          >
             {feature.stats.map((stat, i) => (
               <View key={i} className="flex-1 items-center gap-0.5">
-                <Text className="text-[15px] font-bold" style={{ color: feature.accentColor }}>
+                <Text
+                  className="text-[15px] font-bold"
+                  style={{ color: feature.accentColor }}
+                >
                   {stat.value}
                 </Text>
-                <Text className="text-[10px] font-medium tracking-wider" style={{ color: theme.grey }}>
+                <Text
+                  className="text-[10px] font-medium tracking-wider"
+                  style={{ color: theme.grey }}
+                >
                   {stat.label}
                 </Text>
               </View>
@@ -190,11 +227,14 @@ function FeatureCard({
           <View
             className="border rounded-[10px] py-2.5 items-center mt-1"
             style={{
-              backgroundColor: feature.accentColor + '15',
-              borderColor: feature.accentColor + '40',
+              backgroundColor: feature.accentColor + "15",
+              borderColor: feature.accentColor + "40",
             }}
           >
-            <Text className="text-[13px] font-bold tracking-wide" style={{ color: feature.accentColor }}>
+            <Text
+              className="text-[13px] font-bold tracking-wide"
+              style={{ color: feature.accentColor }}
+            >
               Launch →
             </Text>
           </View>
@@ -211,18 +251,26 @@ function ObjectDetectionView({
 }: {
   onBack: () => void;
   isFocused: boolean;
-  theme: import('@/theme/tokens').ThemeTokens;
+  theme: import("@/theme/tokens").ThemeTokens;
 }) {
   const { permission, handlePermissionButtonPress } = useExplorePermissions();
   const [isLiveDetectionEnabled, setIsLiveDetectionEnabled] = useState(false);
-  const [facing, setFacing] = useState<'back' | 'front'>('back');
+  const [facing, setFacing] = useState<"back" | "front">("back");
   const slideAnim = useRef(new Animated.Value(40)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
-      Animated.timing(slideAnim, { toValue: 0, duration: 300, useNativeDriver: true }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
     ]).start();
   }, []);
 
@@ -233,7 +281,8 @@ function ObjectDetectionView({
   );
 
   useEffect(() => {
-    if (!canUseCamera && isLiveDetectionEnabled) setIsLiveDetectionEnabled(false);
+    if (!canUseCamera && isLiveDetectionEnabled)
+      setIsLiveDetectionEnabled(false);
   }, [canUseCamera, isLiveDetectionEnabled]);
 
   useEffect(() => {
@@ -251,43 +300,67 @@ function ObjectDetectionView({
           className="w-10 h-10 rounded-[10px] justify-center items-center border"
           style={{ backgroundColor: theme.cardBg, borderColor: theme.border }}
         >
-          <Text className="text-lg font-light" style={{ color: theme.grey }}>←</Text>
+          <Text className="text-lg font-light" style={{ color: theme.grey }}>
+            ←
+          </Text>
         </Pressable>
         <View className="flex-1 gap-0.5">
-          <Text className="text-[17px] font-bold" style={{ color: theme.white }}>Object Detection</Text>
-          <Text className="text-[11px] font-medium tracking-wide" style={{ color: theme.grey }}>
+          <Text
+            className="text-[17px] font-bold"
+            style={{ color: theme.white }}
+          >
+            Object Detection
+          </Text>
+          <Text
+            className="text-[11px] font-medium tracking-wide"
+            style={{ color: theme.grey }}
+          >
             YOLOv8n · 80 Classes
           </Text>
         </View>
         <View
           className="flex-row items-center gap-1.5 px-2.5 py-1.5 rounded-lg border"
           style={{
-            backgroundColor: isModelActive ? theme.primary + '15' : theme.cardBg,
-            borderColor: isModelActive ? theme.primary + '35' : theme.border,
+            backgroundColor: isModelActive
+              ? theme.primary + "15"
+              : theme.cardBg,
+            borderColor: isModelActive ? theme.primary + "35" : theme.border,
           }}
         >
           <View
             className="w-1.5 h-1.5 rounded-full"
-            style={{ backgroundColor: isModelActive ? theme.primary : theme.tabInactive }}
+            style={{
+              backgroundColor: isModelActive
+                ? theme.primary
+                : theme.tabInactive,
+            }}
           />
           <Text
             className="text-[10px] font-bold tracking-wider"
             style={{ color: isModelActive ? theme.primary : theme.grey }}
           >
-            {isModelActive ? 'LIVE' : 'OFF'}
+            {isModelActive ? "LIVE" : "OFF"}
           </Text>
         </View>
       </View>
 
-      <View className="flex-1 rounded-2xl border bg-black overflow-hidden" style={{ borderColor: theme.border }}>
+      <View
+        className="flex-1 rounded-2xl border bg-black overflow-hidden"
+        style={{ borderColor: theme.border }}
+      >
         {permission === null ? (
           <View className="flex-1 justify-center items-center gap-3.5 p-6">
             <ActivityIndicator size="large" color={theme.primary} />
           </View>
         ) : !permission.granted ? (
           <View className="flex-1 justify-center items-center gap-3.5 p-6">
-            <Text className="text-4xl" style={{ color: theme.border }}>⬡</Text>
-            <Text className="text-[15px] font-semibold text-center" style={{ color: theme.grey }}>
+            <Text className="text-4xl" style={{ color: theme.border }}>
+              ⬡
+            </Text>
+            <Text
+              className="text-[15px] font-semibold text-center"
+              style={{ color: theme.grey }}
+            >
               Camera access required
             </Text>
             <Pressable
@@ -295,8 +368,11 @@ function ObjectDetectionView({
               style={{ backgroundColor: theme.primary }}
               onPress={() => void handlePermissionButtonPress()}
             >
-              <Text className="text-[13px] font-bold" style={{ color: '#111827' }}>
-                {permission.canAskAgain ? 'Enable Camera' : 'Open Settings'}
+              <Text
+                className="text-[13px] font-bold"
+                style={{ color: "#111827" }}
+              >
+                {permission.canAskAgain ? "Enable Camera" : "Open Settings"}
               </Text>
             </Pressable>
           </View>
@@ -313,7 +389,10 @@ function ObjectDetectionView({
               <View className="absolute bottom-4 left-0 right-0 items-center">
                 <Text
                   className="text-xs font-medium px-3.5 py-1.5 rounded-full overflow-hidden"
-                  style={{ color: theme.grey, backgroundColor: theme.screenBg + 'CC' }}
+                  style={{
+                    color: theme.grey,
+                    backgroundColor: theme.screenBg + "CC",
+                  }}
                 >
                   Press Start to begin detection
                 </Text>
@@ -326,28 +405,38 @@ function ObjectDetectionView({
       <View className="flex-row gap-2.5 pb-2">
         <Pressable
           className={`w-[60px] py-2.5 rounded-xl justify-center items-center border gap-0.5 ${
-            !canUseCamera ? 'opacity-40' : ''
+            !canUseCamera ? "opacity-40" : ""
           }`}
           style={{ backgroundColor: theme.cardBg, borderColor: theme.border }}
-          onPress={() => setFacing((f) => (f === 'back' ? 'front' : 'back'))}
+          onPress={() => setFacing((f) => (f === "back" ? "front" : "back"))}
           disabled={!canUseCamera}
         >
-          <Text className="text-xl" style={{ color: theme.grey }}>⟳</Text>
-          <Text className="text-[10px] font-semibold" style={{ color: theme.grey }}>Flip</Text>
+          <Text className="text-xl" style={{ color: theme.grey }}>
+            ⟳
+          </Text>
+          <Text
+            className="text-[10px] font-semibold"
+            style={{ color: theme.grey }}
+          >
+            Flip
+          </Text>
         </Pressable>
         <Pressable
           className={`flex-1 py-3.5 rounded-xl justify-center items-center border ${
-            !canUseCamera ? 'opacity-40' : ''
+            !canUseCamera ? "opacity-40" : ""
           }`}
           style={{
             backgroundColor: isModelActive ? theme.cardBg : theme.primary,
-            borderColor: isModelActive ? theme.warning + '50' : theme.primary,
+            borderColor: isModelActive ? theme.warning + "50" : theme.primary,
           }}
           onPress={() => setIsLiveDetectionEnabled((v) => !v)}
           disabled={!canUseCamera}
         >
-          <Text className="text-sm font-bold tracking-wide" style={{ color: theme.white }}>
-            {isModelActive ? '◼ Stop Detection' : '▶ Start Detection'}
+          <Text
+            className="text-sm font-bold tracking-wide"
+            style={{ color: theme.white }}
+          >
+            {isModelActive ? "◼ Stop Detection" : "▶ Start Detection"}
           </Text>
         </Pressable>
       </View>
@@ -359,12 +448,14 @@ const ExploreScreen = () => {
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
-  const [selectedFeature, setSelectedFeature] = useState<FeatureId | null>(null);
+  const [selectedFeature, setSelectedFeature] = useState<FeatureId | null>(
+    null,
+  );
   useEffect(() => {
     if (!isFocused) setSelectedFeature(null);
   }, [isFocused]);
 
-  if (selectedFeature === 'objectDetection') {
+  if (selectedFeature === "objectDetection") {
     return (
       <View
         className="flex-1"
@@ -397,18 +488,15 @@ const ExploreScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <View className="py-6 gap-2">
-          <View
-            className="self-start border rounded-md px-2.5 py-1 mb-1"
-            style={{ borderColor: theme.exploreAccent + '35', backgroundColor: theme.exploreAccent + '18' }}
+          <Text
+            className="text-3xl font-extrabold tracking-tight"
+            style={{ color: theme.white }}
           >
-            <Text className="text-[10px] font-bold tracking-widest" style={{ color: theme.exploreAccent }}>
-              VISION AI
-            </Text>
-          </View>
-          <Text className="text-3xl font-extrabold tracking-tight" style={{ color: theme.white }}>
             AI Tools
           </Text>
-          <Text className="text-sm" style={{ color: theme.grey }}>Select a feature to get started</Text>
+          <Text className="text-sm" style={{ color: theme.grey }}>
+            Select a feature to get started
+          </Text>
         </View>
 
         <View className="gap-3.5">
@@ -423,7 +511,10 @@ const ExploreScreen = () => {
           ))}
         </View>
 
-        <Text className="text-xs text-center mt-6 tracking-wide" style={{ color: theme.border }}>
+        <Text
+          className="text-xs text-center mt-6 tracking-wide"
+          style={{ color: theme.border }}
+        >
           More AI capabilities coming soon
         </Text>
       </ScrollView>
