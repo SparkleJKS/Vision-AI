@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@/theme";
@@ -55,28 +55,23 @@ const AlertsScreen = () => {
 
   return (
     <View
-      style={[
-        styles.screen,
-        { paddingTop: insets.top, backgroundColor: theme.screenBg },
-      ]}
+      className="flex-1"
+      style={{ paddingTop: insets.top, backgroundColor: theme.screenBg }}
     >
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: theme.white }]}>
+      <View className="px-4 pt-6 pb-2">
+        <Text className="text-3xl font-extrabold tracking-tight" style={{ color: theme.white }}>
           Notifications
         </Text>
-        <View style={styles.countRow}>
-          <Text style={[styles.countText, { color: theme.grey }]}>
+        <View className="mt-1">
+          <Text className="text-[13px]" style={{ color: theme.grey }}>
             3 recent alerts
           </Text>
         </View>
       </View>
 
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingBottom: insets.bottom + 80 },
-        ]}
+        className="flex-1"
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 80 }}
         showsVerticalScrollIndicator={false}
       >
         {ALERTS.map((alert) => {
@@ -84,34 +79,32 @@ const AlertsScreen = () => {
           return (
             <View
               key={alert.id}
-              style={[
-                styles.alertCard,
-                { backgroundColor: theme.cardBg, borderColor: theme.border },
-              ]}
+              className="border rounded-2xl p-4 mb-3 overflow-hidden flex-row items-center"
+              style={{ backgroundColor: theme.cardBg, borderColor: theme.border }}
             >
               <View
-                style={[styles.cardAccentLine, { backgroundColor: accent }]}
+                className="absolute top-0 left-0 right-0 h-0.5"
+                style={{ backgroundColor: accent }}
               />
               <View
-                style={[
-                  styles.iconContainer,
-                  { borderColor: accent, backgroundColor: accent },
-                ]}
+                className="w-11 h-11 rounded-xl border justify-center items-center mr-3.5"
+                style={{ borderColor: accent, backgroundColor: accent }}
               >
                 <Ionicons name={alert.icon} size={22} color={theme.white} />
               </View>
-              <View style={styles.textBlock}>
-                <Text style={[styles.alertTitle, { color: theme.white }]}>
+              <View className="flex-1">
+                <Text className="text-[15px] font-bold mb-0.5" style={{ color: theme.white }}>
                   {alert.title}
                 </Text>
-                <Text style={[styles.alertSubtitle, { color: theme.grey }]}>
+                <Text className="text-xs font-medium" style={{ color: theme.grey }}>
                   {alert.subtitle}
                 </Text>
               </View>
               <View
-                style={[styles.timeBadge, { backgroundColor: theme.border }]}
+                className="rounded-full px-2 py-1"
+                style={{ backgroundColor: theme.border }}
               >
-                <Text style={[styles.timeText, { color: theme.muted }]}>
+                <Text className="text-[10px] font-semibold" style={{ color: theme.muted }}>
                   {alert.timeAgo}
                 </Text>
               </View>
@@ -124,77 +117,3 @@ const AlertsScreen = () => {
 };
 
 export default AlertsScreen;
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
-  header: {
-    paddingHorizontal: 16,
-    paddingTop: 24,
-    paddingBottom: 8,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "800",
-    letterSpacing: -0.5,
-  },
-  countRow: {
-    marginTop: 4,
-  },
-  countText: {
-    fontSize: 13,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 16,
-  },
-  alertCard: {
-    borderWidth: 1,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    overflow: "hidden",
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  cardAccentLine: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 2,
-  },
-  iconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    borderWidth: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 14,
-  },
-  textBlock: {
-    flex: 1,
-  },
-  alertTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    marginBottom: 2,
-  },
-  alertSubtitle: {
-    fontSize: 12,
-    fontWeight: "500",
-  },
-  timeBadge: {
-    borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  timeText: {
-    fontSize: 10,
-    fontWeight: "600",
-  },
-});
