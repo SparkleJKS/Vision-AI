@@ -158,7 +158,10 @@ const HomeScreen = () => {
   });
 
   return (
-    <View className="flex-1" style={{ paddingTop: insets.top, backgroundColor: theme.screenBg }}>
+    <View
+      className="flex-1"
+      style={{ paddingTop: insets.top, backgroundColor: theme.screenBg }}
+    >
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: 16,
@@ -172,15 +175,27 @@ const HomeScreen = () => {
           style={sectionAnimStyle(headerAnim)}
         >
           <View className="flex-1">
-            <Text className="text-sm font-medium mb-1" style={{ color: theme.grey }}>
+            <Text
+              className="text-sm font-medium mb-1"
+              style={{ color: theme.grey }}
+            >
               {greeting},
             </Text>
-            <Text className="text-3xl font-black tracking-tight" style={{ color: theme.primary }}>
+            <Text
+              className="text-3xl font-black tracking-tight"
+              style={{ color: theme.primary }}
+            >
               {displayName}
             </Text>
             <View className="flex-row items-center mt-1.5">
-              <View className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: theme.primary }} />
-              <Text className="text-xs font-semibold ml-1.5" style={{ color: theme.primary }}>
+              <View
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ backgroundColor: theme.primary }}
+              />
+              <Text
+                className="text-xs font-semibold ml-1.5"
+                style={{ color: theme.primary }}
+              >
                 Vision AI Active
               </Text>
             </View>
@@ -190,7 +205,10 @@ const HomeScreen = () => {
             style={{ backgroundColor: theme.primary }}
             onPress={handlePressProfile}
           >
-            <Text className="text-[17px] font-extrabold" style={{ color: theme.screenBg }}>
+            <Text
+              className="text-[17px] font-extrabold"
+              style={{ color: theme.screenBg }}
+            >
               {displayName[0]?.toUpperCase() ?? "U"}
             </Text>
           </Pressable>
@@ -202,7 +220,10 @@ const HomeScreen = () => {
               <View
                 key={stat.id}
                 className="flex-1 rounded-[14px] p-3.5 items-start overflow-hidden border"
-                style={{ backgroundColor: theme.cardBg, borderColor: theme.border }}
+                style={{
+                  backgroundColor: theme.cardBg,
+                  borderColor: theme.border,
+                }}
               >
                 <View
                   className="absolute top-0 left-0 right-0 h-0.5"
@@ -214,10 +235,16 @@ const HomeScreen = () => {
                   color={theme.primary}
                   className="mb-2"
                 />
-                <Text className="text-[22px] font-black tracking-tight" style={{ color: theme.white }}>
+                <Text
+                  className="text-[22px] font-black tracking-tight"
+                  style={{ color: theme.white }}
+                >
                   {stat.value}
                 </Text>
-                <Text className="text-[10px] font-semibold tracking-wider uppercase mt-0.5" style={{ color: theme.grey }}>
+                <Text
+                  className="text-[10px] font-semibold tracking-wider uppercase mt-0.5"
+                  style={{ color: theme.grey }}
+                >
                   {stat.label}
                 </Text>
               </View>
@@ -227,10 +254,16 @@ const HomeScreen = () => {
 
         <Animated.View style={sectionAnimStyle(gridAnim)}>
           <View className="flex-row justify-between items-center mb-3.5">
-            <Text className="text-[10px] font-bold tracking-widest" style={{ color: theme.grey }}>
+            <Text
+              className="text-[10px] font-bold tracking-widest"
+              style={{ color: theme.grey }}
+            >
               QUICK ACTIONS
             </Text>
-            <Text className="text-[11px] font-semibold" style={{ color: theme.muted }}>
+            <Text
+              className="text-[11px] font-semibold"
+              style={{ color: theme.muted }}
+            >
               See all →
             </Text>
           </View>
@@ -243,7 +276,9 @@ const HomeScreen = () => {
                   key={action.id}
                   className="w-[47.5%] rounded-2xl p-4 overflow-hidden min-h-[110px] border"
                   style={{
-                    backgroundColor: isHighlighted ? theme.primary : theme.cardBg,
+                    backgroundColor: isHighlighted
+                      ? theme.primary
+                      : theme.cardBg,
                     borderColor: isHighlighted ? theme.primary : theme.border,
                   }}
                   activeOpacity={0.85}
@@ -251,7 +286,11 @@ const HomeScreen = () => {
                 >
                   <View
                     className="absolute -top-5 -right-5 w-[60px] h-[60px] rounded-full"
-                    style={{ backgroundColor: isHighlighted ? `${theme.primary}50` : `${theme.primary}18` }}
+                    style={{
+                      backgroundColor: isHighlighted
+                        ? `${theme.primary}50`
+                        : `${theme.primary}18`,
+                    }}
                   />
                   {!isHighlighted && (
                     <View
@@ -262,8 +301,12 @@ const HomeScreen = () => {
                   <View
                     className="w-10 h-10 rounded-[10px] border justify-center items-center mb-3"
                     style={{
-                      backgroundColor: isHighlighted ? 'rgba(0,0,0,0.2)' : `${theme.primary}15`,
-                      borderColor: isHighlighted ? 'rgba(0,0,0,0.25)' : `${theme.primary}30`,
+                      backgroundColor: isHighlighted
+                        ? "rgba(0,0,0,0.2)"
+                        : `${theme.primary}15`,
+                      borderColor: isHighlighted
+                        ? "rgba(0,0,0,0.25)"
+                        : `${theme.primary}30`,
                     }}
                   >
                     <Ionicons
@@ -274,13 +317,17 @@ const HomeScreen = () => {
                   </View>
                   <Text
                     className="text-[15px] font-extrabold tracking-tight"
-                    style={{ color: isHighlighted ? theme.screenBg : theme.white }}
+                    style={{
+                      color: isHighlighted ? theme.screenBg : theme.white,
+                    }}
                   >
                     {action.label}
                   </Text>
                   <Text
                     className="text-[11px] font-medium mt-0.5"
-                    style={{ color: isHighlighted ? 'rgba(0,0,0,0.7)' : theme.grey }}
+                    style={{
+                      color: isHighlighted ? "rgba(0,0,0,0.7)" : theme.grey,
+                    }}
                   >
                     {action.sublabel}
                   </Text>
@@ -291,7 +338,10 @@ const HomeScreen = () => {
 
           <View
             className="mb-6 rounded-2xl p-4 overflow-hidden flex-row items-center gap-3.5 border"
-            style={{ backgroundColor: theme.cardBg, borderColor: `${theme.primary}35` }}
+            style={{
+              backgroundColor: theme.cardBg,
+              borderColor: `${theme.primary}35`,
+            }}
           >
             <View
               className="absolute left-0 top-0 bottom-0 w-0.5"
@@ -307,10 +357,16 @@ const HomeScreen = () => {
               <Ionicons name="sparkles" size={18} color={theme.primary} />
             </View>
             <View className="flex-1">
-              <Text className="text-[9px] font-bold tracking-widest mb-1" style={{ color: theme.primary }}>
+              <Text
+                className="text-[9px] font-bold tracking-widest mb-1"
+                style={{ color: theme.primary }}
+              >
                 AI TIP
               </Text>
-              <Text className="text-xs font-medium leading-[18px]" style={{ color: theme.grey }}>
+              <Text
+                className="text-xs font-medium leading-[18px]"
+                style={{ color: theme.grey }}
+              >
                 {AI_TIP.text}
               </Text>
             </View>
@@ -318,7 +374,10 @@ const HomeScreen = () => {
         </Animated.View>
 
         <Animated.View style={sectionAnimStyle(activityAnim)}>
-          <Text className="text-[10px] font-bold tracking-widest mb-3.5" style={{ color: theme.grey }}>
+          <Text
+            className="text-[10px] font-bold tracking-widest mb-3.5"
+            style={{ color: theme.grey }}
+          >
             RECENT ACTIVITY
           </Text>
 
@@ -330,20 +389,32 @@ const HomeScreen = () => {
                   style={{ backgroundColor: theme.primary }}
                 />
                 <View className="flex-1">
-                  <Text className="text-[13px] font-medium" style={{ color: theme.grey }}>
+                  <Text
+                    className="text-[13px] font-medium"
+                    style={{ color: theme.grey }}
+                  >
                     {item.action}
-                    <Text className="text-[13px] font-bold" style={{ color: theme.white }}>
+                    <Text
+                      className="text-[13px] font-bold"
+                      style={{ color: theme.white }}
+                    >
                       {" "}
                       {item.object}
                     </Text>
                   </Text>
                 </View>
-                <Text className="text-[11px] font-medium" style={{ color: theme.muted }}>
+                <Text
+                  className="text-[11px] font-medium"
+                  style={{ color: theme.muted }}
+                >
                   {item.timeAgo}
                 </Text>
               </View>
               {index < RECENT_ACTIVITY.length - 1 && (
-                <View className="h-px ml-5 mt-4" style={{ backgroundColor: theme.cardBg }} />
+                <View
+                  className="h-px ml-5 mt-4"
+                  style={{ backgroundColor: theme.cardBg }}
+                />
               )}
             </View>
           ))}

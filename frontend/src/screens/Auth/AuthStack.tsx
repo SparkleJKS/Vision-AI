@@ -1,8 +1,8 @@
-import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { ScreenNames } from '@/configs/navigation';
-import type { IAuthStackParamList } from '@/screens/screens.types';
-import { SignInScreen, SignUpScreen } from './index';
+import React from "react";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { ScreenNames } from "@/configs/navigation";
+import type { IAuthStackParamList } from "@/screens/screens.types";
+import { SignInScreen, SignUpScreen } from "./index";
 
 const Stack = createNativeStackNavigator<IAuthStackParamList>();
 
@@ -10,7 +10,7 @@ const AuthStack = () => (
   <Stack.Navigator
     screenOptions={{
       headerShown: false,
-      animation: 'slide_from_right',
+      animation: "slide_from_right",
       gestureEnabled: true,
     }}
   >

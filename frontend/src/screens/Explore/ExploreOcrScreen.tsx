@@ -61,7 +61,8 @@ const ExploreOcrScreen = () => {
             className="text-[13px] text-center mt-2"
             style={{ color: theme.muted }}
           >
-            Extract text from images and documents. This feature is in development.
+            Extract text from images and documents. This feature is in
+            development.
           </Text>
         </View>
       </View>

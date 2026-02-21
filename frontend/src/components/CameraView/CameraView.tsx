@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { NativeModules, Platform, StyleSheet } from 'react-native'
+import React, { useEffect, useMemo, useState } from "react";
+import { NativeModules, Platform, StyleSheet } from "react-native";
 import {
   Camera,
   VisionCameraProxy,
@@ -7,9 +7,9 @@ import {
   useCameraDevice,
   useCameraFormat,
   useFrameProcessor,
-} from 'react-native-vision-camera'
-import type { Frame } from 'react-native-vision-camera'
-import type { CameraViewProps } from './types'
+} from "react-native-vision-camera";
+import type { Frame } from "react-native-vision-camera";
+import type { CameraViewProps } from "./types";
 
 const CameraView = ({
   style,
@@ -18,80 +18,88 @@ const CameraView = ({
   facing,
   maxInferenceFps,
 }: CameraViewProps) => {
-  const active = isActive ?? false
-  const enabled = detectionEnabled ?? false
-  const cameraFacing = facing ?? 'back'
-  const [pluginBootstrapped, setPluginBootstrapped] = useState(Platform.OS !== 'android')
-  const inferenceFps = typeof maxInferenceFps === 'number' && Number.isFinite(maxInferenceFps)
-    ? Math.max(1, Math.trunc(maxInferenceFps))
-    : 8
+  const active = isActive ?? false;
+  const enabled = detectionEnabled ?? false;
+  const cameraFacing = facing ?? "back";
+  const [pluginBootstrapped, setPluginBootstrapped] = useState(
+    Platform.OS !== "android",
+  );
+  const inferenceFps =
+    typeof maxInferenceFps === "number" && Number.isFinite(maxInferenceFps)
+      ? Math.max(1, Math.trunc(maxInferenceFps))
+      : 8;
 
-  const device = useCameraDevice(cameraFacing)
+  const device = useCameraDevice(cameraFacing);
   const format = useCameraFormat(device, [
     { videoResolution: { width: 640, height: 480 } },
-    { fps: 30 }
-  ])
+    { fps: 30 },
+  ]);
 
   useEffect(() => {
-    if (Platform.OS !== 'android') return
+    if (Platform.OS !== "android") return;
 
-    let cancelled = false
+    let cancelled = false;
     const yoloModule = NativeModules?.YoloInferenceModule as
       | { initializeModel?: () => Promise<unknown> | unknown }
-      | undefined
+      | undefined;
 
     const bootstrap = async () => {
       try {
-        if (typeof yoloModule?.initializeModel === 'function') {
-          await yoloModule.initializeModel()
+        if (typeof yoloModule?.initializeModel === "function") {
+          await yoloModule.initializeModel();
         }
       } catch {
         // Keep bootstrapping even if model init fails so plugin registration still proceeds.
       } finally {
-        if (!cancelled) setPluginBootstrapped(true)
+        if (!cancelled) setPluginBootstrapped(true);
       }
-    }
+    };
 
-    void bootstrap()
+    void bootstrap();
     return () => {
-      cancelled = true
-    }
-  }, [])
+      cancelled = true;
+    };
+  }, []);
 
-  const plugin = useMemo(
-    () => {
-      if (!pluginBootstrapped) return null
-      try {
-        const initializedPlugin = VisionCameraProxy.initFrameProcessorPlugin('yoloFramePreprocess', {
+  const plugin = useMemo(() => {
+    if (!pluginBootstrapped) return null;
+    try {
+      const initializedPlugin = VisionCameraProxy.initFrameProcessorPlugin(
+        "yoloFramePreprocess",
+        {
           facing: cameraFacing,
-        })
-        if (initializedPlugin == null && Platform.OS === 'android') {
-          console.warn('[CameraView] yoloFramePreprocess plugin is not registered on Android')
-        }
-        return initializedPlugin
-      } catch (error) {
-        if (Platform.OS === 'android') {
-          console.warn('[CameraView] failed to initialize yoloFramePreprocess plugin', error)
-        }
-        return null
+        },
+      );
+      if (initializedPlugin == null && Platform.OS === "android") {
+        console.warn(
+          "[CameraView] yoloFramePreprocess plugin is not registered on Android",
+        );
       }
-    },
-    [cameraFacing, enabled, pluginBootstrapped],
-  )
+      return initializedPlugin;
+    } catch (error) {
+      if (Platform.OS === "android") {
+        console.warn(
+          "[CameraView] failed to initialize yoloFramePreprocess plugin",
+          error,
+        );
+      }
+      return null;
+    }
+  }, [cameraFacing, enabled, pluginBootstrapped]);
 
   const frameProcessor = useFrameProcessor(
     (frame: Frame) => {
-      'worklet'
-      if (!enabled || plugin == null) return
+      "worklet";
+      if (!enabled || plugin == null) return;
       runAtTargetFps(inferenceFps, () => {
-        'worklet'
-        plugin.call(frame)
-      })
+        "worklet";
+        plugin.call(frame);
+      });
     },
     [enabled, inferenceFps, plugin],
-  )
+  );
 
-  if (!device) return null
+  if (!device) return null;
 
   return (
     <Camera
@@ -108,4 +116,3 @@ const CameraView = ({
 };
 
 export default CameraView;
-

@@ -97,7 +97,10 @@ const VoiceScreen = () => {
       style={{ paddingTop: insets.top, backgroundColor: theme.screenBg }}
     >
       <View className="items-center mt-16">
-        <Text className="text-[28px] font-extrabold tracking-tight mb-2" style={{ color: theme.white }}>
+        <Text
+          className="text-[28px] font-extrabold tracking-tight mb-2"
+          style={{ color: theme.white }}
+        >
           Voice Mode
         </Text>
       </View>

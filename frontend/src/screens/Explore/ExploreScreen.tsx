@@ -79,7 +79,8 @@ function FeatureCard({
   theme: import("@/theme/tokens").ThemeTokens;
   themeId: "accessibility" | "neon";
 }) {
-  const accent = themeId === "accessibility" ? theme.primary : feature.accentColor;
+  const accent =
+    themeId === "accessibility" ? theme.primary : feature.accentColor;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(24)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -146,10 +147,7 @@ function FeatureCard({
               backgroundColor: theme.darkBg,
             }}
           >
-            <Text
-              className="text-[22px]"
-              style={{ color: accent }}
-            >
+            <Text className="text-[22px]" style={{ color: accent }}>
               {feature.icon}
             </Text>
           </View>

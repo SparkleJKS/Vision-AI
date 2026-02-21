@@ -1,13 +1,13 @@
-import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { Component, type ErrorInfo, type ReactNode } from "react";
 import {
   ActivityIndicator,
   useWindowDimensions,
   View,
   Text,
-} from 'react-native';
-import { Lottie } from '@/animations/components';
-import { AppInit } from '@/animations/assets';
-import { useTheme } from '@/theme/ThemeContext';
+} from "react-native";
+import { Lottie } from "@/animations/components";
+import { AppInit } from "@/animations/assets";
+import { useTheme } from "@/theme/ThemeContext";
 
 type Props = { children: ReactNode };
 
@@ -17,7 +17,7 @@ class SplashErrorBoundary extends Component<Props, { hasError: boolean }> {
   static getDerivedStateFromError = () => ({ hasError: true });
 
   componentDidCatch(error: Error, _info: ErrorInfo) {
-    if (__DEV__) console.warn('[Splash] Lottie failed:', error?.message);
+    if (__DEV__) console.warn("[Splash] Lottie failed:", error?.message);
   }
 
   render() {

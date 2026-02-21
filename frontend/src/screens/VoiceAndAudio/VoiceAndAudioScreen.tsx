@@ -1,11 +1,11 @@
-import { Text, View, TouchableOpacity } from 'react-native';
-import { useDispatch } from 'react-redux';
-import { Ionicons } from '@react-native-vector-icons/ionicons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTheme } from '@/theme';
-import { useBackHandler } from '@/navigators';
-import { navigationActions } from '@/store/actions/navigation';
-import type { AppDispatch } from '@/store';
+import { Text, View, TouchableOpacity } from "react-native";
+import { useDispatch } from "react-redux";
+import { Ionicons } from "@react-native-vector-icons/ionicons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTheme } from "@/theme";
+import { useBackHandler } from "@/navigators";
+import { navigationActions } from "@/store/actions/navigation";
+import type { AppDispatch } from "@/store";
 
 const VoiceAndAudioScreen = () => {
   const dispatch = useDispatch<AppDispatch>();

@@ -1,36 +1,36 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Text,
   View,
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-} from 'react-native';
-import { useDispatch } from 'react-redux';
-import { Ionicons } from '@react-native-vector-icons/ionicons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTheme, THEMES, type ThemeId } from '@/theme';
-import { useBackHandler } from '@/navigators';
-import { useAuth } from '@/auth/AuthContext';
-import { logEvent } from '@/utils/logger';
-import { navigationActions } from '@/store/actions/navigation';
-import type { AppDispatch } from '@/store';
+} from "react-native";
+import { useDispatch } from "react-redux";
+import { Ionicons } from "@react-native-vector-icons/ionicons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTheme, THEMES, type ThemeId } from "@/theme";
+import { useBackHandler } from "@/navigators";
+import { useAuth } from "@/auth/AuthContext";
+import { logEvent } from "@/utils/logger";
+import { navigationActions } from "@/store/actions/navigation";
+import type { AppDispatch } from "@/store";
 
 const PROFILE_OPTIONS = [
   {
-    id: 'personal',
-    title: 'Personal Details',
-    icon: 'person-outline' as const,
+    id: "personal",
+    title: "Personal Details",
+    icon: "person-outline" as const,
   },
   {
-    id: 'privacy',
-    title: 'Privacy & Security',
-    icon: 'shield-checkmark-outline' as const,
+    id: "privacy",
+    title: "Privacy & Security",
+    icon: "shield-checkmark-outline" as const,
   },
   {
-    id: 'subscription',
-    title: 'Subscription',
-    icon: 'card-outline' as const,
+    id: "subscription",
+    title: "Subscription",
+    icon: "card-outline" as const,
   },
 ];
 
@@ -48,9 +48,9 @@ const ProfileScreen = () => {
     setIsSigningOut(true);
     try {
       await signOut();
-      logEvent('Profile:SignOutComplete');
+      logEvent("Profile:SignOutComplete");
     } catch (err) {
-      logEvent('Profile:SignOutError', { error: String(err) });
+      logEvent("Profile:SignOutError", { error: String(err) });
     } finally {
       setIsSigningOut(false);
     }
@@ -60,12 +60,13 @@ const ProfileScreen = () => {
     onBack: handleBack,
   });
 
-  const displayName = user?.displayName ?? user?.email?.split('@')[0] ?? 'Guest';
-  const displayInitial = displayName[0]?.toUpperCase() ?? '?';
+  const displayName =
+    user?.displayName ?? user?.email?.split("@")[0] ?? "Guest";
+  const displayInitial = displayName[0]?.toUpperCase() ?? "?";
 
   const handleThemeSelect = (id: ThemeId) => {
     setTheme(id);
-    logEvent('Profile:ThemeChanged', { theme: id });
+    logEvent("Profile:ThemeChanged", { theme: id });
   };
 
   return (
@@ -87,7 +88,7 @@ const ProfileScreen = () => {
       <ScrollView
         className="flex-1 px-4"
         contentContainerStyle={{
-          alignItems: 'center',
+          alignItems: "center",
           paddingBottom: insets.bottom + 80,
         }}
         showsVerticalScrollIndicator={false}
@@ -96,12 +97,11 @@ const ProfileScreen = () => {
           className="w-24 h-24 rounded-full items-center justify-center my-6"
           style={{ backgroundColor: theme.primary }}
         >
-          <Text className="text-4xl font-bold text-black">{displayInitial}</Text>
+          <Text className="text-4xl font-bold text-black">
+            {displayInitial}
+          </Text>
         </View>
-        <Text
-          className="text-2xl font-bold"
-          style={{ color: theme.white }}
-        >
+        <Text className="text-2xl font-bold" style={{ color: theme.white }}>
           {displayName}
         </Text>
         {user?.email ? (
@@ -198,10 +198,14 @@ const ProfileScreen = () => {
                 className="text-lg font-bold flex-1"
                 style={{ color: theme.warning }}
               >
-                {isSigningOut ? 'Signing out...' : 'Sign Out'}
+                {isSigningOut ? "Signing out..." : "Sign Out"}
               </Text>
               {!isSigningOut && (
-                <Ionicons name="chevron-forward" size={20} color={theme.warning} />
+                <Ionicons
+                  name="chevron-forward"
+                  size={20}
+                  color={theme.warning}
+                />
               )}
             </TouchableOpacity>
           )}

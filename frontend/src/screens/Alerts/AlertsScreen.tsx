@@ -59,7 +59,10 @@ const AlertsScreen = () => {
       style={{ paddingTop: insets.top, backgroundColor: theme.screenBg }}
     >
       <View className="px-4 pt-6 pb-2">
-        <Text className="text-3xl font-extrabold tracking-tight" style={{ color: theme.white }}>
+        <Text
+          className="text-3xl font-extrabold tracking-tight"
+          style={{ color: theme.white }}
+        >
           Notifications
         </Text>
         <View className="mt-1">
@@ -71,7 +74,10 @@ const AlertsScreen = () => {
 
       <ScrollView
         className="flex-1"
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 80 }}
+        contentContainerStyle={{
+          paddingHorizontal: 16,
+          paddingBottom: insets.bottom + 80,
+        }}
         showsVerticalScrollIndicator={false}
       >
         {ALERTS.map((alert) => {
@@ -80,7 +86,10 @@ const AlertsScreen = () => {
             <View
               key={alert.id}
               className="border rounded-2xl p-4 mb-3 overflow-hidden flex-row items-center"
-              style={{ backgroundColor: theme.cardBg, borderColor: theme.border }}
+              style={{
+                backgroundColor: theme.cardBg,
+                borderColor: theme.border,
+              }}
             >
               <View
                 className="absolute top-0 left-0 right-0 h-0.5"
@@ -93,10 +102,16 @@ const AlertsScreen = () => {
                 <Ionicons name={alert.icon} size={22} color={theme.white} />
               </View>
               <View className="flex-1">
-                <Text className="text-[15px] font-bold mb-0.5" style={{ color: theme.white }}>
+                <Text
+                  className="text-[15px] font-bold mb-0.5"
+                  style={{ color: theme.white }}
+                >
                   {alert.title}
                 </Text>
-                <Text className="text-xs font-medium" style={{ color: theme.grey }}>
+                <Text
+                  className="text-xs font-medium"
+                  style={{ color: theme.grey }}
+                >
                   {alert.subtitle}
                 </Text>
               </View>
@@ -104,7 +119,10 @@ const AlertsScreen = () => {
                 className="rounded-full px-2 py-1"
                 style={{ backgroundColor: theme.border }}
               >
-                <Text className="text-[10px] font-semibold" style={{ color: theme.muted }}>
+                <Text
+                  className="text-[10px] font-semibold"
+                  style={{ color: theme.muted }}
+                >
                   {alert.timeAgo}
                 </Text>
               </View>

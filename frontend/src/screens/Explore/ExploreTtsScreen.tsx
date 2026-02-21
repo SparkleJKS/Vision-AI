@@ -61,7 +61,8 @@ const ExploreTtsScreen = () => {
             className="text-[13px] text-center mt-2"
             style={{ color: theme.muted }}
           >
-            Convert text to natural speech with multiple voices. This feature is in development.
+            Convert text to natural speech with multiple voices. This feature is
+            in development.
           </Text>
         </View>
       </View>
