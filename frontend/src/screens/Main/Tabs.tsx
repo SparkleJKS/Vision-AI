@@ -1,32 +1,34 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@react-native-vector-icons/ionicons';
-import { ScreenNames } from '@/configs/navigation';
-import type { IHomeTabParamList } from '@/screens/screens.types';
-import { HomeScreen } from '@/screens/Home';
-import { ExploreScreen } from '@/screens/Explore';
-import { VoiceScreen } from '@/screens/Voice';
-import { AlertsScreen } from '@/screens/Alerts';
-import { SettingsStack } from '@/screens/Settings/SettingsStack';
-import { colors } from '@/theme/colors';
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Text } from "react-native";
+import { Ionicons } from "@react-native-vector-icons/ionicons";
+import { ScreenNames } from "@/configs/navigation";
+import type { IHomeTabParamList } from "@/screens/screens.types";
+import { HomeScreen } from "@/screens/Home";
+import ExploreStack from "@/screens/Explore/ExploreStack";
+import { VoiceScreen } from "@/screens/Voice";
+import { AlertsScreen } from "@/screens/Alerts";
+import SettingsStack from "@/screens/Settings/SettingsStack";
+import { useTheme } from "@/theme/ThemeContext";
 
 const Tab = createBottomTabNavigator<IHomeTabParamList>();
 
-export function Tabs() {
+const Tabs = () => {
+  const { theme } = useTheme();
+  const inactiveColor = theme.tabInactive;
+
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.accentYellow,
-        tabBarInactiveTintColor: colors.white,
         tabBarStyle: {
-          backgroundColor: colors.tabBarBg,
-          borderTopColor: colors.border,
+          backgroundColor: theme.tabBarBg,
+          borderTopColor: theme.border,
           borderTopWidth: 1,
-        },
-        tabBarLabelStyle: {
-          fontSize: 10,
-          fontWeight: '600',
-          textTransform: 'uppercase',
+          elevation: 0,
+          shadowOpacity: 0,
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 4,
         },
       }}
     >
@@ -34,27 +36,43 @@ export function Tabs() {
         name={ScreenNames.Home}
         component={HomeScreen}
         options={{
-          title: 'HOME',
-          tabBarIcon: ({ color, focused }) => (
+          title: "HOME",
+          tabBarIcon: ({ focused }) => (
             <Ionicons
-              name={focused ? 'home' : 'home-outline'}
-              size={24}
-              color={color}
+              name={focused ? "home" : "home-outline"}
+              size={22}
+              color={focused ? theme.tabHome : inactiveColor}
             />
+          ),
+          tabBarLabel: ({ focused }) => (
+            <Text
+              className="text-[9px] font-bold tracking-widest uppercase -mt-0.5"
+              style={{ color: focused ? theme.tabHome : inactiveColor }}
+            >
+              HOME
+            </Text>
           ),
         }}
       />
       <Tab.Screen
         name={ScreenNames.Explore}
-        component={ExploreScreen}
+        component={ExploreStack}
         options={{
-          title: 'EXPLORE',
-          tabBarIcon: ({ color, focused }) => (
+          title: "EXPLORE",
+          tabBarIcon: ({ focused }) => (
             <Ionicons
-              name={focused ? 'compass' : 'compass-outline'}
-              size={24}
-              color={color}
+              name={focused ? "compass" : "compass-outline"}
+              size={22}
+              color={focused ? theme.tabExplore : inactiveColor}
             />
+          ),
+          tabBarLabel: ({ focused }) => (
+            <Text
+              className="text-[9px] font-bold tracking-widest uppercase -mt-0.5"
+              style={{ color: focused ? theme.tabExplore : inactiveColor }}
+            >
+              EXPLORE
+            </Text>
           ),
         }}
       />
@@ -62,9 +80,21 @@ export function Tabs() {
         name={ScreenNames.Voice}
         component={VoiceScreen}
         options={{
-          title: 'VOICE',
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="mic-outline" size={24} color={color} />
+          title: "VOICE",
+          tabBarIcon: ({ focused }) => (
+            <Ionicons
+              name={focused ? "mic" : "mic-outline"}
+              size={22}
+              color={focused ? theme.tabVoice : inactiveColor}
+            />
+          ),
+          tabBarLabel: ({ focused }) => (
+            <Text
+              className="text-[9px] font-bold tracking-widest uppercase -mt-0.5"
+              style={{ color: focused ? theme.tabVoice : inactiveColor }}
+            >
+              VOICE
+            </Text>
           ),
         }}
       />
@@ -72,13 +102,21 @@ export function Tabs() {
         name={ScreenNames.Alerts}
         component={AlertsScreen}
         options={{
-          title: 'ALERTS',
-          tabBarIcon: ({ color, focused }) => (
+          title: "ALERTS",
+          tabBarIcon: ({ focused }) => (
             <Ionicons
-              name={focused ? 'notifications' : 'notifications-outline'}
-              size={24}
-              color={color}
+              name={focused ? "notifications" : "notifications-outline"}
+              size={22}
+              color={focused ? theme.tabAlerts : inactiveColor}
             />
+          ),
+          tabBarLabel: ({ focused }) => (
+            <Text
+              className="text-[9px] font-bold tracking-widest uppercase -mt-0.5"
+              style={{ color: focused ? theme.tabAlerts : inactiveColor }}
+            >
+              ALERTS
+            </Text>
           ),
         }}
       />
@@ -86,16 +124,26 @@ export function Tabs() {
         name={ScreenNames.Settings}
         component={SettingsStack}
         options={{
-          title: 'SETTINGS',
-          tabBarIcon: ({ color, focused }) => (
+          title: "SETTINGS",
+          tabBarIcon: ({ focused }) => (
             <Ionicons
-              name={focused ? 'settings' : 'settings-outline'}
-              size={24}
-              color={color}
+              name={focused ? "settings" : "settings-outline"}
+              size={22}
+              color={focused ? theme.tabSettings : inactiveColor}
             />
+          ),
+          tabBarLabel: ({ focused }) => (
+            <Text
+              className="text-[9px] font-bold tracking-widest uppercase -mt-0.5"
+              style={{ color: focused ? theme.tabSettings : inactiveColor }}
+            >
+              SETTINGS
+            </Text>
           ),
         }}
       />
     </Tab.Navigator>
   );
-}
+};
+
+export default Tabs;

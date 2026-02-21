@@ -12,14 +12,15 @@ import {
 import { useDispatch } from "react-redux";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
-import { colors } from "@/theme/colors";
+import { useTheme } from "@/theme";
 import { useAuth } from "@/auth/AuthContext";
 import { navigationActions } from "@/store/actions/navigation";
 import type { AppDispatch } from "@/store";
 
-export function SignInScreen() {
+const SignInScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
   const { signInWithEmail, signInWithGoogle, authError, clearAuthError } =
     useAuth();
 
@@ -64,9 +65,13 @@ export function SignInScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-screen"
+      className="flex-1"
+      style={{
+        backgroundColor: theme.screenBg,
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+      }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
       keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}
     >
       <ScrollView
@@ -81,21 +86,33 @@ export function SignInScreen() {
         keyboardDismissMode="on-drag"
         showsVerticalScrollIndicator={false}
       >
-        <Text className="text-white text-[28px] font-bold mb-2">
+        <Text
+          className="text-3xl font-bold mb-2"
+          style={{ color: theme.white }}
+        >
           Welcome back
         </Text>
-        <Text className="text-grey text-base mb-8">
+        <Text className="text-base mb-8" style={{ color: theme.grey }}>
           Sign in to continue to VisionAI
         </Text>
 
         {errorMessage ? (
-          <View className="bg-card rounded-xl p-3 mb-4 flex-row items-center border-l-4 border-warning">
+          <View
+            className="flex-row items-center p-3 rounded-xl mb-4 border-l-4"
+            style={{
+              backgroundColor: theme.cardBg,
+              borderLeftColor: theme.warning,
+            }}
+          >
             <Ionicons
               name="information-circle"
               size={20}
-              color={colors.warning}
+              color={theme.warning}
             />
-            <Text className="text-white text-sm ml-3 flex-1">
+            <Text
+              className="text-sm ml-3 flex-1"
+              style={{ color: theme.white }}
+            >
               {errorMessage}
             </Text>
             <TouchableOpacity
@@ -103,15 +120,16 @@ export function SignInScreen() {
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
               className="p-1"
             >
-              <Ionicons name="close" size={20} color={colors.grey} />
+              <Ionicons name="close" size={20} color={theme.grey} />
             </TouchableOpacity>
           </View>
         ) : null}
 
         <TextInput
-          className="bg-card rounded-xl px-4 py-3.5 text-white text-base mb-3"
+          className="rounded-xl px-4 py-3.5 text-base mb-3"
+          style={{ backgroundColor: theme.cardBg, color: theme.white }}
           placeholder="Email"
-          placeholderTextColor={colors.grey}
+          placeholderTextColor={theme.grey}
           value={email}
           onChangeText={(v) => {
             setEmail(v);
@@ -123,9 +141,10 @@ export function SignInScreen() {
           editable={!loading}
         />
         <TextInput
-          className="bg-card rounded-xl px-4 py-3.5 text-white text-base mb-6"
+          className="rounded-xl px-4 py-3.5 text-base mb-6"
+          style={{ backgroundColor: theme.cardBg, color: theme.white }}
           placeholder="Password"
-          placeholderTextColor={colors.grey}
+          placeholderTextColor={theme.grey}
           value={password}
           onChangeText={(v) => {
             setPassword(v);
@@ -137,7 +156,8 @@ export function SignInScreen() {
         />
 
         <TouchableOpacity
-          className="bg-accent rounded-xl py-3.5 items-center mb-4"
+          className="rounded-xl py-3.5 items-center mb-4"
+          style={{ backgroundColor: theme.primary }}
           activeOpacity={0.8}
           onPress={handleSignIn}
           disabled={loading}
@@ -145,38 +165,62 @@ export function SignInScreen() {
           {loading ? (
             <ActivityIndicator color="#000" />
           ) : (
-            <Text className="text-black text-base font-bold">Sign In</Text>
+            <Text className="text-base font-bold text-black">Sign In</Text>
           )}
         </TouchableOpacity>
 
         <View className="flex-row items-center mb-4">
-          <View className="flex-1 h-px bg-border" />
-          <Text className="text-grey text-sm mx-4">or</Text>
-          <View className="flex-1 h-px bg-border" />
+          <View
+            className="flex-1 h-px"
+            style={{ backgroundColor: theme.border }}
+          />
+          <Text className="text-sm mx-4" style={{ color: theme.grey }}>
+            or
+          </Text>
+          <View
+            className="flex-1 h-px"
+            style={{ backgroundColor: theme.border }}
+          />
         </View>
 
         <TouchableOpacity
-          className="bg-card rounded-xl py-3.5 flex-row items-center justify-center border border-border"
+          className="flex-row items-center justify-center rounded-xl py-3.5 border"
+          style={{
+            backgroundColor: theme.cardBg,
+            borderColor: theme.border,
+          }}
           activeOpacity={0.8}
           onPress={handleGoogleSignIn}
           disabled={loading}
         >
-          <Ionicons name="logo-google" size={22} color={colors.white} />
-          <Text className="text-white text-base font-semibold ml-3">
+          <Ionicons name="logo-google" size={22} color={theme.white} />
+          <Text
+            className="text-base font-semibold ml-3"
+            style={{ color: theme.white }}
+          >
             Continue with Google
           </Text>
         </TouchableOpacity>
 
         <View className="flex-row justify-center mt-6">
-          <Text className="text-grey text-sm">Don't have an account? </Text>
+          <Text className="text-sm" style={{ color: theme.grey }}>
+            Don't have an account?{" "}
+          </Text>
           <TouchableOpacity
             onPress={() => dispatch(navigationActions.toSignUp())}
             disabled={loading}
           >
-            <Text className="text-accent text-sm font-semibold">Sign Up</Text>
+            <Text
+              className="text-sm font-semibold"
+              style={{ color: theme.primary }}
+            >
+              Sign Up
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
-}
+};
+
+export default SignInScreen;

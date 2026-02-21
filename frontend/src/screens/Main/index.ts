@@ -1,3 +1,3 @@
-export { MainContainer } from './Container';
-export { Navigation } from './Navigation';
-export { Tabs } from './Tabs';
+export { default as MainContainer } from './Container';
+export { default as Navigation } from './Navigation';
+export { default as Tabs } from './Tabs';

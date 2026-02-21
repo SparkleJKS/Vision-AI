@@ -1,5 +1,5 @@
-import { Tabs } from './Tabs';
+import Tabs from "./Tabs";
 
-export function Navigation() {
-  return <Tabs />;
-}
+const Navigation = () => <Tabs />;
+
+export default Navigation;

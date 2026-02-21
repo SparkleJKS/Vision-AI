@@ -1,1 +1,1 @@
-export { ViewTabScreen } from './ViewTabScreen';
+export { default as ViewTabScreen } from './ViewTabScreen';

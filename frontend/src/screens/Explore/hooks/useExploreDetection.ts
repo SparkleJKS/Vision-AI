@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Easing } from 'react-native';
+import { Animated, Easing, NativeModules, Platform } from 'react-native';
 import modelManager from '@/lib/modelManager';
 import { formatError } from '../utils';
 import type {
@@ -28,12 +28,31 @@ export interface UseExploreDetectionOptions {
   nmsEnabled: boolean;
 }
 
+type NativeYoloDetection = {
+  classId: number;
+  confidence: number;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+};
+
+type NativeYoloModule = {
+  initializeModel?: () => Promise<string>;
+  getLatestDetections?: () => NativeYoloDetection[];
+};
+
 export function useExploreDetection({
   isFocused,
   selectedRuntime,
   tfliteDelegate,
   nmsEnabled,
 }: UseExploreDetectionOptions) {
+  const nativeYoloModule = NativeModules?.YoloInferenceModule as NativeYoloModule | undefined;
+  const hasNativeAndroidYoloModule =
+    Platform.OS === 'android' &&
+    typeof nativeYoloModule?.initializeModel === 'function';
+
   const lastFrameAtRef = useRef<number | null>(null);
 
   const [isDetecting, setIsDetecting] = useState(false);
@@ -159,10 +178,36 @@ export function useExploreDetection({
       setCurrentStride(1);
       setTotalMs(null);
       const ok = await applyRuntimePreference(runtime);
-      if (ok) setIsDetecting(true);
+      if (ok || hasNativeAndroidYoloModule) {
+        setIsDetecting(true);
+      }
+      if (!ok && hasNativeAndroidYoloModule) {
+        setRuntimeStatus('fallback');
+        setStatusMessage('Using Android native YOLO frame-processor fallback.');
+      }
     },
-    [applyRuntimePreference],
+    [applyRuntimePreference, hasNativeAndroidYoloModule],
   );
+
+  useEffect(() => {
+    if (!isDetecting || !hasNativeAndroidYoloModule) return;
+    if (typeof nativeYoloModule?.getLatestDetections !== 'function') return;
+
+    const pullLatestDetections = () => {
+      try {
+        const detections = nativeYoloModule.getLatestDetections?.();
+        if (Array.isArray(detections) && detections.length > 0) {
+          console.log('[Explore] Latest detections:', detections);
+        }
+      } catch (error) {
+        console.warn('[Explore] Failed to pull latest detections:', formatError(error));
+      }
+    };
+
+    pullLatestDetections();
+    const intervalId = setInterval(pullLatestDetections, 500);
+    return () => clearInterval(intervalId);
+  }, [hasNativeAndroidYoloModule, isDetecting, nativeYoloModule]);
 
   const latencyBars = useMemo(() => {
     if (latencyHistory.length === 0) return [];

@@ -16,6 +16,9 @@ export enum ScreenNames {
   HomeTabs = 'HomeTabs',
   Home = 'Home',
   Explore = 'Explore',
+  ExploreObjectDetection = 'ExploreObjectDetection',
+  ExploreOcr = 'ExploreOcr',
+  ExploreTts = 'ExploreTts',
   Voice = 'Voice',
   Alerts = 'Alerts',
 

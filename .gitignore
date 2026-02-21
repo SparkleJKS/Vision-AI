@@ -60,7 +60,6 @@ models/**
 *.weights
 *.engine
 *.onnx
-*.tflite
 *.mlmodel
 *.pb
 *.pbtxt
@@ -82,6 +81,7 @@ models/**
 docs/
 android_app/
 runs/
+a.py
 
 # Mit PC
 batman-development/

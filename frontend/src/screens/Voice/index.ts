@@ -1,1 +1,1 @@
-export { VoiceScreen } from './VoiceScreen';
+export { default as VoiceScreen } from './VoiceScreen';

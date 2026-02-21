@@ -164,6 +164,11 @@ android {
     androidResources {
         ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'
     }
+    sourceSets {
+        main {
+            assets.srcDirs = ['src/main/assets']
+        }
+    }
 }
 
 // Apply static values from `gradle.properties` to the `android.packagingOptions`
@@ -190,6 +195,11 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
+    // TensorFlow Lite CPU runtime
+    implementation("org.tensorflow:tensorflow-lite:2.14.0")
+    implementation("org.tensorflow:tensorflow-lite-gpu:2.14.0")
+    implementation("org.tensorflow:tensorflow-lite-gpu-api:2.14.0")
+
     // GIF and WebP support
     implementation("com.facebook.fresco:animated-gif:3.4.0")
     implementation("com.facebook.fresco:webpsupport:3.4.0")
@@ -202,3 +212,4 @@ dependencies {
 }
 
 apply plugin: 'com.google.firebase.crashlytics'
+

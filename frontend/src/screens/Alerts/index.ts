@@ -1,1 +1,1 @@
-export { AlertsScreen } from './AlertsScreen';
+export { default as AlertsScreen } from './AlertsScreen';

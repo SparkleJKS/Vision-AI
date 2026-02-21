@@ -18,10 +18,18 @@ export type IAuthStackParamList = {
   [ScreenNames.SignUp]: undefined;
 };
 
+// ── Explore Stack Param List ─────────────────────────────────────────
+export type IExploreStackParamList = {
+  [ScreenNames.Explore]: undefined;
+  [ScreenNames.ExploreObjectDetection]: undefined;
+  [ScreenNames.ExploreOcr]: undefined;
+  [ScreenNames.ExploreTts]: undefined;
+};
+
 // ── Home Tab Param List ──────────────────────────────────────────────
 export type IHomeTabParamList = {
   [ScreenNames.Home]: undefined;
-  [ScreenNames.Explore]: undefined;
+  [ScreenNames.Explore]: NavigatorScreenParams<IExploreStackParamList>;
   [ScreenNames.Voice]: undefined;
   [ScreenNames.Alerts]: undefined;
   [ScreenNames.Settings]: NavigatorScreenParams<ISettingsStackParamList>;
@@ -46,6 +54,18 @@ export type IHomeScreenProps = BottomTabScreenProps<
 export type IExploreScreenProps = BottomTabScreenProps<
   IHomeTabParamList,
   ScreenNames.Explore
+>;
+export type IExploreObjectDetectionScreenProps = NativeStackScreenProps<
+  IExploreStackParamList,
+  ScreenNames.ExploreObjectDetection
+>;
+export type IExploreOcrScreenProps = NativeStackScreenProps<
+  IExploreStackParamList,
+  ScreenNames.ExploreOcr
+>;
+export type IExploreTtsScreenProps = NativeStackScreenProps<
+  IExploreStackParamList,
+  ScreenNames.ExploreTts
 >;
 export type IVoiceScreenProps = BottomTabScreenProps<
   IHomeTabParamList,
