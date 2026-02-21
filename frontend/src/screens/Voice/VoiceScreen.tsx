@@ -1,20 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
-import {
-  Text,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Animated,
-} from 'react-native';
-import { Ionicons } from '@react-native-vector-icons/ionicons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors } from '@/theme/colors';
+import { useEffect, useRef, useState } from "react";
+import { Animated, Text, TouchableOpacity, View } from "react-native";
+import { Ionicons } from "@react-native-vector-icons/ionicons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTheme } from "@/theme";
 
 const BAR_COUNT = 8;
 const BAR_MIN = 0.15;
 const BAR_MAX = 1;
 
-function SoundWaveBars({ isActive }: { isActive: boolean }) {
+type SoundWaveBarsProps = { isActive: boolean; barColor?: string };
+function SoundWaveBars({ isActive, barColor = "#6366F1" }: SoundWaveBarsProps) {
   const bars = useRef(
     Array.from({ length: BAR_COUNT }, () => new Animated.Value(BAR_MIN)),
   ).current;
@@ -54,16 +49,15 @@ function SoundWaveBars({ isActive }: { isActive: boolean }) {
       ),
     );
 
-    const loop = Animated.loop(
-      Animated.sequence([waveForward, waveBack]),
-      { iterations: -1 },
-    );
+    const loop = Animated.loop(Animated.sequence([waveForward, waveBack]), {
+      iterations: -1,
+    });
     loop.start();
     return () => loop.stop();
   }, [isActive]);
 
   return (
-    <View className="flex-row items-center justify-center gap-1.5 mb-4 h-7">
+    <View className="flex-row items-center justify-center gap-1.5 mb-1 h-7">
       {bars.map((bar, i) => {
         const scaleY = bar.interpolate({
           inputRange: [0, 1],
@@ -76,9 +70,12 @@ function SoundWaveBars({ isActive }: { isActive: boolean }) {
         return (
           <View key={`bar-${i}`} className="w-1 h-6 items-center justify-end">
             <Animated.View
+              className="w-1 h-6 rounded-sm"
               style={[
-                styles.waveBar,
-                { transform: [{ scaleY }, { translateY }] },
+                {
+                  backgroundColor: barColor,
+                  transform: [{ scaleY }, { translateY }],
+                },
               ]}
             />
           </View>
@@ -88,64 +85,72 @@ function SoundWaveBars({ isActive }: { isActive: boolean }) {
   );
 }
 
-const styles = StyleSheet.create({
-  waveBar: {
-    width: 4,
-    height: 24,
-    backgroundColor: colors.accentYellow,
-    borderRadius: 2,
-  },
-});
-
-export function VoiceScreen() {
+const VoiceScreen = () => {
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
   const [isListening, setIsListening] = useState<boolean>(false);
+  const accent = theme.tabVoice;
 
   return (
     <View
-      className="flex-1 bg-screen items-center"
-      style={{ paddingTop: insets.top }}
+      className="flex-1 items-center"
+      style={{ paddingTop: insets.top, backgroundColor: theme.screenBg }}
     >
-      <Text className="text-white text-[28px] font-bold mt-6 mb-8">
-        Voice Mode
-      </Text>
+      <View className="items-center mt-16">
+        <Text
+          className="text-[28px] font-extrabold tracking-tight mb-2"
+          style={{ color: theme.white }}
+        >
+          Voice Mode
+        </Text>
+      </View>
 
       <View className="flex-1 items-center justify-center px-6">
         <TouchableOpacity
-          className="w-40 h-40 rounded-full bg-dark border-[3px] border-accent items-center justify-center mb-6"
+          className="w-40 h-40 rounded-full mb-7 border-2 justify-center items-center"
+          style={{
+            backgroundColor: isListening ? `${accent}12` : theme.cardBg,
+            borderColor: isListening ? accent : `${accent}35`,
+          }}
           activeOpacity={0.9}
           onPress={() => setIsListening((p) => !p)}
         >
-          <Ionicons name="mic" size={64} color={colors.accentYellow} />
+          <Ionicons name="mic" size={64} color={accent} />
         </TouchableOpacity>
 
-        <SoundWaveBars isActive={isListening} />
+        <SoundWaveBars isActive={isListening} barColor={accent} />
 
-        <Text className="text-white text-base font-semibold tracking-[2px] mb-8">
-          {isListening ? 'LISTENING...' : 'TAP TO START'}
+        <Text
+          className="text-[13px] font-bold tracking-widest mb-8"
+          style={{ color: isListening ? accent : theme.white }}
+        >
+          {isListening ? "LISTENING..." : "TAP TO START"}
         </Text>
 
         <TouchableOpacity
-          className={`flex-row items-center justify-center py-4 px-7 rounded-xl gap-3 min-w-[260px] ${
-            isListening ? 'bg-accent' : 'bg-card border-2 border-accent'
-          }`}
+          className="rounded-[14px] py-4 px-7 min-w-[260px] flex-row items-center justify-center gap-2.5 border"
+          style={{
+            backgroundColor: isListening ? accent : theme.cardBg,
+            borderColor: isListening ? "transparent" : `${accent}40`,
+          }}
           activeOpacity={0.8}
           onPress={() => setIsListening((p) => !p)}
         >
           <Ionicons
-            name={isListening ? 'stop-circle' : 'mic'}
+            name={isListening ? "stop-circle" : "mic"}
             size={24}
-            color={isListening ? '#000000' : colors.white}
+            color={isListening ? theme.white : accent}
           />
           <Text
-            className={`text-base font-bold ${
-              isListening ? 'text-black' : 'text-accent'
-            }`}
+            className="text-[15px] font-bold"
+            style={{ color: isListening ? theme.white : accent }}
           >
-            {isListening ? 'Stop Listening' : 'Start Listening'}
+            {isListening ? "Stop Listening" : "Start Listening"}
           </Text>
         </TouchableOpacity>
       </View>
     </View>
   );
-}
+};
+
+export default VoiceScreen;

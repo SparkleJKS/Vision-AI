@@ -1,1 +1,1 @@
-export { VisionSettingsScreen } from './VisionSettingsScreen';
+export { default as VisionSettingsScreen } from './VisionSettingsScreen';

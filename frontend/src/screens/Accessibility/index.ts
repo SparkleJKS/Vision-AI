@@ -1,1 +1,1 @@
-export { AccessibilityScreen } from './AccessibilityScreen';
+export { default as AccessibilityScreen } from './AccessibilityScreen';
