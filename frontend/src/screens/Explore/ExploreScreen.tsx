@@ -81,12 +81,15 @@ function FeatureCard({
   onSelect,
   index,
   theme,
+  themeId,
 }: {
   feature: Feature;
   onSelect: (id: FeatureId) => void;
   index: number;
   theme: import("@/theme/tokens").ThemeTokens;
+  themeId: "accessibility" | "neon";
 }) {
+  const accent = themeId === "accessibility" ? theme.primary : feature.accentColor;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(24)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -143,19 +146,19 @@ function FeatureCard({
       >
         <View
           className="absolute top-0 left-5 right-5 h-px"
-          style={{ backgroundColor: feature.accentColor }}
+          style={{ backgroundColor: accent }}
         />
         <View className="flex-row justify-between items-center">
           <View
             className="w-11 h-11 rounded-xl border justify-center items-center"
             style={{
-              borderColor: feature.accentColor + "40",
+              borderColor: accent + "40",
               backgroundColor: theme.darkBg,
             }}
           >
             <Text
               className="text-[22px]"
-              style={{ color: feature.accentColor }}
+              style={{ color: accent }}
             >
               {feature.icon}
             </Text>
@@ -163,9 +166,7 @@ function FeatureCard({
           <View
             className="flex-row items-center gap-1.5 px-2.5 py-1.5 rounded-full"
             style={{
-              backgroundColor: isActive
-                ? feature.accentColor + "20"
-                : theme.cardBg,
+              backgroundColor: isActive ? accent + "20" : theme.cardBg,
             }}
           >
             {!isActive && (
@@ -176,7 +177,7 @@ function FeatureCard({
             )}
             <Text
               className="text-[10px] font-bold tracking-wider"
-              style={{ color: isActive ? feature.accentColor : theme.muted }}
+              style={{ color: isActive ? accent : theme.muted }}
             >
               {isActive ? "LIVE" : "SOON"}
             </Text>
@@ -209,7 +210,7 @@ function FeatureCard({
               <View key={i} className="flex-1 items-center gap-0.5">
                 <Text
                   className="text-[15px] font-bold"
-                  style={{ color: feature.accentColor }}
+                  style={{ color: accent }}
                 >
                   {stat.value}
                 </Text>
@@ -227,13 +228,13 @@ function FeatureCard({
           <View
             className="border rounded-[10px] py-2.5 items-center mt-1"
             style={{
-              backgroundColor: feature.accentColor + "15",
-              borderColor: feature.accentColor + "40",
+              backgroundColor: accent + "15",
+              borderColor: accent + "40",
             }}
           >
             <Text
               className="text-[13px] font-bold tracking-wide"
-              style={{ color: feature.accentColor }}
+              style={{ color: accent }}
             >
               Launch →
             </Text>
@@ -447,7 +448,7 @@ function ObjectDetectionView({
 const ExploreScreen = () => {
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
-  const { theme } = useTheme();
+  const { theme, themeId } = useTheme();
   const [selectedFeature, setSelectedFeature] = useState<FeatureId | null>(
     null,
   );
@@ -507,6 +508,7 @@ const ExploreScreen = () => {
               onSelect={setSelectedFeature}
               index={index}
               theme={theme}
+              themeId={themeId}
             />
           ))}
         </View>
