@@ -1,317 +1,214 @@
 # VisionAI Setup Instructions
 
-Complete setup guide for VisionAI: an assistive app for the visually impaired with real-time camera scanning, ML-powered object detection, and audio feedback.
-
-## 🏗️ Architecture
-
-- **Frontend**: React Native CLI, **TypeScript**, **NativeWind** (Tailwind CSS)
-- **Backend**: FastAPI (Python) in `backend/`
-- **Models**: ML models (to be added in `models/`)
-- **Database**: Optional (add PostgreSQL or SQLite if you store data)
-
-## Prerequisites
-
-### Required
-
-- **Node.js** (v18 or higher) — [nodejs.org](https://nodejs.org/)
-- **npm** (comes with Node.js)
-- **Git**
-- **Android Studio** or **Xcode** (for emulator/device builds)
-
-### Optional
-
-- **Python 3.10+** — for backend
-- **Android Studio** — for Android emulator
-- **Xcode** — for iOS development (macOS only)
-- **VS Code** or **Cursor** — recommended editor
+Setup guide for VisionAI: assistive app with real-time camera scanning, ML object detection, and audio feedback.
 
 ---
 
-## 1. Clone the repository
+## Architecture
+
+| Layer | Stack |
+|-------|--------|
+| Frontend | React Native CLI, TypeScript, NativeWind |
+| Backend | FastAPI (Python), `backend/` |
+| Models | ML assets in `models/` (optional) |
+
+---
+
+## Prerequisites
+
+| Requirement | Version / Notes |
+|-------------|-----------------|
+| Node.js | v18+ |
+| npm | Bundled with Node.js |
+| Git | — |
+| Android Studio | For Android builds; NDK **26.1.10909125** (SDK Manager → SDK Tools → NDK) |
+| Xcode | macOS only, for iOS |
+| Python | 3.10+ (backend) |
+
+---
+
+## 1. Clone and install
 
 ```bash
 git clone <repository-url>
 cd VisionAI
+cd frontend
+npm install
 ```
 
 ---
 
-## 2. Git hooks (one-time, all contributors)
+## 2. Git hooks (one-time)
 
-Branch-name validation runs on commit. Configure from the repo root:
+Branch-name validation runs on commit. From repo root:
 
 **Windows (PowerShell):**
-
 ```powershell
 git config core.hooksPath .githooks
 ```
 
-**macOS / Linux / Git Bash:**
-
+**macOS / Linux:**
 ```bash
 git config core.hooksPath .githooks
 chmod +x .githooks/pre-commit .githooks/pre-commit-bash.sh .githooks/pre-commit-node.js
 ```
 
-**Allowed branch names:** `develop`, `HEAD`, or:
-
-- `feature/<slug>` (e.g. `feature/camera-settings`)
-- `bugfix/<slug>` (e.g. `bugfix/audio-crash`)
-- `update/<slug>` (e.g. `update/deps`)
-- `release/<slug>` (e.g. `release/1.0.0`)
-
-Use only lowercase letters, numbers, dots, underscores, and hyphens in the slug.
+Allowed branch names: `develop`, `HEAD`, or `feature/<slug>`, `bugfix/<slug>`, `update/<slug>`, `release/<slug>` (lowercase slug: letters, numbers, dots, underscores, hyphens).
 
 ---
 
-## 3. Frontend setup (React Native CLI)
+## 3. Frontend
 
-### Install dependencies
+### 3.1 Android SDK and local.properties
 
-From repo root:
-
-```bash
-cd frontend
-npm install
-```
-
-Or run frontend commands from root (no need to `cd frontend` for install if you use root scripts):
+From `frontend/`:
 
 ```bash
-npm start          # same as: cd frontend && npm start
-npm run android
-npm run ios
-```
-
-First time you should run `npm install` inside `frontend/` so `node_modules` is created there.
-
-### Start the dev server
-
-**From root:**
-
-```bash
-npm start
-```
-
-**From frontend folder:**
-
-```bash
-cd frontend
-npm start
-```
-
-### Run the app
-
-- **Android emulator**: Run `npm run android` (requires Android Studio). Or use the two-step flow: start Metro with `npm run start`, then in another terminal run `npm run android:install-dev` (this script forwards port 8081 so the app can reach Metro).
-- **iOS simulator** (macOS only): Run `npm run ios` (requires Xcode).
-- **Physical device**: Run `npm run android:install-dev` for a dev build, then connect via USB and ensure USB debugging is enabled.
-
-### Android native build (dev client / New Architecture)
-
-The app uses React Native’s **New Architecture** and builds native code with **NDK 26**.
-
-- **NDK version:** The project pins **NDK 26.1.10909125**. Install it in **Android Studio → SDK Manager → SDK Tools** → enable "Show Package Details" → under **NDK** select **26.1.10909125** → Apply.
-- **Patched header:** A patch is applied to React Native’s `graphicsConversions.h` (for NDK 26’s C++ stdlib). It is applied automatically when you run `npm install` in `frontend/` (via `patch-package`). The app’s Gradle/CMake setup copies this patched header and passes it to the native build so both the app and autolinked libraries use it.
-- **First native build:** From `frontend/` run `npm run android:install-dev` (or from `frontend/android`: `./gradlew installDevDebug` on macOS/Linux, `gradlew.bat installDevDebug` on Windows). The first build can take several minutes.
-
-#### Prebuild and `local.properties`
-
-The `prebuild` script runs `scripts/setup-local-properties.js` to create or update `android/local.properties` with the correct `sdk.dir`. Without this file you may see "SDK location not found" errors.
-
-**Solution:** Run the prebuild script from `frontend/`:
-
-```bash
-cd frontend
 npm run prebuild
 ```
 
-This runs the **postprebuild** script (`scripts/setup-local-properties.js`) that creates `local.properties`. The script looks for the SDK in this order:
+This creates `android/local.properties` (sdk.dir). The script uses `ANDROID_HOME` or `ANDROID_SDK_ROOT`, or default paths (`%LOCALAPPDATA%\Android\Sdk` on Windows, `~/Android/Sdk` on macOS/Linux). Set `ANDROID_HOME` if the script cannot find the SDK.
 
-1. `ANDROID_HOME` environment variable  
-2. `ANDROID_SDK_ROOT` environment variable  
-3. Default path (e.g. `%LOCALAPPDATA%\Android\Sdk` on Windows, `~/Android/Sdk` on macOS/Linux)
+### 3.2 Environment and Firebase
 
-**Optional:** Set `ANDROID_HOME` (or `ANDROID_SDK_ROOT`) so the script always finds your SDK:
+Firebase config is **not** committed. `google-services.json` is generated at build time from `frontend/.env`.
 
-- **Windows:** `set ANDROID_HOME=%LOCALAPPDATA%\Android\Sdk` (or add it in System Environment Variables)
-- **macOS/Linux:** `export ANDROID_HOME=~/Android/Sdk` (or add to `~/.bashrc` / `~/.zshrc`)
+1. Copy `frontend/.env.example` to `frontend/.env`.
+2. Create a project in [Firebase Console](https://console.firebase.google.com/).
+3. Add two Android apps: package names `com.anonymous.VisionAI` and `com.anonymous.VisionAI.dev`.
+4. In Firebase Console → Project settings, obtain:
+   - Project number, Project ID, Web API Key
+   - For each Android app: App ID (e.g. `1:558368469782:android:18e666c73ce261aaef9637`)
+5. Set in `frontend/.env`:
 
-`local.properties` is gitignored because it contains machine-specific paths.
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `FIREBASE_PROJECT_NUMBER` | Yes | Project number |
+| `FIREBASE_PROJECT_ID` | Yes | Project ID |
+| `FIREBASE_API_KEY` | Yes | Web API Key |
+| `FIREBASE_MOBILE_SDK_APP_ID` | Yes | Main app App ID |
+| `FIREBASE_MOBILE_SDK_APP_ID_DEV` | Yes | Dev flavor App ID |
+| `GOOGLE_WEB_CLIENT_ID` | Yes | Web client ID (Google Sign-In) |
+| `FIREBASE_STORAGE_BUCKET` | No | Defaults to `{PROJECT_ID}.firebasestorage.app` |
+| `FIREBASE_DEBUG_CERTIFICATE_SHA1` | No | Debug SHA-1 for Google Sign-In |
+| `FIREBASE_OAUTH_ANDROID_CLIENT_ID` | No | Android OAuth client (main) |
+| `FIREBASE_OAUTH_ANDROID_CLIENT_ID_DEV` | No | Android OAuth client (dev) |
 
-#### Firebase (Crashlytics)
+Do not commit `.env`. The build scripts run `scripts/generate-google-services.js` and write `android/app/google-services.json` before Gradle.
 
-The app uses **Firebase Crashlytics** for crash reporting. Crashlytics works only in **development builds** (not in Expo Go).
+**Firebase Authentication:** In Firebase Console → Authentication → Sign-in method, enable **Email/Password** and **Google**. For Google Sign-In issues (e.g. `DEVELOPER_ERROR`), see [frontend/docs/GOOGLE_SIGNIN_SETUP.md](frontend/docs/GOOGLE_SIGNIN_SETUP.md).
 
-**Setup:**
+### 3.3 Run the app
 
-1. Create a project at [Firebase Console](https://console.firebase.google.com/).
-2. Add an **Android app** with package name `com.anonymous.VisionAI` (or `com.anonymous.VisionAI.dev` for the dev flavor).
-3. Download `google-services.json` and place it in `frontend/` (project root).
-4. Build the app: `npm run android:install-dev`.
+**Metro (required for dev):**
+```bash
+cd frontend
+npm start
+```
 
-**Note:** `google-services.json` is committed to the repo.
+**Android (separate terminal):**
+```bash
+cd frontend
+npm run android
+# or: npm run android:install-dev   # installs dev debug + adb reverse 8081
+```
 
-#### Firebase Authentication (Email/Password & Google)
+**iOS (macOS):**
+```bash
+cd frontend
+npm run ios
+```
 
-The app uses **Firebase Auth** with email/password and Google Sign-In.
+**Physical device:** USB debugging enabled, device connected. Use `npm run android:install-dev`; Metro must be running.
 
-**1. Enable sign-in methods in Firebase Console:**
+### 3.4 Native build (Android)
 
-- Go to [Firebase Console](https://console.firebase.google.com/) → your project → **Authentication** → **Sign-in method**
-- Enable **Email/Password**
-- Enable **Google** (add support email if prompted)
+- **NDK:** 26.1.10909125 (Android Studio → SDK Manager → SDK Tools → NDK, enable “Show Package Details”).
+- **Patched header:** Applied via `patch-package` on `npm install`; Gradle uses it for the native build.
+- First build: `npm run android:install-dev` from `frontend/` (several minutes).
 
-**2. Google Sign-In – Web Client ID (required for Google auth):**
-
-- Firebase Console → Project Settings → **Your apps** → select your Android app
-- Under "SDK setup and configuration", if you have a **Web app** in the project, copy its **Web client ID** (format: `XXXXX-xxx.apps.googleusercontent.com`)
-- If you don't have a Web app: **Add app** → **Web** → register, then copy the Web client ID
-- Copy `frontend/.env.example` to `frontend/.env` and add:
-  ```
-  GOOGLE_WEB_CLIENT_ID=YOUR_WEB_CLIENT_ID_HERE
-  ```
-- Rebuild the app after adding the env var
-
-**3. Debug SHA-1 for Google Sign-In:** If you get `DEVELOPER_ERROR`, add your debug SHA-1 to Firebase. See [frontend/docs/GOOGLE_SIGNIN_SETUP.md](frontend/docs/GOOGLE_SIGNIN_SETUP.md).
-
-**4. Add both package names to Firebase:**
-
-- Add Android apps for both `com.anonymous.VisionAI` and `com.anonymous.VisionAI.dev` (dev flavor)
-- The `google-services.json` should include clients for both (see Firebase Crashlytics section)
-
-#### Release APK (shareable build)
-
-To build a release APK for distribution (real devices only, arm64):
+### 3.5 Release APK
 
 ```bash
 cd frontend
 npm run android:apk
 ```
 
-Output: `frontend/android/app/build/outputs/apk/dev/release/app-dev-release.apk`. The script builds for **arm64 only** to reduce size (~15–25 MB). For emulator testing, use `npm run android:install-dev` (includes x86).
+Output: `frontend/android/app/build/outputs/apk/dev/release/app-dev-release.apk` (arm64 only). For emulator, use `npm run android:install-dev`.
 
-### Frontend environment variables
-
-Create `frontend/.env` from `frontend/.env.example`. Required for Google Sign-In:
+### 3.6 Frontend env reference
 
 | Variable | Description |
-|----------|-------------|
-| `GOOGLE_WEB_CLIENT_ID` | Web client ID from Firebase (format: `XXXXX-xxx.apps.googleusercontent.com`) |
-| `API_URL` | (Optional) Backend API URL. Default: `http://10.0.2.2:8000` (Android emulator) or `http://127.0.0.1:8000` (iOS) |
-
-### Frontend tech stack
-
-- **React Native CLI**
-- **TypeScript**
-- **NativeWind** (Tailwind for React Native) — use `className` on React Native components
-- **React Native Reanimated** & **Safe Area Context**
+|---------|-------------|
+| `GOOGLE_WEB_CLIENT_ID` | Firebase Web client ID |
+| `API_URL` | Backend API base URL (default: emulator `http://10.0.2.2:8000`, iOS `http://127.0.0.1:8000`) |
 
 ---
 
-## 4. Backend setup (FastAPI)
+## 4. CI (GitHub Actions)
 
-### Install Python dependencies
+Workflow: `.github/workflows/android-dev-apk-cd.yml` (builds dev release APK on push to `main` or manual dispatch).
+
+**Required secret:** `FIREBASE_ENV`
+
+- **Settings** → **Secrets and variables** → **Actions** → **New repository secret**
+- Name: `FIREBASE_ENV`
+- Value: full contents of `frontend/.env` (Firebase/Google vars only; used to generate `google-services.json` in CI)
+
+Without `FIREBASE_ENV`, the Android APK job fails.
+
+---
+
+## 5. Backend
 
 ```bash
 cd backend
 python -m venv venv
-
-# Windows
-venv\Scripts\activate
-
-# macOS/Linux
-source venv/bin/activate
-
+# Windows: venv\Scripts\activate
+# macOS/Linux: source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Run backend
-
+Run:
 ```bash
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Backend will run at `http://localhost:8000` (or as configured).
-
-### Environment variables (when added)
-
-Create `backend/.env` as needed, for example:
-
-```env
-APP_NAME=VisionAI Backend
-ENVIRONMENT=local
-LOG_LEVEL=INFO
-CORS_ALLOW_ORIGINS=*
-MODEL_VERSION=mock-0.1
-```
+Optional `backend/.env` (e.g. `APP_NAME`, `ENVIRONMENT`, `LOG_LEVEL`, `CORS_ALLOW_ORIGINS`, `MODEL_VERSION`).
 
 ---
 
-## 5. Models folder
+## 6. Models
 
-The `models/` folder is a placeholder for ML model files (e.g. TensorFlow, ONNX). When you add models, document the expected format and how the backend loads them in this file or in `backend/` docs.
-
----
-
-## 6. Troubleshooting
-
-### Frontend
-
-- **Metro/NativeWind cache issues**  
-  ```bash
-  cd frontend
-  npm start -- --reset-cache
-  ```
-
-- **Node version**  
-  Use Node 18+ and ensure `node` and `npm` are on your PATH.
-
-- **Dev server not connecting to device**  
-  Ensure phone/emulator and computer are on the same Wi‑Fi (for wireless debugging) or use USB debugging. Check that no firewall is blocking the Metro port (default 8081). For emulator, run `adb reverse tcp:8081 tcp:8081` so the app can reach Metro on the host (this is done automatically by `npm run android:install-dev`).
-
-- **App crashes on startup / closes immediately on emulator**  
-  1. Start Metro first: `npm run start` (or `npm run start:reset` if you suspect cache issues).  
-  2. Run `npm run android:install-dev` — it forwards port 8081 and installs the app.  
-  3. Launch the app from the emulator. If it still crashes, check `adb logcat` for native errors. Crashlytics is disabled in dev to avoid crash loops.
-
-- **Android native build: undefined C++ symbols or std::format / graphicsConversions errors**  
-  The project is pinned to **NDK 26.1.10909125**. Install it in **Android Studio → SDK Manager → SDK Tools** → "Show Package Details" → **NDK** → **26.1.10909125** → Apply. Ensure patches are applied: from `frontend/` run `npm install` (this runs `patch-package` and applies the React Native header patch). Then build again (e.g. `gradlew.bat installDevDebug` or `./gradlew installDevDebug`). Avoid `gradlew clean` before build unless necessary—it can cause longer rebuilds.
-
-- **SDK location not found / `local.properties` missing**  
-  Run `npm run prebuild` from `frontend/`; the postprebuild script recreates `local.properties` automatically. See [Prebuild and local.properties](#prebuild-and-localproperties) above.
-
-### Backend
-
-- **Port 8000 in use**  
-  Change port: `uvicorn app.main:app --reload --port 8001`  
-  Or (Windows) find and stop the process using port 8000.
-
-### Git hooks not running
-
-- Confirm: `git config core.hooksPath` shows `.githooks`.
-- On Windows, ensure Node is installed (pre-commit uses the Node script).
+The `models/` directory holds ML assets. Document expected formats and loading in `backend/` or project docs when adding models.
 
 ---
 
-## 7. Production (future)
+## 7. Troubleshooting
 
-- **Backend**: Use a production WSGI/ASGI server (e.g. Gunicorn), PostgreSQL, and env-based config.
-- **Frontend**: Use `npm run android:apk` from `frontend/` for release APK. Output: `android/app/build/outputs/apk/dev/release/app-dev-release.apk`.
-- **API**: Set `API_URL` in `frontend/.env` to point the app to the production API (e.g. `https://api.example.com`).
+| Issue | Action |
+|-------|--------|
+| Metro / NativeWind cache | `cd frontend && npm start -- --reset-cache` |
+| SDK / local.properties | `cd frontend && npm run prebuild` |
+| Device not reaching Metro | Run `npm run android:install-dev` (sets `adb reverse tcp:8081 tcp:8081`); ensure Metro is running. |
+| App crashes on launch | Start Metro first; then install with `npm run android:install-dev`. Check `adb logcat` for native errors. |
+| NDK / C++ / std::format errors | Use NDK 26.1.10909125; run `npm install` in `frontend/` so patches apply; rebuild. |
+| Port 8000 in use | `uvicorn app.main:app --reload --port 8001` or stop the process using 8000. |
+| Git hooks not running | `git config core.hooksPath` should show `.githooks`. On Windows, Node must be available. |
 
 ---
 
-## 8. Summary
+## 8. Command reference
 
-| Task              | Command (from repo root)     |
-|-------------------|------------------------------|
-| Install frontend  | `cd frontend && npm install`  |
-| Start Metro       | `npm start`                   |
-| Android (dev)     | `npm run android`             |
-| Android install dev | `npm run android:install-dev` (from root) |
-| Android release APK | `npm run android:apk` (from root) |
-| Prebuild          | `cd frontend && npm run prebuild` |
-| iOS               | `npm run ios`                 |
-| Git hooks         | `git config core.hooksPath .githooks` |
+| Task | Command |
+|------|---------|
+| Install frontend | `cd frontend && npm install` |
+| Prebuild (local.properties) | `cd frontend && npm run prebuild` |
+| Start Metro | `cd frontend && npm start` |
+| Android dev run | `cd frontend && npm run android` |
+| Android dev install | `cd frontend && npm run android:install-dev` |
+| Android release APK | `cd frontend && npm run android:apk` |
+| iOS | `cd frontend && npm run ios` |
+| Git hooks | `git config core.hooksPath .githooks` |
 
-For more on the project and branching workflow, see [README.md](README.md).
+For project overview and branching, see [README.md](README.md).
