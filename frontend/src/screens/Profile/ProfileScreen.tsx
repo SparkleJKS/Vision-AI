@@ -15,6 +15,7 @@ import { useAuth } from "@/auth/AuthContext";
 import { logEvent } from "@/utils/logger";
 import { navigationActions } from "@/store/actions/navigation";
 import type { AppDispatch } from "@/store";
+import Version from "@/components/Version/Version";
 
 const PROFILE_OPTIONS = [
   {
@@ -209,6 +210,10 @@ const ProfileScreen = () => {
               )}
             </TouchableOpacity>
           )}
+        </View>
+
+        <View className="items-center mt-8 mb-4">
+          <Version />
         </View>
       </ScrollView>
     </View>
