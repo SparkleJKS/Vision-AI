@@ -11,9 +11,12 @@
 const { execSync } = require('child_process');
 const path = require('path');
 
-const androidDir = path.join(__dirname, '..', 'android');
+const frontendRoot = path.join(__dirname, '..');
+const androidDir = path.join(frontendRoot, 'android');
 const gradlew = process.platform === 'win32' ? 'gradlew.bat' : './gradlew';
 const doClean = process.argv.includes('--clean');
+
+execSync('node scripts/generate-google-services.js', { cwd: frontendRoot, stdio: 'inherit' });
 
 if (doClean) {
   console.log('Cleaning Android build first...\n');

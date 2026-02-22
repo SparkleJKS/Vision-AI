@@ -36,5 +36,10 @@ yarn-error.*
 .env*.local
 !.env.example
 
+# Firebase / Google – keys live in .env; google-services.json is generated at build time
+google-services.json
+android/google-services.json
+android/app/google-services.json
+
 # typescript
 *.tsbuildinfo

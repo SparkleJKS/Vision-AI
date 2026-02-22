@@ -17,6 +17,16 @@ tasks.register("copyPatchedReactHeaders", Copy) {
   onlyIf { sourceGraphicsConversions.exists() }
 }
 
+// Single source of truth
+def frontendRoot = rootProject.projectDir.parent
+def tfliteSource = file("${frontendRoot}/assets/yolov8n.tflite")
+def tfliteDestDir = file("${projectDir}/src/main/assets")
+tasks.register("copyTfliteModel", Copy) {
+  from tfliteSource
+  into tfliteDestDir
+  onlyIf { tfliteSource.exists() }
+}
+
 /**
  * This is the configuration block to customize your React Native Android app.
  * By default you don't need to apply any configuration, just uncomment the lines you need.
@@ -131,6 +141,9 @@ android {
     }
     afterEvaluate {
         tasks.matching { it.name.startsWith("configureCMake") }.configureEach { it.dependsOn("copyPatchedReactHeaders") }
+        tasks.matching { it.name.startsWith("merge") && it.name.endsWith("Assets") }.configureEach { it.dependsOn("copyTfliteModel") }
+        // Lint tasks read src/main/assets; must run after copyTfliteModel (Gradle implicit-dependency validation)
+        tasks.matching { it.name.toLowerCase().contains("lintvital") }.configureEach { it.dependsOn("copyTfliteModel") }
     }
     signingConfigs {
         debug {
