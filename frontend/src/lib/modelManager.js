@@ -80,8 +80,8 @@ function normalizeConfig(config) {
 
   const onnxExecutionProviders = Array.isArray(merged.onnxExecutionProviders)
     ? merged.onnxExecutionProviders
-        .map((provider) => String(provider).trim().toLowerCase())
-        .filter((provider) => provider.length > 0)
+      .map((provider) => String(provider).trim().toLowerCase())
+      .filter((provider) => provider.length > 0)
     : [...DEFAULT_CONFIG.onnxExecutionProviders];
 
   return {
@@ -516,9 +516,9 @@ class ServerRuntimeAdapter {
     return typeof this.baseUrl === 'string' && this.baseUrl.trim().length > 0;
   }
 
-  async load() {}
+  async load() { }
 
-  async unload() {}
+  async unload() { }
 
   async infer(input) {
     const uploadValue = resolveUploadValue(input);
@@ -537,8 +537,8 @@ class ServerRuntimeAdapter {
     const timeoutHandle =
       controller !== null
         ? setTimeout(() => {
-            controller.abort();
-          }, this.timeoutMs)
+          controller.abort();
+        }, this.timeoutMs)
         : null;
 
     const startedAt = nowMs();
