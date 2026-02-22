@@ -103,7 +103,7 @@ npm start
 ### Run the app
 
 - **Android emulator**: Run `npm run android` (requires Android Studio). Or use the two-step flow: start Metro with `npm run start`, then in another terminal run `npm run android:install-dev` (this script forwards port 8081 so the app can reach Metro).
-- **iOS simulator** (macOS only): Run `npm run ios` (requires Xcode).
+- **iOS simulator** (macOS only): Run `npm run ios` (requires Xcode). See [iOS setup](#ios-setup-mac-only) below.
 - **Physical device**: Run `npm run android:install-dev` for a dev build, then connect via USB and ensure USB debugging is enabled.
 
 ### Android native build (dev client / New Architecture)
@@ -189,6 +189,17 @@ npm run android:apk
 ```
 
 Output: `frontend/android/app/build/outputs/apk/dev/release/app-dev-release.apk`. The script builds for **arm64 only** to reduce size (~15–25 MB). For emulator testing, use `npm run android:install-dev` (includes x86).
+
+#### iOS setup (Mac only)
+
+The `frontend/ios/` folder is committed and ready. You can set it up and build when you have a Mac:
+
+1. **Install CocoaPods**: `sudo gem install cocoapods`
+2. **Install pods**: `cd frontend/ios && pod install`
+3. **Add Firebase**: In Firebase Console, add an iOS app with bundle ID `com.anonymous.VisionAI`, download `GoogleService-Info.plist`, and place it in `frontend/ios/VisionAI/`
+4. **Run**: `npm run ios` from repo root
+
+Without a Mac, you can still edit JS/TS code; the iOS native project is ready to build once you have Xcode.
 
 ### Frontend environment variables
 
