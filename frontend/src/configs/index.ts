@@ -1,1 +1,0 @@
-export { ScreenNames } from './navigation';
