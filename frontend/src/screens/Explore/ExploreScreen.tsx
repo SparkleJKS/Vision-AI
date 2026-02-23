@@ -56,7 +56,7 @@ const FEATURES: Feature[] = [
     description:
       "Convert any text into natural-sounding speech with multiple voice profiles and languages.",
     icon: "◎",
-    status: "coming_soon",
+    status: "active",
     accentColor: "#F59E0B",
     stats: [
       { label: "Voices", value: "12" },
