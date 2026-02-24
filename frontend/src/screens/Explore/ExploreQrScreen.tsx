@@ -24,6 +24,9 @@ import {
 } from "react-native-vision-camera";
 import type { CameraPermissionStatus, Code, CodeType } from "react-native-vision-camera";
 import { useTheme } from "@/theme";
+import { logEvent, warn, error } from "@/utils/logger";
+
+const LOG_NAME = "ExploreQr";
 
 const SCAN_BOX_SIZE = 240;
 const CORNER_SIZE = 34;
@@ -103,12 +106,22 @@ const ExploreQrScreen = () => {
   useFocusEffect(
     useCallback(() => {
       refreshPermissionStatus();
+      logEvent(`${LOG_NAME}_focus`, { screen: "ExploreQrScanner" });
     }, [refreshPermissionStatus]),
   );
 
   useEffect(() => {
     refreshPermissionStatus();
   }, [refreshPermissionStatus]);
+
+  useEffect(() => {
+    if (permissionStatus === "denied" || permissionStatus === "restricted") {
+      warn(LOG_NAME, "Camera permission denied or restricted", { status: permissionStatus });
+    }
+    if (hasPermission && !device) {
+      warn(LOG_NAME, "Back camera not available on this device");
+    }
+  }, [permissionStatus, hasPermission, device]);
 
   useEffect(() => {
     const subscription = AppState.addEventListener(
@@ -175,11 +188,13 @@ const ExploreQrScreen = () => {
   const handlePermissionButtonPress = useCallback(async () => {
     if (permissionStatus === "not-determined") {
       await requestPermission();
+      logEvent(`${LOG_NAME}_permission_request`, { status: "asked" });
     } else {
       try {
         await Linking.openSettings();
-      } catch {
-        // Keep flow silent on settings open failure.
+        logEvent(`${LOG_NAME}_open_settings`, {});
+      } catch (e) {
+        error(LOG_NAME, "Failed to open app settings", e);
       }
     }
     refreshPermissionStatus();
@@ -189,6 +204,7 @@ const ExploreQrScreen = () => {
     scannedRef.current = false;
     setScanned(false);
     setResult(null);
+    logEvent(`${LOG_NAME}_scan_again`, {});
   }, []);
 
   const codeScanner = useCodeScanner({
@@ -203,6 +219,12 @@ const ExploreQrScreen = () => {
       scannedRef.current = true;
       setScanned(true);
       setResult({ value: detected.value, type: detected.type });
+      const openableUrl = getOpenableUrl(detected.value);
+      logEvent(`${LOG_NAME}_scan_success`, {
+        type: detected.type,
+        valueLength: detected.value.length,
+        hasOpenableUrl: Boolean(openableUrl),
+      });
     },
   });
 
@@ -345,7 +367,12 @@ const ExploreQrScreen = () => {
                   <Pressable
                     className="flex-1 rounded-xl py-3 border items-center justify-center"
                     style={{ borderColor: theme.border, backgroundColor: theme.cardBg }}
-                    onPress={() => void Linking.openURL(urlToOpen)}
+                    onPress={() => {
+                      logEvent(`${LOG_NAME}_open_link`, { url: urlToOpen });
+                      Linking.openURL(urlToOpen).catch((e) =>
+                        error(LOG_NAME, "Failed to open URL", urlToOpen, e),
+                      );
+                    }}
                   >
                     <Text className="text-[13px] font-bold" style={{ color: theme.white }}>
                       Open Link
