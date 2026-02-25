@@ -7,6 +7,9 @@ apply plugin: "com.facebook.react"
 apply plugin: "com.google.gms.google-services"
 
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
+if (!rootProject.hasProperty("VisionCamera_enableCodeScanner") || !rootProject.property("VisionCamera_enableCodeScanner").toString().toBoolean()) {
+    rootProject.ext.set("VisionCamera_enableCodeScanner", true)
+}
 
 // Patched React Native header for NDK 26 (std::format not in libc++) - copied so app/autolinked native build use it
 def patchedReactHeadersDir = file("${buildDir}/patched_react_headers")

@@ -4,6 +4,7 @@ import type { IExploreStackParamList } from "@/screens/screens.types";
 import ExploreScreen from "./ExploreScreen";
 import ObjectDetectionScreen from "./ObjectDetectionScreen";
 import ExploreOcrScreen from "./ExploreOcrScreen";
+import ExploreQrScreen from "./ExploreQrScreen";
 import ExploreTtsScreen from "./ExploreTtsScreen";
 
 const Stack = createNativeStackNavigator<IExploreStackParamList>();
@@ -22,6 +23,10 @@ const ExploreStack = () => (
       component={ObjectDetectionScreen}
     />
     <Stack.Screen name={ScreenNames.ExploreOcr} component={ExploreOcrScreen} />
+    <Stack.Screen
+      name={ScreenNames.ExploreQrScanner}
+      component={ExploreQrScreen}
+    />
     <Stack.Screen name={ScreenNames.ExploreTts} component={ExploreTtsScreen} />
   </Stack.Navigator>
 );

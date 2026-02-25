@@ -18,6 +18,7 @@ export enum ScreenNames {
   Explore = 'Explore',
   ExploreObjectDetection = 'ExploreObjectDetection',
   ExploreOcr = 'ExploreOcr',
+  ExploreQrScanner = 'ExploreQrScanner',
   ExploreTts = 'ExploreTts',
   Voice = 'Voice',
   Alerts = 'Alerts',
