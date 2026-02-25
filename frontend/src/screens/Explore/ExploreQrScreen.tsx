@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { AppStateStatus } from "react-native";
 import {
   ActivityIndicator,
@@ -22,28 +22,18 @@ import {
   useCameraPermission,
   useCodeScanner,
 } from "react-native-vision-camera";
-import type { CameraPermissionStatus, Code, CodeType } from "react-native-vision-camera";
+import type { CameraPermissionStatus, Code } from "react-native-vision-camera";
 import { useTheme } from "@/theme";
 import { logEvent, warn, error } from "@/utils/logger";
+import {
+  CORNER_SIZE,
+  CORNER_THICKNESS,
+  SCAN_BOX_SIZE,
+  SUPPORTED_CODE_TYPES,
+} from "./constants";
+import { getCodeTypeLabel, getOpenableUrl } from "./helpers";
 
 const LOG_NAME = "ExploreQr";
-import { error } from "@/utils/logger";
-import { SCAN_BOX_SIZE } from "./constants";
-import { getCodeTypeLabel } from "./helpers";
-
-const CORNER_SIZE = 34;
-const CORNER_THICKNESS = 4;
-
-const SUPPORTED_CODE_TYPES: CodeType[] = [
-  "qr",
-  "ean-13",
-  "ean-8",
-  "code-128",
-  "code-39",
-  "upc-e",
-  "data-matrix",
-  "pdf-417",
-];
 
 type ScannedResult = {
   value: string;
@@ -57,33 +47,20 @@ type CornerBracketProps = {
   color: string;
 };
 
-const CornerBracket = ({ position, color }: CornerBracketProps) => {
-  const positionStyle =
-    position === "topLeft"
-      ? styles.topLeft
-      : position === "topRight"
-      ? styles.topRight
-      : position === "bottomLeft"
-      ? styles.bottomLeft
-      : styles.bottomRight;
-
-  return <View style={[styles.corner, positionStyle, { borderColor: color }]} />;
-};
-
-const getOpenableUrl = (rawValue: string): string | null => {
-  const value = rawValue.trim();
-  if (!value) return null;
-
-  const looksLikeHttpUrl =
-    /^(https?:\/\/)[\w.-]+\.[a-z]{2,}(:\d+)?(\/[^\s]*)?$/i.test(value);
-  if (looksLikeHttpUrl) return value;
-
-  const looksLikeDomainPath =
-    /^([\w-]+\.)+[a-z]{2,}(:\d+)?(\/[^\s]*)?$/i.test(value);
-  if (looksLikeDomainPath) return `https://${value}`;
-
-  return null;
-};
+const CornerBracket = memo(function CornerBracket({
+  position,
+  color,
+}: CornerBracketProps) {
+  const style = useMemo(
+    () => [
+      styles.corner,
+      CORNER_POSITION_STYLES[position],
+      { borderColor: color },
+    ],
+    [position, color],
+  );
+  return <View style={style} />;
+});
 
 const ExploreQrScreen = () => {
   const navigation = useNavigation();
@@ -120,7 +97,9 @@ const ExploreQrScreen = () => {
 
   useEffect(() => {
     if (permissionStatus === "denied" || permissionStatus === "restricted") {
-      warn(LOG_NAME, "Camera permission denied or restricted", { status: permissionStatus });
+      warn(LOG_NAME, "Camera permission denied or restricted", {
+        status: permissionStatus,
+      });
     }
     if (hasPermission && !device) {
       warn(LOG_NAME, "Back camera not available on this device");
@@ -216,7 +195,8 @@ const ExploreQrScreen = () => {
     onCodeScanned: (codes: Code[]) => {
       if (scannedRef.current) return;
       const detected = codes.find(
-        (code) => typeof code.value === "string" && code.value.trim().length > 0,
+        (code) =>
+          typeof code.value === "string" && code.value.trim().length > 0,
       );
       if (!detected?.value) return;
 
@@ -250,7 +230,9 @@ const ExploreQrScreen = () => {
     return getOpenableUrl(result.value);
   }, [result]);
 
-  const isCameraActive = Boolean(isFocused && hasPermission && device && !scanned);
+  const isCameraActive = Boolean(
+    isFocused && hasPermission && device && !scanned,
+  );
   const canAskAgain = permissionStatus === "not-determined";
   const cornerColor = scanned ? theme.warning : theme.primary;
 
@@ -268,7 +250,10 @@ const ExploreQrScreen = () => {
             audio={false}
           />
 
-          <View className="absolute inset-0 items-center justify-center" pointerEvents="none">
+          <View
+            className="absolute inset-0 items-center justify-center"
+            pointerEvents="none"
+          >
             <Animated.View
               style={{
                 width: SCAN_BOX_SIZE,
@@ -311,16 +296,26 @@ const ExploreQrScreen = () => {
                 >
                   CODE DETECTED
                 </Text>
-                <Text className="text-[12px] font-semibold" style={{ color: theme.grey }}>
+                <Text
+                  className="text-[12px] font-semibold"
+                  style={{ color: theme.grey }}
+                >
                   {getCodeTypeLabel(result.type)}
                 </Text>
               </View>
 
               <View
                 className="rounded-xl border px-3 py-2.5"
-                style={{ borderColor: theme.border, backgroundColor: theme.screenBg + "B3" }}
+                style={{
+                  borderColor: theme.border,
+                  backgroundColor: theme.screenBg + "B3",
+                }}
               >
-                <Text selectable className="text-[13px] font-medium" style={{ color: theme.white }}>
+                <Text
+                  selectable
+                  className="text-[13px] font-medium"
+                  style={{ color: theme.white }}
+                >
                   {result.value}
                 </Text>
               </View>
@@ -328,17 +323,26 @@ const ExploreQrScreen = () => {
               <View className="flex-row gap-2.5">
                 <Pressable
                   className="flex-1 rounded-xl py-3 border items-center justify-center"
-                  style={{ borderColor: theme.primary, backgroundColor: theme.primary + "20" }}
+                  style={{
+                    borderColor: theme.primary,
+                    backgroundColor: theme.primary + "20",
+                  }}
                   onPress={handleScanAgain}
                 >
-                  <Text className="text-[13px] font-bold" style={{ color: theme.primary }}>
+                  <Text
+                    className="text-[13px] font-bold"
+                    style={{ color: theme.primary }}
+                  >
                     Scan Again
                   </Text>
                 </Pressable>
                 {urlToOpen && (
                   <Pressable
                     className="flex-1 rounded-xl py-3 border items-center justify-center"
-                    style={{ borderColor: theme.border, backgroundColor: theme.cardBg }}
+                    style={{
+                      borderColor: theme.border,
+                      backgroundColor: theme.cardBg,
+                    }}
                     onPress={() => {
                       logEvent(`${LOG_NAME}_open_link`, { url: urlToOpen });
                       Linking.openURL(urlToOpen).catch((e) =>
@@ -346,7 +350,10 @@ const ExploreQrScreen = () => {
                       );
                     }}
                   >
-                    <Text className="text-[13px] font-bold" style={{ color: theme.white }}>
+                    <Text
+                      className="text-[13px] font-bold"
+                      style={{ color: theme.white }}
+                    >
                       Open Link
                     </Text>
                   </Pressable>
@@ -362,7 +369,10 @@ const ExploreQrScreen = () => {
           ) : hasPermission && !device ? (
             <View
               className="w-full rounded-2xl border p-6 items-center gap-3"
-              style={{ borderColor: theme.border, backgroundColor: theme.cardBg }}
+              style={{
+                borderColor: theme.border,
+                backgroundColor: theme.cardBg,
+              }}
             >
               <Text className="text-4xl" style={{ color: theme.border }}>
                 ◉
@@ -377,7 +387,10 @@ const ExploreQrScreen = () => {
           ) : (
             <View
               className="w-full rounded-2xl border p-6 items-center gap-3.5"
-              style={{ borderColor: theme.border, backgroundColor: theme.cardBg }}
+              style={{
+                borderColor: theme.border,
+                backgroundColor: theme.cardBg,
+              }}
             >
               <Text className="text-4xl" style={{ color: theme.border }}>
                 ⬡
@@ -393,7 +406,10 @@ const ExploreQrScreen = () => {
                 style={{ backgroundColor: theme.primary }}
                 onPress={() => void handlePermissionButtonPress()}
               >
-                <Text className="text-[13px] font-bold" style={{ color: "#111827" }}>
+                <Text
+                  className="text-[13px] font-bold"
+                  style={{ color: "#111827" }}
+                >
                   {canAskAgain ? "Enable Camera" : "Open Settings"}
                 </Text>
               </Pressable>
@@ -402,21 +418,33 @@ const ExploreQrScreen = () => {
         </View>
       )}
 
-      <View className="absolute left-4 right-4 flex-row items-center" style={{ top: insets.top + 10 }}>
+      <View
+        className="absolute left-4 right-4 flex-row items-center"
+        style={{ top: insets.top + 10 }}
+      >
         <Pressable
           onPress={() => navigation.goBack()}
           className="w-10 h-10 rounded-[10px] justify-center items-center border"
-          style={{ backgroundColor: theme.cardBg + "E6", borderColor: theme.border }}
+          style={{
+            backgroundColor: theme.cardBg + "E6",
+            borderColor: theme.border,
+          }}
         >
           <Text className="text-lg font-light" style={{ color: theme.grey }}>
             ←
           </Text>
         </Pressable>
         <View className="ml-3">
-          <Text className="text-[16px] font-bold" style={{ color: theme.white }}>
+          <Text
+            className="text-[16px] font-bold"
+            style={{ color: theme.white }}
+          >
             QR & Barcode
           </Text>
-          <Text className="text-[11px] font-medium tracking-wide" style={{ color: theme.grey }}>
+          <Text
+            className="text-[11px] font-medium tracking-wide"
+            style={{ color: theme.grey }}
+          >
             Live scanner
           </Text>
         </View>
@@ -467,5 +495,12 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
 });
+
+const CORNER_POSITION_STYLES: Record<CornerPosition, object> = {
+  topLeft: styles.topLeft,
+  topRight: styles.topRight,
+  bottomLeft: styles.bottomLeft,
+  bottomRight: styles.bottomRight,
+};
 
 export default ExploreQrScreen;
