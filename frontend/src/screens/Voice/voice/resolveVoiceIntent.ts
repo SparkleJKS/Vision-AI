@@ -107,9 +107,7 @@ export function resolveVoiceIntent(normalized: string): VoiceIntent {
     return { type: 'navigate_home' };
   }
 
-  if (
-    includesAny(normalized, ['open explore', 'go to explore', 'explore'])
-  ) {
+  if (includesAny(normalized, ['open explore', 'go to explore', 'explore'])) {
     return { type: 'navigate_explore' };
   }
 

@@ -49,7 +49,9 @@ const RECOGNIZER_STATES: VoiceRecognizerState[] = [
   'paused',
 ];
 
-export function parseVoiceRecognizerState(value: unknown): VoiceRecognizerState {
+export function parseVoiceRecognizerState(
+  value: unknown,
+): VoiceRecognizerState {
   if (typeof value !== 'string') return 'idle';
   return (RECOGNIZER_STATES as string[]).includes(value)
     ? (value as VoiceRecognizerState)

@@ -20,7 +20,11 @@ export type {
 } from './types';
 export { parseVoiceRecognizerState } from './types';
 export { getVoiceAssistantModule } from './nativeModule';
-export { normalizeCommand, includesAny, isObjectDetectionCommand } from './commandParsing';
+export {
+  normalizeCommand,
+  includesAny,
+  isObjectDetectionCommand,
+} from './commandParsing';
 export { resolveVoiceIntent } from './resolveVoiceIntent';
 export type { VoiceIntent } from './resolveVoiceIntent';
 export { executeVoiceIntent } from './executeVoiceIntent';
