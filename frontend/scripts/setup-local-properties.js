@@ -41,4 +41,3 @@ fs.writeFileSync(localPropsPath, content, 'utf8');
 console.log(
   '[setup-local-properties] Wrote android/local.properties with sdk.dir (value not logged for privacy).',
 );
-
