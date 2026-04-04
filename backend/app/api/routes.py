@@ -14,6 +14,18 @@ router = APIRouter()
 service = InferenceService()
 
 
+def validate_upload_type(file: UploadFile) -> None:
+    # Some mobile clients omit file content type or send application/octet-stream.
+    if not file.content_type:
+        return
+
+    normalized = file.content_type.lower()
+    if normalized.startswith("image/") or normalized == "application/octet-stream":
+        return
+
+    raise HTTPException(status_code=415, detail="Only image uploads are supported.")
+
+
 @router.get("/health", response_model=HealthResponse)
 async def health() -> HealthResponse:
     settings = get_settings()
@@ -30,8 +42,7 @@ async def describe_image(
     file: UploadFile = File(...),
     device_id: str | None = Form(default=None),
 ) -> DescribeResponse:
-    if not file.content_type or not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=415, detail="Only image uploads are supported.")
+    validate_upload_type(file)
 
     start = time.perf_counter()
     image_bytes = await file.read()
@@ -56,8 +67,7 @@ async def detect_objects(
     file: UploadFile = File(...),
     device_id: str | None = Form(default=None),
 ) -> DetectResponse:
-    if not file.content_type or not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=415, detail="Only image uploads are supported.")
+    validate_upload_type(file)
 
     start = time.perf_counter()
     image_bytes = await file.read()

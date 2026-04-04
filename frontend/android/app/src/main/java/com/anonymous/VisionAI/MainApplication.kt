@@ -14,6 +14,7 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint
 import com.facebook.react.defaults.DefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.anonymous.VisionAI.yolo.YoloInferencePackage
+import com.anonymous.VisionAI.voice.VoiceAssistantPackage
 
 class MainApplication : Application(), ReactApplication {
 
@@ -23,6 +24,7 @@ class MainApplication : Application(), ReactApplication {
             PackageList(this).packages.apply {
               // Packages that cannot be autolinked yet can be added manually here, for example:
               add(YoloInferencePackage())
+              add(VoiceAssistantPackage())
             }
 
         override fun getJSMainModuleName(): String = "index"

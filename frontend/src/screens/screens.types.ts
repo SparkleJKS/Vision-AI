@@ -21,7 +21,7 @@ export type IAuthStackParamList = {
 // ── Explore Stack Param List ─────────────────────────────────────────
 export type IExploreStackParamList = {
   [ScreenNames.Explore]: undefined;
-  [ScreenNames.ExploreObjectDetection]: undefined;
+  [ScreenNames.ExploreObjectDetection]: { autoStart?: boolean } | undefined;
   [ScreenNames.ExploreOcr]: undefined;
   [ScreenNames.ExploreQrScanner]: undefined;
   [ScreenNames.ExploreTts]: undefined;
