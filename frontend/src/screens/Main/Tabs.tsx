@@ -1,14 +1,14 @@
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Text } from "react-native";
-import { Ionicons } from "@react-native-vector-icons/ionicons";
-import { ScreenNames } from "@/configs/navigation";
-import type { IHomeTabParamList } from "@/screens/screens.types";
-import { HomeScreen } from "@/screens/Home";
-import ExploreStack from "@/screens/Explore/ExploreStack";
-import { VoiceScreen } from "@/screens/Voice";
-import { AlertsScreen } from "@/screens/Alerts";
-import SettingsStack from "@/screens/Settings/SettingsStack";
-import { useTheme } from "@/theme/ThemeContext";
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Text } from 'react-native';
+import { Ionicons } from '@react-native-vector-icons/ionicons';
+import { ScreenNames } from '@/configs/navigation';
+import type { IHomeTabParamList } from '@/screens/screens.types';
+import { HomeScreen } from '@/screens/Home';
+import ExploreStack from '@/screens/Explore/ExploreStack';
+import { VoiceScreen } from '@/screens/Voice';
+import { AlertsScreen } from '@/screens/Alerts';
+import SettingsStack from '@/screens/Settings/SettingsStack';
+import { useTheme } from '@/theme/ThemeContext';
 
 const Tab = createBottomTabNavigator<IHomeTabParamList>();
 
@@ -30,16 +30,15 @@ const Tabs = () => {
           paddingBottom: 8,
           paddingTop: 4,
         },
-      }}
-    >
+      }}>
       <Tab.Screen
         name={ScreenNames.Home}
         component={HomeScreen}
         options={{
-          title: "HOME",
+          title: 'HOME',
           tabBarIcon: ({ focused }) => (
             <Ionicons
-              name={focused ? "home" : "home-outline"}
+              name={focused ? 'home' : 'home-outline'}
               size={22}
               color={focused ? theme.tabHome : inactiveColor}
             />
@@ -47,8 +46,7 @@ const Tabs = () => {
           tabBarLabel: ({ focused }) => (
             <Text
               className="text-[9px] font-bold tracking-widest uppercase -mt-0.5"
-              style={{ color: focused ? theme.tabHome : inactiveColor }}
-            >
+              style={{ color: focused ? theme.tabHome : inactiveColor }}>
               HOME
             </Text>
           ),
@@ -58,10 +56,10 @@ const Tabs = () => {
         name={ScreenNames.Explore}
         component={ExploreStack}
         options={{
-          title: "EXPLORE",
+          title: 'EXPLORE',
           tabBarIcon: ({ focused }) => (
             <Ionicons
-              name={focused ? "compass" : "compass-outline"}
+              name={focused ? 'compass' : 'compass-outline'}
               size={22}
               color={focused ? theme.tabExplore : inactiveColor}
             />
@@ -69,8 +67,7 @@ const Tabs = () => {
           tabBarLabel: ({ focused }) => (
             <Text
               className="text-[9px] font-bold tracking-widest uppercase -mt-0.5"
-              style={{ color: focused ? theme.tabExplore : inactiveColor }}
-            >
+              style={{ color: focused ? theme.tabExplore : inactiveColor }}>
               EXPLORE
             </Text>
           ),
@@ -80,10 +77,10 @@ const Tabs = () => {
         name={ScreenNames.Voice}
         component={VoiceScreen}
         options={{
-          title: "VOICE",
+          title: 'VOICE',
           tabBarIcon: ({ focused }) => (
             <Ionicons
-              name={focused ? "mic" : "mic-outline"}
+              name={focused ? 'mic' : 'mic-outline'}
               size={22}
               color={focused ? theme.tabVoice : inactiveColor}
             />
@@ -91,8 +88,7 @@ const Tabs = () => {
           tabBarLabel: ({ focused }) => (
             <Text
               className="text-[9px] font-bold tracking-widest uppercase -mt-0.5"
-              style={{ color: focused ? theme.tabVoice : inactiveColor }}
-            >
+              style={{ color: focused ? theme.tabVoice : inactiveColor }}>
               VOICE
             </Text>
           ),
@@ -102,10 +98,10 @@ const Tabs = () => {
         name={ScreenNames.Alerts}
         component={AlertsScreen}
         options={{
-          title: "ALERTS",
+          title: 'ALERTS',
           tabBarIcon: ({ focused }) => (
             <Ionicons
-              name={focused ? "notifications" : "notifications-outline"}
+              name={focused ? 'notifications' : 'notifications-outline'}
               size={22}
               color={focused ? theme.tabAlerts : inactiveColor}
             />
@@ -113,8 +109,7 @@ const Tabs = () => {
           tabBarLabel: ({ focused }) => (
             <Text
               className="text-[9px] font-bold tracking-widest uppercase -mt-0.5"
-              style={{ color: focused ? theme.tabAlerts : inactiveColor }}
-            >
+              style={{ color: focused ? theme.tabAlerts : inactiveColor }}>
               ALERTS
             </Text>
           ),
@@ -124,10 +119,10 @@ const Tabs = () => {
         name={ScreenNames.Settings}
         component={SettingsStack}
         options={{
-          title: "SETTINGS",
+          title: 'SETTINGS',
           tabBarIcon: ({ focused }) => (
             <Ionicons
-              name={focused ? "settings" : "settings-outline"}
+              name={focused ? 'settings' : 'settings-outline'}
               size={22}
               color={focused ? theme.tabSettings : inactiveColor}
             />
@@ -135,8 +130,7 @@ const Tabs = () => {
           tabBarLabel: ({ focused }) => (
             <Text
               className="text-[9px] font-bold tracking-widest uppercase -mt-0.5"
-              style={{ color: focused ? theme.tabSettings : inactiveColor }}
-            >
+              style={{ color: focused ? theme.tabSettings : inactiveColor }}>
               SETTINGS
             </Text>
           ),

@@ -20,6 +20,8 @@ export const navigationActions = {
   ),
   toVoiceAndAudio: createAction(`${NAV_PREFIX}${ScreenNames.VoiceAndAudio}`),
   toVisionSettings: createAction(`${NAV_PREFIX}${ScreenNames.VisionSettings}`),
-  toConnectedDevices: createAction(`${NAV_PREFIX}${ScreenNames.ConnectedDevices}`),
+  toConnectedDevices: createAction(
+    `${NAV_PREFIX}${ScreenNames.ConnectedDevices}`,
+  ),
   toAccessibility: createAction(`${NAV_PREFIX}${ScreenNames.Accessibility}`),
 };

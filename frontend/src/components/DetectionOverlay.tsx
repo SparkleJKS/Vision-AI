@@ -4,95 +4,95 @@ import React, {
   useMemo,
   useRef,
   useState,
-} from "react";
+} from 'react';
 import {
   DeviceEventEmitter,
   Text,
   type LayoutChangeEvent,
   View,
-} from "react-native";
+} from 'react-native';
 
 const COCO_CLASSES: string[] = [
-  "person",
-  "bicycle",
-  "car",
-  "motorcycle",
-  "airplane",
-  "bus",
-  "train",
-  "truck",
-  "boat",
-  "traffic light",
-  "fire hydrant",
-  "stop sign",
-  "parking meter",
-  "bench",
-  "bird",
-  "cat",
-  "dog",
-  "horse",
-  "sheep",
-  "cow",
-  "elephant",
-  "bear",
-  "zebra",
-  "giraffe",
-  "backpack",
-  "umbrella",
-  "handbag",
-  "tie",
-  "suitcase",
-  "frisbee",
-  "skis",
-  "snowboard",
-  "sports ball",
-  "kite",
-  "baseball bat",
-  "baseball glove",
-  "skateboard",
-  "surfboard",
-  "tennis racket",
-  "bottle",
-  "wine glass",
-  "cup",
-  "fork",
-  "knife",
-  "spoon",
-  "bowl",
-  "banana",
-  "apple",
-  "sandwich",
-  "orange",
-  "broccoli",
-  "carrot",
-  "hot dog",
-  "pizza",
-  "donut",
-  "cake",
-  "chair",
-  "couch",
-  "potted plant",
-  "bed",
-  "dining table",
-  "toilet",
-  "tv",
-  "laptop",
-  "mouse",
-  "remote",
-  "keyboard",
-  "cell phone",
-  "microwave",
-  "oven",
-  "toaster",
-  "sink",
-  "refrigerator",
-  "book",
-  "clock",
-  "vase",
-  "scissors",
-  "teddy bear",
-  "hair drier",
-  "toothbrush",
+  'person',
+  'bicycle',
+  'car',
+  'motorcycle',
+  'airplane',
+  'bus',
+  'train',
+  'truck',
+  'boat',
+  'traffic light',
+  'fire hydrant',
+  'stop sign',
+  'parking meter',
+  'bench',
+  'bird',
+  'cat',
+  'dog',
+  'horse',
+  'sheep',
+  'cow',
+  'elephant',
+  'bear',
+  'zebra',
+  'giraffe',
+  'backpack',
+  'umbrella',
+  'handbag',
+  'tie',
+  'suitcase',
+  'frisbee',
+  'skis',
+  'snowboard',
+  'sports ball',
+  'kite',
+  'baseball bat',
+  'baseball glove',
+  'skateboard',
+  'surfboard',
+  'tennis racket',
+  'bottle',
+  'wine glass',
+  'cup',
+  'fork',
+  'knife',
+  'spoon',
+  'bowl',
+  'banana',
+  'apple',
+  'sandwich',
+  'orange',
+  'broccoli',
+  'carrot',
+  'hot dog',
+  'pizza',
+  'donut',
+  'cake',
+  'chair',
+  'couch',
+  'potted plant',
+  'bed',
+  'dining table',
+  'toilet',
+  'tv',
+  'laptop',
+  'mouse',
+  'remote',
+  'keyboard',
+  'cell phone',
+  'microwave',
+  'oven',
+  'toaster',
+  'sink',
+  'refrigerator',
+  'book',
+  'clock',
+  'vase',
+  'scissors',
+  'teddy bear',
+  'hair drier',
+  'toothbrush',
 ];
 
 type Detection = {
@@ -116,7 +116,7 @@ const MODEL_SIZE = 320;
 const MAX_RENDER_BOXES = 20;
 
 const toFiniteNumber = (value: unknown): number | null => {
-  if (typeof value !== "number" || !Number.isFinite(value)) return null;
+  if (typeof value !== 'number' || !Number.isFinite(value)) return null;
   return value;
 };
 
@@ -124,13 +124,13 @@ const normalizeDetections = (payload: unknown): Detection[] => {
   if (!Array.isArray(payload)) return [];
   const normalized: Detection[] = [];
   for (const item of payload) {
-    if (!item || typeof item !== "object") continue;
+    if (!item || typeof item !== 'object') continue;
     const record = item as Record<string, unknown>;
     const x1 = toFiniteNumber(record.x1);
     const y1 = toFiniteNumber(record.y1);
     const x2 = toFiniteNumber(record.x2);
     const y2 = toFiniteNumber(record.y2);
-    const classId = typeof record.classId === "number" ? record.classId : 0;
+    const classId = typeof record.classId === 'number' ? record.classId : 0;
     if (x1 == null || y1 == null || x2 == null || y2 == null) continue;
     normalized.push({ x1, y1, x2, y2, classId });
   }
@@ -173,16 +173,16 @@ const mapDetectionToBox = (detection: Detection, viewSize: ViewSize) => {
 
 // Distinct vivid colors per class family
 const BOX_COLORS = [
-  "#00FF41",
-  "#FF3131",
-  "#00D4FF",
-  "#FFD600",
-  "#FF6B00",
-  "#BF5FFF",
-  "#00FFB3",
-  "#FF007A",
-  "#4DFFFF",
-  "#FF9500",
+  '#00FF41',
+  '#FF3131',
+  '#00D4FF',
+  '#FFD600',
+  '#FF6B00',
+  '#BF5FFF',
+  '#00FFB3',
+  '#FF007A',
+  '#4DFFFF',
+  '#FF9500',
 ];
 
 const getColor = (classId: number) => BOX_COLORS[classId % BOX_COLORS.length];
@@ -197,7 +197,7 @@ function useLatestDetectionsLoop(enabled: boolean) {
     if (!enabled) return;
 
     const subscription = DeviceEventEmitter.addListener(
-      "onYoloDetections",
+      'onYoloDetections',
       (data: { detections: Detection[] }) => {
         latestDetectionsRef.current = normalizeDetections(data?.detections);
         detectionsVersionRef.current += 1;
@@ -333,8 +333,7 @@ const DetectionOverlay = ({ enabled = true }: DetectionOverlayProps) => {
     <View
       pointerEvents="none"
       className="absolute inset-0 z-20"
-      onLayout={handleLayout}
-    >
+      onLayout={handleLayout}>
       <>
         {Array.from({ length: MAX_RENDER_BOXES }, (_, i) => (
           <View
@@ -351,12 +350,10 @@ const DetectionOverlay = ({ enabled = true }: DetectionOverlayProps) => {
               left: label.left,
               top: label.top,
               backgroundColor: label.color,
-            }}
-          >
+            }}>
             <Text
               className="text-black text-xs font-black tracking-wide"
-              numberOfLines={1}
-            >
+              numberOfLines={1}>
               {label.text}
             </Text>
           </View>

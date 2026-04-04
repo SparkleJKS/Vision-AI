@@ -1,27 +1,27 @@
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { Ionicons } from "@react-native-vector-icons/ionicons";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
-import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useTheme } from "@/theme";
-import { SETTINGS_ITEMS } from "./config";
-import type { ISettingsStackParamList } from "@/screens/screens.types";
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@react-native-vector-icons/ionicons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useTheme } from '@/theme';
+import { SETTINGS_ITEMS } from './config';
+import type { ISettingsStackParamList } from '@/screens/screens.types';
 
 type NavProp = NativeStackNavigationProp<ISettingsStackParamList>;
 
 const ITEM_ACCENT_KEY: Record<
   string,
-  | "settingsProfile"
-  | "settingsVoice"
-  | "settingsVision"
-  | "settingsDevices"
-  | "settingsAccessibility"
+  | 'settingsProfile'
+  | 'settingsVoice'
+  | 'settingsVision'
+  | 'settingsDevices'
+  | 'settingsAccessibility'
 > = {
-  profile: "settingsProfile",
-  voice: "settingsVoice",
-  vision: "settingsVision",
-  devices: "settingsDevices",
-  accessibility: "settingsAccessibility",
+  profile: 'settingsProfile',
+  voice: 'settingsVoice',
+  vision: 'settingsVision',
+  devices: 'settingsDevices',
+  accessibility: 'settingsAccessibility',
 };
 
 const SettingsListScreen = () => {
@@ -32,13 +32,11 @@ const SettingsListScreen = () => {
   return (
     <View
       className="flex-1"
-      style={{ paddingTop: insets.top, backgroundColor: theme.screenBg }}
-    >
+      style={{ paddingTop: insets.top, backgroundColor: theme.screenBg }}>
       <View className="px-4 pt-6 pb-4">
         <Text
           className="text-3xl font-extrabold tracking-tight"
-          style={{ color: theme.white }}
-        >
+          style={{ color: theme.white }}>
           Preferences
         </Text>
         <Text className="text-[13px] mt-1" style={{ color: theme.grey }}>
@@ -52,9 +50,8 @@ const SettingsListScreen = () => {
           paddingHorizontal: 16,
           paddingBottom: insets.bottom + 80,
         }}
-        showsVerticalScrollIndicator={false}
-      >
-        {SETTINGS_ITEMS.map((item) => {
+        showsVerticalScrollIndicator={false}>
+        {SETTINGS_ITEMS.map(item => {
           const key = ITEM_ACCENT_KEY[item.id];
           const accent = key ? theme[key] : theme.grey;
 
@@ -67,8 +64,7 @@ const SettingsListScreen = () => {
                 borderColor: theme.border,
               }}
               activeOpacity={0.8}
-              onPress={() => navigation.navigate(item.screenName)}
-            >
+              onPress={() => navigation.navigate(item.screenName)}>
               <View
                 className="absolute top-0 left-0 right-0 h-0.5"
                 style={{ backgroundColor: accent }}
@@ -78,21 +74,18 @@ const SettingsListScreen = () => {
                 style={{
                   borderColor: `${accent}40`,
                   backgroundColor: theme.darkBg,
-                }}
-              >
+                }}>
                 <Ionicons name={item.icon} size={22} color={accent} />
               </View>
               <View className="flex-1">
                 <Text
                   className="text-[15px] font-bold mb-0.5"
-                  style={{ color: theme.white }}
-                >
+                  style={{ color: theme.white }}>
                   {item.title}
                 </Text>
                 <Text
                   className="text-xs font-medium"
-                  style={{ color: theme.grey }}
-                >
+                  style={{ color: theme.grey }}>
                   {item.subtitle}
                 </Text>
               </View>

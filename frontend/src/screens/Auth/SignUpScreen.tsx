@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Text,
   View,
@@ -8,14 +8,14 @@ import {
   Platform,
   ActivityIndicator,
   ScrollView,
-} from "react-native";
-import { useDispatch } from "react-redux";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Ionicons } from "@react-native-vector-icons/ionicons";
-import { useTheme } from "@/theme";
-import { useAuth } from "@/auth/AuthContext";
-import { navigationActions } from "@/store/actions/navigation";
-import type { AppDispatch } from "@/store";
+} from 'react-native';
+import { useDispatch } from 'react-redux';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@react-native-vector-icons/ionicons';
+import { useTheme } from '@/theme';
+import { useAuth } from '@/auth/AuthContext';
+import { navigationActions } from '@/store/actions/navigation';
+import type { AppDispatch } from '@/store';
 
 const SignUpScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -24,9 +24,9 @@ const SignUpScreen = () => {
   const { signUpWithEmail, signInWithGoogle, authError, clearAuthError } =
     useAuth();
 
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -38,15 +38,15 @@ const SignUpScreen = () => {
 
   const handleSignUp = async () => {
     if (!email.trim() || !password || !confirmPassword) {
-      setValidationError("Please fill in all fields");
+      setValidationError('Please fill in all fields');
       return;
     }
     if (password !== confirmPassword) {
-      setValidationError("Passwords do not match");
+      setValidationError('Passwords do not match');
       return;
     }
     if (password.length < 6) {
-      setValidationError("Password must be at least 6 characters");
+      setValidationError('Password must be at least 6 characters');
       return;
     }
     setLoading(true);
@@ -80,25 +80,22 @@ const SignUpScreen = () => {
         paddingTop: insets.top,
         paddingBottom: insets.bottom,
       }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? insets.top : 0}
-    >
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : 0}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
           flexGrow: 1,
-          justifyContent: "center",
+          justifyContent: 'center',
           paddingHorizontal: 24,
           paddingBottom: insets.bottom + 40,
         }}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
-        showsVerticalScrollIndicator={false}
-      >
+        showsVerticalScrollIndicator={false}>
         <Text
           className="text-3xl font-bold mb-2"
-          style={{ color: theme.white }}
-        >
+          style={{ color: theme.white }}>
           Create account
         </Text>
         <Text className="text-base mb-8" style={{ color: theme.grey }}>
@@ -111,8 +108,7 @@ const SignUpScreen = () => {
             style={{
               backgroundColor: theme.cardBg,
               borderLeftColor: theme.warning,
-            }}
-          >
+            }}>
             <Ionicons
               name="information-circle"
               size={20}
@@ -120,15 +116,13 @@ const SignUpScreen = () => {
             />
             <Text
               className="text-sm ml-3 flex-1"
-              style={{ color: theme.white }}
-            >
+              style={{ color: theme.white }}>
               {errorMessage}
             </Text>
             <TouchableOpacity
               onPress={clearError}
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-              className="p-1"
-            >
+              className="p-1">
               <Ionicons name="close" size={20} color={theme.grey} />
             </TouchableOpacity>
           </View>
@@ -140,7 +134,7 @@ const SignUpScreen = () => {
           placeholder="Email"
           placeholderTextColor={theme.grey}
           value={email}
-          onChangeText={(v) => {
+          onChangeText={v => {
             setEmail(v);
             clearError();
           }}
@@ -155,7 +149,7 @@ const SignUpScreen = () => {
           placeholder="Password (min 6 characters)"
           placeholderTextColor={theme.grey}
           value={password}
-          onChangeText={(v) => {
+          onChangeText={v => {
             setPassword(v);
             clearError();
           }}
@@ -169,7 +163,7 @@ const SignUpScreen = () => {
           placeholder="Confirm password"
           placeholderTextColor={theme.grey}
           value={confirmPassword}
-          onChangeText={(v) => {
+          onChangeText={v => {
             setConfirmPassword(v);
             clearError();
           }}
@@ -183,8 +177,7 @@ const SignUpScreen = () => {
           style={{ backgroundColor: theme.primary }}
           activeOpacity={0.8}
           onPress={handleSignUp}
-          disabled={loading}
-        >
+          disabled={loading}>
           {loading ? (
             <ActivityIndicator color="#000" />
           ) : (
@@ -214,29 +207,25 @@ const SignUpScreen = () => {
           }}
           activeOpacity={0.8}
           onPress={handleGoogleSignIn}
-          disabled={loading}
-        >
+          disabled={loading}>
           <Ionicons name="logo-google" size={22} color={theme.white} />
           <Text
             className="text-base font-semibold ml-3"
-            style={{ color: theme.white }}
-          >
+            style={{ color: theme.white }}>
             Continue with Google
           </Text>
         </TouchableOpacity>
 
         <View className="flex-row justify-center mt-6">
           <Text className="text-sm" style={{ color: theme.grey }}>
-            Already have an account?{" "}
+            Already have an account?{' '}
           </Text>
           <TouchableOpacity
             onPress={() => dispatch(navigationActions.toSignIn())}
-            disabled={loading}
-          >
+            disabled={loading}>
             <Text
               className="text-sm font-semibold"
-              style={{ color: theme.primary }}
-            >
+              style={{ color: theme.primary }}>
               Sign In
             </Text>
           </TouchableOpacity>

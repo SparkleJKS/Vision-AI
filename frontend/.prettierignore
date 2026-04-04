@@ -1,0 +1,23 @@
+node_modules
+build
+dist
+coverage
+
+package-lock.json
+
+# Native / generated
+android/app/.cxx
+android/app/build
+android/build
+android/.gradle
+ios/build
+ios/Pods
+ios/DerivedData
+
+# Large binaries
+*.tflite
+*.pt
+*.onnx
+
+# Patches (whitespace-sensitive)
+patches

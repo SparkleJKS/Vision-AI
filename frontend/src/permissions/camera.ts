@@ -41,41 +41,42 @@ export const getCameraPermissionStatus = (): CameraPermissionStatus => {
  * - Ask every time (denied, canAskAgain - we request each time)
  * - Don't allow (blocked - must go to Settings)
  */
-export const requestCameraPermission = async (): Promise<CameraPermissionResult> => {
-  const status = Camera.getCameraPermissionStatus();
+export const requestCameraPermission =
+  async (): Promise<CameraPermissionResult> => {
+    const status = Camera.getCameraPermissionStatus();
 
-  if (status === 'granted') {
-    return {
-      granted: true,
-      blocked: false,
-      shouldOpenSettings: false,
-    };
-  }
+    if (status === 'granted') {
+      return {
+        granted: true,
+        blocked: false,
+        shouldOpenSettings: false,
+      };
+    }
 
-  if (status === 'denied' || status === 'restricted') {
+    if (status === 'denied' || status === 'restricted') {
+      return {
+        granted: false,
+        blocked: true,
+        shouldOpenSettings: true,
+      };
+    }
+
+    const result = await Camera.requestCameraPermission();
+
+    if (result === 'granted') {
+      return {
+        granted: true,
+        blocked: false,
+        shouldOpenSettings: false,
+      };
+    }
+
     return {
       granted: false,
       blocked: true,
       shouldOpenSettings: true,
     };
-  }
-
-  const result = await Camera.requestCameraPermission();
-
-  if (result === 'granted') {
-    return {
-      granted: true,
-      blocked: false,
-      shouldOpenSettings: false,
-    };
-  }
-
-  return {
-    granted: false,
-    blocked: true,
-    shouldOpenSettings: true,
   };
-};
 
 /**
  * Check and request camera permission, handling all cases.
@@ -90,7 +91,7 @@ export const ensureCameraPermission = async (): Promise<boolean> => {
   }
 
   if (result.shouldOpenSettings) {
-    return new Promise<boolean>((resolve) => {
+    return new Promise<boolean>(resolve => {
       Alert.alert(
         'Camera Access Required',
         'To use live object detection, please allow camera access in Settings.',

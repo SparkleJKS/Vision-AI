@@ -23,6 +23,7 @@ export type IExploreStackParamList = {
   [ScreenNames.Explore]: undefined;
   [ScreenNames.ExploreObjectDetection]: undefined;
   [ScreenNames.ExploreOcr]: undefined;
+  [ScreenNames.ExploreQrScanner]: undefined;
   [ScreenNames.ExploreTts]: undefined;
 };
 

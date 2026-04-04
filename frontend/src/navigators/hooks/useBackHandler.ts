@@ -14,7 +14,8 @@ export function useBackHandler({
   onBack,
   showExitPrompt = false,
 }: UseBackHandlerOptions = {}): void {
-  const navigation = useNavigation<NavigationProp<Record<string, object | undefined>>>();
+  const navigation =
+    useNavigation<NavigationProp<Record<string, object | undefined>>>();
 
   useEffect(() => {
     if (!enabled) return;
@@ -33,7 +34,11 @@ export function useBackHandler({
       if (showExitPrompt) {
         Alert.alert('Exit App', 'Are you sure you want to exit?', [
           { text: 'Cancel', onPress: () => null, style: 'cancel' },
-          { text: 'Exit', onPress: () => BackHandler.exitApp(), style: 'destructive' },
+          {
+            text: 'Exit',
+            onPress: () => BackHandler.exitApp(),
+            style: 'destructive',
+          },
         ]);
         return true;
       }

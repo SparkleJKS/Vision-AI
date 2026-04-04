@@ -8,7 +8,7 @@ const isDev = __DEV__;
 
 const toMessage = (...args: unknown[]): string => {
   return args
-    .map((arg) => {
+    .map(arg => {
       if (arg instanceof Error) {
         return `${arg.name}: ${arg.message}${arg.stack ? `\n${arg.stack}` : ''}`;
       }
@@ -56,7 +56,11 @@ const display = (options: {
       important: options.important ?? false,
     });
   } else {
-    console.log(`[${options.name}]`, options.preview ?? '', options.value ?? '');
+    console.log(
+      `[${options.name}]`,
+      options.preview ?? '',
+      options.value ?? '',
+    );
   }
 };
 
@@ -82,7 +86,12 @@ const warn = (name: string, ...args: unknown[]) => {
 const error = (name: string, ...args: unknown[]) => {
   if (!isDev) return;
   const message = toMessage(...args);
-  display({ name: `Error: ${name}`, preview: message, value: args, important: true });
+  display({
+    name: `Error: ${name}`,
+    preview: message,
+    value: args,
+    important: true,
+  });
 };
 
 /** Debug level */
@@ -110,7 +119,7 @@ const logEvent = (eventName: string, payload?: Record<string, unknown>) => {
 const logApi = (
   type: 'request' | 'response' | 'error',
   endpoint: string,
-  details?: Record<string, unknown>
+  details?: Record<string, unknown>,
 ) => {
   if (!isDev) return;
   const name = `API ${type.toUpperCase()}: ${endpoint}`;

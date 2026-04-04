@@ -5,23 +5,23 @@ import React, {
   useMemo,
   useRef,
   useState,
-} from "react";
-import { Pressable, Text, View } from "react-native";
-import type { LayoutChangeEvent } from "react-native";
+} from 'react';
+import { Pressable, Text, View } from 'react-native';
+import type { LayoutChangeEvent } from 'react-native';
 import {
   DEFAULT_MODEL_SIZE,
   DEFAULT_SMOOTHING_ALPHA,
   DEFAULT_MAX_BOXES,
-} from "./config";
+} from './config';
 import {
   toFiniteNumber,
   normalizeSize,
   mapPredictionsToScreen,
   smoothBoxes,
   hexToRgba,
-} from "./utils";
-import type { BoxOverlayProps } from "./types";
-import type { ScreenBox } from "./utils";
+} from './utils';
+import type { BoxOverlayProps } from './types';
+import type { ScreenBox } from './utils';
 
 function propsAreEqual(
   previousProps: BoxOverlayProps,
@@ -89,13 +89,11 @@ const OverlayBox = memo(function OverlayBox({
       style={borderStyle}
       onPress={onPress}
       disabled={!isPressable}
-      pointerEvents={isPressable ? "auto" : "none"}
-    >
+      pointerEvents={isPressable ? 'auto' : 'none'}>
       {showLabels ? (
         <View
           className="absolute left-0 -top-6 max-w-[220px] rounded px-1.5 py-0.5"
-          style={labelContainerStyle}
-        >
+          style={labelContainerStyle}>
           <Text className="text-white text-[11px] font-bold" numberOfLines={1}>
             {labelText}
           </Text>
@@ -109,8 +107,8 @@ function BoxOverlay({
   predictions = [],
   modelSize = [...DEFAULT_MODEL_SIZE],
   sourceSize = modelSize,
-  resizeMode = "cover",
-  modelResizeMode = "stretch",
+  resizeMode = 'cover',
+  modelResizeMode = 'stretch',
   smoothingAlpha = DEFAULT_SMOOTHING_ALPHA,
   maxBoxes = DEFAULT_MAX_BOXES,
   minBoxSize = 2,
@@ -135,7 +133,7 @@ function BoxOverlay({
   const handleLayout = useCallback((event: LayoutChangeEvent) => {
     const width = Math.round(event.nativeEvent.layout.width);
     const height = Math.round(event.nativeEvent.layout.height);
-    setLayoutSize((prev) =>
+    setLayoutSize(prev =>
       prev[0] === width && prev[1] === height ? prev : [width, height],
     );
   }, []);
@@ -193,10 +191,10 @@ function BoxOverlay({
     previousBoxesByKeyRef.current = smoothedBoxesResult.nextBoxesByKey;
   }, [smoothedBoxesResult.nextBoxesByKey]);
 
-  const isPressable = enableTapDetails || typeof onBoxPress === "function";
+  const isPressable = enableTapDetails || typeof onBoxPress === 'function';
   const handleBoxPress = useCallback(
     (box: ScreenBox) => {
-      if (typeof onBoxPress === "function") onBoxPress(box);
+      if (typeof onBoxPress === 'function') onBoxPress(box);
       else if (enableTapDetails) setSelectedBox(box);
     },
     [enableTapDetails, onBoxPress],
@@ -209,9 +207,8 @@ function BoxOverlay({
       className="absolute inset-0"
       style={style}
       pointerEvents="box-none"
-      onLayout={handleLayout}
-    >
-      {smoothedBoxesResult.boxes.map((box) => (
+      onLayout={handleLayout}>
+      {smoothedBoxesResult.boxes.map(box => (
         <OverlayBox
           key={box.trackKey}
           box={box}
@@ -224,12 +221,10 @@ function BoxOverlay({
       {enableTapDetails && selectedBox ? (
         <View
           className="absolute left-3 right-3 bottom-3"
-          pointerEvents="box-none"
-        >
+          pointerEvents="box-none">
           <Pressable
             className="rounded-[10px] px-3 py-2.5 border border-white/20 bg-[rgba(10,10,10,0.86)]"
-            onPress={closePanel}
-          >
+            onPress={closePanel}>
             <Text className="text-white text-[15px] font-bold">
               {selectedBox.label}
             </Text>
@@ -237,9 +232,9 @@ function BoxOverlay({
               Confidence: {Math.round(selectedBox.confidence * 100)}%
             </Text>
             <Text className="text-[#E5E7EB] text-xs mt-0.5">
-              Box: [{Math.round(selectedBox.sourceBox[0])},{" "}
-              {Math.round(selectedBox.sourceBox[1])},{" "}
-              {Math.round(selectedBox.sourceBox[2])},{" "}
+              Box: [{Math.round(selectedBox.sourceBox[0])},{' '}
+              {Math.round(selectedBox.sourceBox[1])},{' '}
+              {Math.round(selectedBox.sourceBox[2])},{' '}
               {Math.round(selectedBox.sourceBox[3])}]
             </Text>
             <Text className="text-[#9CA3AF] text-[11px] mt-2">

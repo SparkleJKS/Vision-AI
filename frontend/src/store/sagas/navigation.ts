@@ -6,7 +6,9 @@ import { navigationActions } from '../actions/navigation';
 
 type NavPayload = { name: string; params?: Record<string, unknown> };
 
-const getNavigationPayload = (action: PayloadAction<unknown>): NavPayload | null => {
+const getNavigationPayload = (
+  action: PayloadAction<unknown>,
+): NavPayload | null => {
   let navigationPayload: NavPayload | null = null;
   const payload = action.payload as Record<string, unknown> | undefined;
 
@@ -36,7 +38,10 @@ const getNavigationPayload = (action: PayloadAction<unknown>): NavPayload | null
       };
       break;
     case navigationActions.toSettingsList.type:
-      navigationPayload = { name: ScreenNames.Settings, params: { screen: ScreenNames.SettingsList } };
+      navigationPayload = {
+        name: ScreenNames.Settings,
+        params: { screen: ScreenNames.SettingsList },
+      };
       break;
     case navigationActions.toProfile.type:
       navigationPayload = {
@@ -76,7 +81,7 @@ const getNavigationPayload = (action: PayloadAction<unknown>): NavPayload | null
   }
 
   return navigationPayload;
-}
+};
 
 function* onNavigate(action: PayloadAction<unknown>) {
   const payload = getNavigationPayload(action);
@@ -97,7 +102,8 @@ function* onBack() {
 const NAV_ACTION_REGEX = /^navigation\//;
 
 const navActionMatcher = (action: { type: string }) =>
-  action.type !== navigationActions.toBack.type && NAV_ACTION_REGEX.test(action.type);
+  action.type !== navigationActions.toBack.type &&
+  NAV_ACTION_REGEX.test(action.type);
 
 export default [
   takeLatest(navActionMatcher, onNavigate),

@@ -43,4 +43,6 @@ export interface FramePacket {
   bytes: ArrayBuffer;
 }
 
-export function createInferenceWorker(options?: InferenceWorkerOptions): InferenceWorker;
+export function createInferenceWorker(
+  options?: InferenceWorkerOptions,
+): InferenceWorker;

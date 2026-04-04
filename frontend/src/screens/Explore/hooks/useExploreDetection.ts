@@ -48,7 +48,9 @@ export function useExploreDetection({
   tfliteDelegate,
   nmsEnabled,
 }: UseExploreDetectionOptions) {
-  const nativeYoloModule = NativeModules?.YoloInferenceModule as NativeYoloModule | undefined;
+  const nativeYoloModule = NativeModules?.YoloInferenceModule as
+    | NativeYoloModule
+    | undefined;
   const hasNativeAndroidYoloModule =
     Platform.OS === 'android' &&
     typeof nativeYoloModule?.initializeModel === 'function';
@@ -67,9 +69,15 @@ export function useExploreDetection({
   const [latencyHistory, setLatencyHistory] = useState<number[]>([]);
   const [currentStride, setCurrentStride] = useState(1);
   const [droppedFrames, setDroppedFrames] = useState(0);
-  const [targetBudgetMs, setTargetBudgetMs] = useState(1000 / MAX_INFERENCE_FPS);
-  const [modelSize, setModelSize] = useState<number[]>(INPUT_RESOLUTION as unknown as number[]);
-  const [sourceSize, setSourceSize] = useState<number[]>(INPUT_RESOLUTION as unknown as number[]);
+  const [targetBudgetMs, setTargetBudgetMs] = useState(
+    1000 / MAX_INFERENCE_FPS,
+  );
+  const [modelSize, setModelSize] = useState<number[]>(
+    INPUT_RESOLUTION as unknown as number[],
+  );
+  const [sourceSize, setSourceSize] = useState<number[]>(
+    INPUT_RESOLUTION as unknown as number[],
+  );
   const [isSwitchingRuntime, setIsSwitchingRuntime] = useState(false);
 
   const effectiveNmsIoU = nmsEnabled ? NMS_IOU : 1;
@@ -79,7 +87,9 @@ export function useExploreDetection({
       setIsSwitchingRuntime(true);
       setRuntimeStatus('loading');
       const resolvedDelegate =
-        typeof options.tfliteDelegate === 'string' ? options.tfliteDelegate : tfliteDelegate;
+        typeof options.tfliteDelegate === 'string'
+          ? options.tfliteDelegate
+          : tfliteDelegate;
 
       try {
         modelManager.setConfig({
@@ -112,7 +122,9 @@ export function useExploreDetection({
   );
 
   const handleInferenceResult = useCallback((result: InferenceResult) => {
-    const nextPredictions = Array.isArray(result?.predictions) ? result.predictions : [];
+    const nextPredictions = Array.isArray(result?.predictions)
+      ? result.predictions
+      : [];
     setPredictions(nextPredictions);
 
     if (Array.isArray(result?.inputSize) && result.inputSize.length === 2) {
@@ -123,15 +135,19 @@ export function useExploreDetection({
     }
 
     const inferMsVal = result?.inferMs;
-    if (inferMsVal != null && Number.isFinite(inferMsVal)) setInferMs(inferMsVal);
+    if (inferMsVal != null && Number.isFinite(inferMsVal))
+      setInferMs(inferMsVal);
 
     const preprocessMsVal = result?.preprocessMs;
-    if (preprocessMsVal != null && Number.isFinite(preprocessMsVal)) setPreprocessMs(preprocessMsVal);
+    if (preprocessMsVal != null && Number.isFinite(preprocessMsVal))
+      setPreprocessMs(preprocessMsVal);
 
     const totalMsVal = result?.totalMs;
     if (totalMsVal != null && Number.isFinite(totalMsVal)) {
       setTotalMs(totalMsVal);
-      setLatencyHistory((prev) => [...prev, totalMsVal].slice(-LATENCY_GRAPH_POINTS));
+      setLatencyHistory(prev =>
+        [...prev, totalMsVal].slice(-LATENCY_GRAPH_POINTS),
+      );
     }
 
     const processEveryNVal = result?.processEveryN;
@@ -140,20 +156,26 @@ export function useExploreDetection({
     }
 
     const droppedVal = result?.droppedFramesSinceLast;
-    if (droppedVal != null && Number.isFinite(droppedVal)) setDroppedFrames(droppedVal);
+    if (droppedVal != null && Number.isFinite(droppedVal))
+      setDroppedFrames(droppedVal);
 
     const budgetVal = result?.targetBudgetMs;
-    if (budgetVal != null && Number.isFinite(budgetVal)) setTargetBudgetMs(budgetVal);
+    if (budgetVal != null && Number.isFinite(budgetVal))
+      setTargetBudgetMs(budgetVal);
 
     const now = Date.now();
     if (lastFrameAtRef.current !== null) {
       const elapsed = Math.max(1, now - lastFrameAtRef.current);
       const instantFps = 1000 / elapsed;
-      setFps((prev) => (prev === null ? instantFps : prev * 0.7 + instantFps * 0.3));
+      setFps(prev =>
+        prev === null ? instantFps : prev * 0.7 + instantFps * 0.3,
+      );
     }
     lastFrameAtRef.current = now;
 
-    setActiveRuntime(result?.runtime ?? modelManager.getActiveRuntime?.() ?? null);
+    setActiveRuntime(
+      result?.runtime ?? modelManager.getActiveRuntime?.() ?? null,
+    );
     setRuntimeStatus('running');
     setStatusMessage(null);
   }, []);
@@ -200,7 +222,10 @@ export function useExploreDetection({
           console.log('[Explore] Latest detections:', detections);
         }
       } catch (error) {
-        console.warn('[Explore] Failed to pull latest detections:', formatError(error));
+        console.warn(
+          '[Explore] Failed to pull latest detections:',
+          formatError(error),
+        );
       }
     };
 

@@ -1,14 +1,14 @@
-import "./global.css";
-import { useEffect } from "react";
-import { View, StatusBar, AppState, type AppStateStatus } from "react-native";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Provider } from "react-redux";
-import { AuthProvider } from "./src/auth/AuthContext";
-import { ThemeProvider, useTheme } from "./src/theme/ThemeContext";
-import { MainContainer } from "./src/screens/Main";
-import { store } from "./src/store";
-import { logApp } from "./src/utils/logger";
+import './global.css';
+import { useEffect } from 'react';
+import { View, StatusBar, AppState, type AppStateStatus } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Provider } from 'react-redux';
+import { AuthProvider } from './src/auth/AuthContext';
+import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
+import { MainContainer } from './src/screens/Main';
+import { store } from './src/store';
+import { logApp } from './src/utils/logger';
 
 function AppContent() {
   const { theme } = useTheme();
@@ -21,21 +21,21 @@ function AppContent() {
 
 export default function App() {
   useEffect(() => {
-    logApp("ready", { mounted: true });
+    logApp('ready', { mounted: true });
   }, []);
 
   useEffect(() => {
     const sub = AppState.addEventListener(
-      "change",
+      'change',
       (nextState: AppStateStatus) => {
-        if (nextState === "background") {
-          logApp("exit", {
-            state: "background",
+        if (nextState === 'background') {
+          logApp('exit', {
+            state: 'background',
             timestamp: new Date().toISOString(),
           });
-        } else if (nextState === "active") {
-          logApp("resume", {
-            state: "active",
+        } else if (nextState === 'active') {
+          logApp('resume', {
+            state: 'active',
             timestamp: new Date().toISOString(),
           });
         }

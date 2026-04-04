@@ -24,18 +24,24 @@ export function useExplorePermissions() {
   );
 
   useEffect(() => {
-    const subscription = AppState.addEventListener('change', (nextState: AppStateStatus) => {
-      if (nextState === 'active') {
-        refreshPermission();
-      }
-    });
+    const subscription = AppState.addEventListener(
+      'change',
+      (nextState: AppStateStatus) => {
+        if (nextState === 'active') {
+          refreshPermission();
+        }
+      },
+    );
     return () => subscription.remove();
   }, [refreshPermission]);
 
   const handlePermissionButtonPress = useCallback(async () => {
     if (permission?.canAskAgain) {
       const result = await Camera.requestCameraPermission();
-      setPermission({ granted: result === 'granted', canAskAgain: result !== 'granted' });
+      setPermission({
+        granted: result === 'granted',
+        canAskAgain: result !== 'granted',
+      });
     } else {
       await ensureCameraPermission();
       refreshPermission();

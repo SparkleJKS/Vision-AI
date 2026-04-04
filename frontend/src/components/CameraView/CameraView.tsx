@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { NativeModules, Platform, StyleSheet } from "react-native";
+import React, { useEffect, useMemo, useState } from 'react';
+import { NativeModules, Platform, StyleSheet } from 'react-native';
 import {
   Camera,
   VisionCameraProxy,
@@ -7,9 +7,9 @@ import {
   useCameraDevice,
   useCameraFormat,
   useFrameProcessor,
-} from "react-native-vision-camera";
-import type { Frame } from "react-native-vision-camera";
-import type { CameraViewProps } from "./types";
+} from 'react-native-vision-camera';
+import type { Frame } from 'react-native-vision-camera';
+import type { CameraViewProps } from './types';
 
 const CameraView = ({
   style,
@@ -20,12 +20,12 @@ const CameraView = ({
 }: CameraViewProps) => {
   const active = isActive ?? false;
   const enabled = detectionEnabled ?? false;
-  const cameraFacing = facing ?? "back";
+  const cameraFacing = facing ?? 'back';
   const [pluginBootstrapped, setPluginBootstrapped] = useState(
-    Platform.OS !== "android",
+    Platform.OS !== 'android',
   );
   const inferenceFps =
-    typeof maxInferenceFps === "number" && Number.isFinite(maxInferenceFps)
+    typeof maxInferenceFps === 'number' && Number.isFinite(maxInferenceFps)
       ? Math.max(1, Math.trunc(maxInferenceFps))
       : 8;
 
@@ -36,7 +36,7 @@ const CameraView = ({
   ]);
 
   useEffect(() => {
-    if (Platform.OS !== "android") return;
+    if (Platform.OS !== 'android') return;
 
     let cancelled = false;
     const yoloModule = NativeModules?.YoloInferenceModule as
@@ -45,7 +45,7 @@ const CameraView = ({
 
     const bootstrap = async () => {
       try {
-        if (typeof yoloModule?.initializeModel === "function") {
+        if (typeof yoloModule?.initializeModel === 'function') {
           await yoloModule.initializeModel();
         }
       } catch {
@@ -65,21 +65,21 @@ const CameraView = ({
     if (!pluginBootstrapped) return null;
     try {
       const initializedPlugin = VisionCameraProxy.initFrameProcessorPlugin(
-        "yoloFramePreprocess",
+        'yoloFramePreprocess',
         {
           facing: cameraFacing,
         },
       );
-      if (initializedPlugin == null && Platform.OS === "android") {
+      if (initializedPlugin == null && Platform.OS === 'android') {
         console.warn(
-          "[CameraView] yoloFramePreprocess plugin is not registered on Android",
+          '[CameraView] yoloFramePreprocess plugin is not registered on Android',
         );
       }
       return initializedPlugin;
     } catch (error) {
-      if (Platform.OS === "android") {
+      if (Platform.OS === 'android') {
         console.warn(
-          "[CameraView] failed to initialize yoloFramePreprocess plugin",
+          '[CameraView] failed to initialize yoloFramePreprocess plugin',
           error,
         );
       }
@@ -89,10 +89,10 @@ const CameraView = ({
 
   const frameProcessor = useFrameProcessor(
     (frame: Frame) => {
-      "worklet";
+      'worklet';
       if (!enabled || plugin == null) return;
       runAtTargetFps(inferenceFps, () => {
-        "worklet";
+        'worklet';
         plugin.call(frame);
       });
     },

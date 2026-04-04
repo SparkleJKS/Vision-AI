@@ -65,27 +65,39 @@ function normalizeConfig(config = {}) {
   };
   const onnxExecutionProviders = Array.isArray(merged.onnxExecutionProviders)
     ? merged.onnxExecutionProviders
-        .map((provider) => String(provider).trim().toLowerCase())
-        .filter((provider) => provider.length > 0)
+        .map(provider => String(provider).trim().toLowerCase())
+        .filter(provider => provider.length > 0)
     : [...DEFAULT_CONFIG.onnxExecutionProviders];
 
   return {
     maxInferenceFps: clamp(
-      Math.trunc(toFiniteNumber(merged.maxInferenceFps, DEFAULT_CONFIG.maxInferenceFps)),
+      Math.trunc(
+        toFiniteNumber(merged.maxInferenceFps, DEFAULT_CONFIG.maxInferenceFps),
+      ),
       1,
       30,
     ),
     confidenceThreshold: clamp(
-      toFiniteNumber(merged.confidenceThreshold, DEFAULT_CONFIG.confidenceThreshold),
+      toFiniteNumber(
+        merged.confidenceThreshold,
+        DEFAULT_CONFIG.confidenceThreshold,
+      ),
       0,
       1,
     ),
     nmsIoU: clamp(toFiniteNumber(merged.nmsIoU, DEFAULT_CONFIG.nmsIoU), 0, 1),
     inputResolution: normalizeInputResolution(merged.inputResolution),
-    tfliteDelegate: String(merged.tfliteDelegate ?? DEFAULT_CONFIG.tfliteDelegate).toLowerCase(),
+    tfliteDelegate: String(
+      merged.tfliteDelegate ?? DEFAULT_CONFIG.tfliteDelegate,
+    ).toLowerCase(),
     tfliteAllowNnapiFallback: Boolean(merged.tfliteAllowNnapiFallback),
     tfliteNumThreads: clamp(
-      Math.trunc(toFiniteNumber(merged.tfliteNumThreads, DEFAULT_CONFIG.tfliteNumThreads)),
+      Math.trunc(
+        toFiniteNumber(
+          merged.tfliteNumThreads,
+          DEFAULT_CONFIG.tfliteNumThreads,
+        ),
+      ),
       1,
       8,
     ),
@@ -94,15 +106,26 @@ function normalizeConfig(config = {}) {
         ? onnxExecutionProviders
         : [...DEFAULT_CONFIG.onnxExecutionProviders],
     onnxGraphOptimizationLevel: String(
-      merged.onnxGraphOptimizationLevel ?? DEFAULT_CONFIG.onnxGraphOptimizationLevel,
+      merged.onnxGraphOptimizationLevel ??
+        DEFAULT_CONFIG.onnxGraphOptimizationLevel,
     ).toLowerCase(),
     onnxIntraOpThreads: clamp(
-      Math.trunc(toFiniteNumber(merged.onnxIntraOpThreads, DEFAULT_CONFIG.onnxIntraOpThreads)),
+      Math.trunc(
+        toFiniteNumber(
+          merged.onnxIntraOpThreads,
+          DEFAULT_CONFIG.onnxIntraOpThreads,
+        ),
+      ),
       1,
       8,
     ),
     onnxInterOpThreads: clamp(
-      Math.trunc(toFiniteNumber(merged.onnxInterOpThreads, DEFAULT_CONFIG.onnxInterOpThreads)),
+      Math.trunc(
+        toFiniteNumber(
+          merged.onnxInterOpThreads,
+          DEFAULT_CONFIG.onnxInterOpThreads,
+        ),
+      ),
       1,
       4,
     ),
@@ -111,27 +134,52 @@ function normalizeConfig(config = {}) {
     preprocessOnJs: Boolean(merged.preprocessOnJs),
     adaptiveFrameSkip: Boolean(merged.adaptiveFrameSkip),
     processEveryNStart: clamp(
-      Math.trunc(toFiniteNumber(merged.processEveryNStart, DEFAULT_CONFIG.processEveryNStart)),
+      Math.trunc(
+        toFiniteNumber(
+          merged.processEveryNStart,
+          DEFAULT_CONFIG.processEveryNStart,
+        ),
+      ),
       1,
       12,
     ),
     processEveryNMin: clamp(
-      Math.trunc(toFiniteNumber(merged.processEveryNMin, DEFAULT_CONFIG.processEveryNMin)),
+      Math.trunc(
+        toFiniteNumber(
+          merged.processEveryNMin,
+          DEFAULT_CONFIG.processEveryNMin,
+        ),
+      ),
       1,
       12,
     ),
     processEveryNMax: clamp(
-      Math.trunc(toFiniteNumber(merged.processEveryNMax, DEFAULT_CONFIG.processEveryNMax)),
+      Math.trunc(
+        toFiniteNumber(
+          merged.processEveryNMax,
+          DEFAULT_CONFIG.processEveryNMax,
+        ),
+      ),
       1,
       12,
     ),
     overBudgetWindow: clamp(
-      Math.trunc(toFiniteNumber(merged.overBudgetWindow, DEFAULT_CONFIG.overBudgetWindow)),
+      Math.trunc(
+        toFiniteNumber(
+          merged.overBudgetWindow,
+          DEFAULT_CONFIG.overBudgetWindow,
+        ),
+      ),
       1,
       12,
     ),
     underBudgetWindow: clamp(
-      Math.trunc(toFiniteNumber(merged.underBudgetWindow, DEFAULT_CONFIG.underBudgetWindow)),
+      Math.trunc(
+        toFiniteNumber(
+          merged.underBudgetWindow,
+          DEFAULT_CONFIG.underBudgetWindow,
+        ),
+      ),
       1,
       30,
     ),
@@ -230,18 +278,27 @@ export function preprocessFrame(framePacket, inputResolution) {
     throw new Error('Invalid source frame dimensions.');
   }
 
-  const sourceBytes = toUint8Array(framePacket?.bytes ?? framePacket?.buffer ?? framePacket?.imageBuffer);
+  const sourceBytes = toUint8Array(
+    framePacket?.bytes ?? framePacket?.buffer ?? framePacket?.imageBuffer,
+  );
   if (!sourceBytes || sourceBytes.length === 0) {
     throw new Error('Frame buffer is empty or unsupported.');
   }
 
   const [targetWidth, targetHeight] = normalizeInputResolution(inputResolution);
-  const channels = getSourceChannels(sourceBytes.length, sourceWidth, sourceHeight);
+  const channels = getSourceChannels(
+    sourceBytes.length,
+    sourceWidth,
+    sourceHeight,
+  );
   if (channels === 0) {
     throw new Error('Unable to determine frame channel layout.');
   }
 
-  const pixelFormat = typeof framePacket?.pixelFormat === 'string' ? framePacket.pixelFormat : 'rgb';
+  const pixelFormat =
+    typeof framePacket?.pixelFormat === 'string'
+      ? framePacket.pixelFormat
+      : 'rgb';
   const output = new Float32Array(targetWidth * targetHeight * 3);
   const xScale = sourceWidth / targetWidth;
   const yScale = sourceHeight / targetHeight;
@@ -254,7 +311,12 @@ export function preprocessFrame(framePacket, inputResolution) {
     for (let x = 0; x < targetWidth; x += 1) {
       const sourceX = Math.min(sourceWidth - 1, Math.floor(x * xScale));
       const sourcePixelIndex = sourceRowOffset + sourceX;
-      const [r, g, b] = readRgbPixel(sourceBytes, sourcePixelIndex, channels, pixelFormat);
+      const [r, g, b] = readRgbPixel(
+        sourceBytes,
+        sourcePixelIndex,
+        channels,
+        pixelFormat,
+      );
 
       output[outputOffset] = r / 255;
       output[outputOffset + 1] = g / 255;
@@ -272,7 +334,9 @@ export function preprocessFrame(framePacket, inputResolution) {
       layout: 'nhwc',
       sourceWidth,
       sourceHeight,
-      rotationDegrees: Math.trunc(toFiniteNumber(framePacket?.rotationDegrees, 0)),
+      rotationDegrees: Math.trunc(
+        toFiniteNumber(framePacket?.rotationDegrees, 0),
+      ),
     },
     sourceSize: [sourceWidth, sourceHeight],
     inputSize: [targetWidth, targetHeight],
@@ -319,10 +383,12 @@ export class InferenceWorker {
   }
 
   configure(nextConfig = {}) {
-    this.config = normalizeFrameStrideBounds(normalizeConfig({
-      ...this.config,
-      ...nextConfig,
-    }));
+    this.config = normalizeFrameStrideBounds(
+      normalizeConfig({
+        ...this.config,
+        ...nextConfig,
+      }),
+    );
     this.processEveryN = clamp(
       this.processEveryN,
       this.config.processEveryNMin,
@@ -497,13 +563,18 @@ export class InferenceWorker {
           width: Math.trunc(toFiniteNumber(framePacket?.width, 0)),
           height: Math.trunc(toFiniteNumber(framePacket?.height, 0)),
           pixelFormat: framePacket?.pixelFormat ?? 'rgb',
-          rotationDegrees: Math.trunc(toFiniteNumber(framePacket?.rotationDegrees, 0)),
+          rotationDegrees: Math.trunc(
+            toFiniteNumber(framePacket?.rotationDegrees, 0),
+          ),
           inputResolution: [...this.config.inputResolution],
         },
       };
 
       const inferenceResult = await this.manager.infer(inferInput);
-      const fallbackInferMs = Math.max(0, nowMs() - frameStartedAt - preprocessMs);
+      const fallbackInferMs = Math.max(
+        0,
+        nowMs() - frameStartedAt - preprocessMs,
+      );
       const inferMs = Number.isFinite(inferenceResult?.inferMs)
         ? inferenceResult.inferMs
         : fallbackInferMs;

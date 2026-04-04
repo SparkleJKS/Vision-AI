@@ -45,8 +45,20 @@ jobs:
         run: |
           sed -i '/org.gradle.java.home/d' android/gradle.properties || true
 
+      # google-services.json is generated from .env (not in repo). In CI, create .env from secret.
+      - name: Create .env for Firebase (CI)
+        env:
+          FIREBASE_ENV: ${{ secrets.FIREBASE_ENV }}
+        run: |
+          if [ -z "$FIREBASE_ENV" ]; then
+            echo "::error::FIREBASE_ENV secret not set. Add your .env contents as a repo secret for Firebase/APK build."
+            exit 1
+          fi
+          printf '%s\n' "$FIREBASE_ENV" > .env
+          echo "Created .env from FIREBASE_ENV secret"
+
       - name: Build APK (assembleDevRelease)
-        run: cd android && chmod +x gradlew && ./gradlew assembleDevRelease --no-daemon
+        run: node scripts/assemble-dev-release.js
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4

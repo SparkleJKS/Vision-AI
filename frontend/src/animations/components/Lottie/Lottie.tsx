@@ -1,12 +1,12 @@
-import React from "react";
-import LottieView from "lottie-react-native";
-import type { LottieProps } from "./Lottie.types";
+import React from 'react';
+import LottieView from 'lottie-react-native';
+import type { LottieProps } from './Lottie.types';
 
 const Lottie = ({
   source,
   autoPlay = true,
   loop = false,
-  resizeMode = "cover",
+  resizeMode = 'cover',
   onAnimationFinish,
   style,
   width,

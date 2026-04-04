@@ -3,7 +3,9 @@ declare module '../../components/CameraView' {
   import type { StyleProp, ViewStyle } from 'react-native';
 
   export interface CameraViewRef {
-    takeSnapshot(options?: { quality?: number }): Promise<{ path?: string; filePath?: string; uri?: string }>;
+    takeSnapshot(options?: {
+      quality?: number;
+    }): Promise<{ path?: string; filePath?: string; uri?: string }>;
   }
 
   export interface CameraViewProps {

@@ -14,7 +14,10 @@ export function navigate(
     const { name, params: p } = nameOrPayload;
     navigationRef.dispatch(CommonActions.navigate({ name, params: p }));
   } else {
-    (navigationRef.navigate as (n: string, p?: object) => void)(nameOrPayload, params);
+    (navigationRef.navigate as (n: string, p?: object) => void)(
+      nameOrPayload,
+      params,
+    );
   }
 }
 

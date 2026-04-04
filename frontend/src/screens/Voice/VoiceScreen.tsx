@@ -1,22 +1,22 @@
-import { useEffect, useRef, useState } from "react";
-import { Animated, Text, TouchableOpacity, View } from "react-native";
-import { Ionicons } from "@react-native-vector-icons/ionicons";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useTheme } from "@/theme";
+import { useEffect, useRef, useState } from 'react';
+import { Animated, Text, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@react-native-vector-icons/ionicons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme } from '@/theme';
 
 const BAR_COUNT = 8;
 const BAR_MIN = 0.15;
 const BAR_MAX = 1;
 
 type SoundWaveBarsProps = { isActive: boolean; barColor?: string };
-function SoundWaveBars({ isActive, barColor = "#6366F1" }: SoundWaveBarsProps) {
+function SoundWaveBars({ isActive, barColor = '#6366F1' }: SoundWaveBarsProps) {
   const bars = useRef(
     Array.from({ length: BAR_COUNT }, () => new Animated.Value(BAR_MIN)),
   ).current;
 
   useEffect(() => {
     if (!isActive) {
-      bars.forEach((b) => b.setValue(BAR_MIN));
+      bars.forEach(b => b.setValue(BAR_MIN));
       return;
     }
 
@@ -94,13 +94,11 @@ const VoiceScreen = () => {
   return (
     <View
       className="flex-1 items-center"
-      style={{ paddingTop: insets.top, backgroundColor: theme.screenBg }}
-    >
+      style={{ paddingTop: insets.top, backgroundColor: theme.screenBg }}>
       <View className="items-center mt-16">
         <Text
           className="text-[28px] font-extrabold tracking-tight mb-2"
-          style={{ color: theme.white }}
-        >
+          style={{ color: theme.white }}>
           Voice Mode
         </Text>
       </View>
@@ -113,8 +111,7 @@ const VoiceScreen = () => {
             borderColor: isListening ? accent : `${accent}35`,
           }}
           activeOpacity={0.9}
-          onPress={() => setIsListening((p) => !p)}
-        >
+          onPress={() => setIsListening(p => !p)}>
           <Ionicons name="mic" size={64} color={accent} />
         </TouchableOpacity>
 
@@ -122,30 +119,27 @@ const VoiceScreen = () => {
 
         <Text
           className="text-[13px] font-bold tracking-widest mb-8"
-          style={{ color: isListening ? accent : theme.white }}
-        >
-          {isListening ? "LISTENING..." : "TAP TO START"}
+          style={{ color: isListening ? accent : theme.white }}>
+          {isListening ? 'LISTENING...' : 'TAP TO START'}
         </Text>
 
         <TouchableOpacity
           className="rounded-[14px] py-4 px-7 min-w-[260px] flex-row items-center justify-center gap-2.5 border"
           style={{
             backgroundColor: isListening ? accent : theme.cardBg,
-            borderColor: isListening ? "transparent" : `${accent}40`,
+            borderColor: isListening ? 'transparent' : `${accent}40`,
           }}
           activeOpacity={0.8}
-          onPress={() => setIsListening((p) => !p)}
-        >
+          onPress={() => setIsListening(p => !p)}>
           <Ionicons
-            name={isListening ? "stop-circle" : "mic"}
+            name={isListening ? 'stop-circle' : 'mic'}
             size={24}
             color={isListening ? theme.white : accent}
           />
           <Text
             className="text-[15px] font-bold"
-            style={{ color: isListening ? theme.white : accent }}
-          >
-            {isListening ? "Stop Listening" : "Start Listening"}
+            style={{ color: isListening ? theme.white : accent }}>
+            {isListening ? 'Stop Listening' : 'Start Listening'}
           </Text>
         </TouchableOpacity>
       </View>

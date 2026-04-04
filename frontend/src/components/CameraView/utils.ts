@@ -1,4 +1,8 @@
-import { DEFAULT_MAX_INFERENCE_FPS, DEFAULT_INPUT_RESOLUTION, DEFAULT_ONNX_PROVIDERS } from './config';
+import {
+  DEFAULT_MAX_INFERENCE_FPS,
+  DEFAULT_INPUT_RESOLUTION,
+  DEFAULT_ONNX_PROVIDERS,
+} from './config';
 
 export function normalizeMaxInferenceFps(value: unknown): number {
   const numericValue = typeof value === 'number' ? value : Number(value);
@@ -18,7 +22,7 @@ export function normalizeInputResolution(value: unknown): number[] {
 export function normalizeExecutionProviders(value: unknown): string[] {
   if (!Array.isArray(value)) return [...DEFAULT_ONNX_PROVIDERS];
   const providers = value
-    .map((p) => String(p).trim().toLowerCase())
-    .filter((p) => p.length > 0);
+    .map(p => String(p).trim().toLowerCase())
+    .filter(p => p.length > 0);
   return providers.length > 0 ? providers : [...DEFAULT_ONNX_PROVIDERS];
 }
