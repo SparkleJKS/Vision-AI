@@ -1,12 +1,12 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { ScreenNames } from "@/configs/navigation";
-import type { ISettingsStackParamList } from "@/screens/screens.types";
-import SettingsListScreen from "./SettingsListScreen";
-import { ProfileScreen } from "@/screens/Profile";
-import { VoiceAndAudioScreen } from "@/screens/VoiceAndAudio";
-import { VisionSettingsScreen } from "@/screens/VisionSettings";
-import { ConnectedDevicesScreen } from "@/screens/ConnectedDevices";
-import { AccessibilityScreen } from "@/screens/Accessibility";
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { ScreenNames } from '@/configs/navigation';
+import type { ISettingsStackParamList } from '@/screens/screens.types';
+import SettingsListScreen from './SettingsListScreen';
+import { ProfileScreen } from '@/screens/Profile';
+import { VoiceAndAudioScreen } from '@/screens/VoiceAndAudio';
+import { VisionSettingsScreen } from '@/screens/VisionSettings';
+import { ConnectedDevicesScreen } from '@/screens/ConnectedDevices';
+import { AccessibilityScreen } from '@/screens/Accessibility';
 
 const Stack = createNativeStackNavigator<ISettingsStackParamList>();
 
@@ -14,10 +14,9 @@ const SettingsStack = () => (
   <Stack.Navigator
     screenOptions={{
       headerShown: false,
-      animation: "slide_from_right",
+      animation: 'slide_from_right',
       gestureEnabled: true,
-    }}
-  >
+    }}>
     <Stack.Screen
       name={ScreenNames.SettingsList}
       component={SettingsListScreen}

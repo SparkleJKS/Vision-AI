@@ -4,13 +4,13 @@ import React, {
   useContext,
   useEffect,
   useState,
-} from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import type { ThemeId, ThemeTokens } from "./tokens";
-import { THEMES, THEME_ACCESSIBILITY } from "./tokens";
-import { logApp } from "@/utils/logger";
+} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import type { ThemeId, ThemeTokens } from './tokens';
+import { THEMES, THEME_ACCESSIBILITY } from './tokens';
+import { logApp } from '@/utils/logger';
 
-const STORAGE_KEY = "@visionai/theme";
+const STORAGE_KEY = '@visionai/theme';
 
 type ThemeContextValue = {
   themeId: ThemeId;
@@ -21,19 +21,19 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 const LEGACY_MIGRATION: Record<string, ThemeId> = {
-  original: "accessibility",
-  classic: "accessibility",
-  overhaul: "neon",
-  modern: "neon",
+  original: 'accessibility',
+  classic: 'accessibility',
+  overhaul: 'neon',
+  modern: 'neon',
 };
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [themeId, setThemeIdState] = useState<ThemeId>("accessibility");
+  const [themeId, setThemeIdState] = useState<ThemeId>('accessibility');
 
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY)
-      .then((stored) => {
-        if (stored === "accessibility" || stored === "neon") {
+      .then(stored => {
+        if (stored === 'accessibility' || stored === 'neon') {
           setThemeIdState(stored);
         } else if (stored && LEGACY_MIGRATION[stored]) {
           const migrated = LEGACY_MIGRATION[stored];
@@ -41,11 +41,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           AsyncStorage.setItem(STORAGE_KEY, migrated);
         }
       })
-      .catch((err) => {
-        logApp("error", {
-          component: "ThemeProvider",
-          phase: "theme_init",
-          error: String(err) ?? "Failed to get theme from storage",
+      .catch(err => {
+        logApp('error', {
+          component: 'ThemeProvider',
+          phase: 'theme_init',
+          error: String(err) ?? 'Failed to get theme from storage',
         });
       });
   }, []);
@@ -55,7 +55,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     await AsyncStorage.setItem(STORAGE_KEY, id);
   }, []);
 
-  const safeThemeId = themeId ?? "accessibility";
+  const safeThemeId = themeId ?? 'accessibility';
   const theme = (THEMES && THEMES[safeThemeId]) ?? THEME_ACCESSIBILITY;
 
   const value: ThemeContextValue = {
@@ -72,7 +72,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 export function useTheme(): ThemeContextValue {
   const ctx = useContext(ThemeContext);
   if (!ctx) {
-    throw new Error("useTheme must be used within ThemeProvider");
+    throw new Error('useTheme must be used within ThemeProvider');
   }
   return ctx;
 }

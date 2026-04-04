@@ -10,8 +10,13 @@ const gradlew = isWin ? 'gradlew.bat' : './gradlew';
 // arm64 only - covers most phones (2017+). Saves ~15MB vs armeabi-v7a+arm64
 const architectures = 'arm64-v8a';
 
-execSync('node scripts/generate-google-services.js', { cwd: frontendRoot, stdio: 'inherit' });
-console.log('Building dev release APK (assembleDevRelease) for real devices only...\n');
+execSync('node scripts/generate-google-services.js', {
+  cwd: frontendRoot,
+  stdio: 'inherit',
+});
+console.log(
+  'Building dev release APK (assembleDevRelease) for real devices only...\n',
+);
 
 // On Linux/macOS, ensure gradlew is executable (CI checkout does not preserve execute bit)
 if (!isWin) {
@@ -21,8 +26,13 @@ if (!isWin) {
   } catch (_) {}
 }
 
-execSync(`${gradlew} assembleDevRelease -PreactNativeArchitectures=${architectures}`, {
-  cwd: androidDir,
-  stdio: 'inherit',
-});
-console.log('\nAPK output: android/app/build/outputs/apk/dev/release/app-dev-release.apk');
+execSync(
+  `${gradlew} assembleDevRelease -PreactNativeArchitectures=${architectures}`,
+  {
+    cwd: androidDir,
+    stdio: 'inherit',
+  },
+);
+console.log(
+  '\nAPK output: android/app/build/outputs/apk/dev/release/app-dev-release.apk',
+);

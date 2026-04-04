@@ -22,21 +22,21 @@ const parseErrorDetail = (payload: unknown): string | null => {
     }
   }
   return null;
-}
+};
 
 const detectObjects = async (imageUri: string): Promise<DetectResponse> => {
   const endpoint = `${API_BASE_URL}/v1/detect`;
-  logApi('request', endpoint, { method: 'POST', imageUri: imageUri.slice(0, 50) + '...' });
+  logApi('request', endpoint, {
+    method: 'POST',
+    imageUri: imageUri.slice(0, 50) + '...',
+  });
 
   const formData = new FormData();
-  formData.append(
-    'file',
-    {
-      uri: imageUri,
-      name: `frame-${Date.now()}.jpg`,
-      type: 'image/jpeg',
-    } as any,
-  );
+  formData.append('file', {
+    uri: imageUri,
+    name: `frame-${Date.now()}.jpg`,
+    type: 'image/jpeg',
+  } as any);
 
   const startTime = Date.now();
   const response = await fetch(endpoint, {
@@ -50,7 +50,9 @@ const detectObjects = async (imageUri: string): Promise<DetectResponse> => {
   if (!response.ok) {
     const detail = parseErrorDetail(payload);
     logApi('error', endpoint, { status: response.status, detail, duration });
-    throw new Error(detail ?? `Detection failed with status ${response.status}.`);
+    throw new Error(
+      detail ?? `Detection failed with status ${response.status}.`,
+    );
   }
 
   logApi('response', endpoint, {
@@ -59,6 +61,6 @@ const detectObjects = async (imageUri: string): Promise<DetectResponse> => {
     objectCount: (payload as DetectResponse)?.objects?.length ?? 0,
   });
   return payload as DetectResponse;
-}
+};
 
 export { detectObjects };

@@ -1,6 +1,12 @@
 export type ModelRuntime = 'tflite' | 'onnx' | 'server';
 export type TfliteDelegate = 'gpu' | 'nnapi' | 'xnnpack' | 'cpu';
-export type RuntimeStatus = 'idle' | 'ready' | 'loading' | 'running' | 'error' | 'fallback';
+export type RuntimeStatus =
+  | 'idle'
+  | 'ready'
+  | 'loading'
+  | 'running'
+  | 'error'
+  | 'fallback';
 export type CameraFacing = 'back' | 'front';
 
 export interface Prediction {

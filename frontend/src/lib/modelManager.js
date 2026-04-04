@@ -74,19 +74,24 @@ function normalizeConfig(config) {
   const tfliteDelegate = TFLITE_DELEGATES.includes(merged.tfliteDelegate)
     ? merged.tfliteDelegate
     : DEFAULT_CONFIG.tfliteDelegate;
-  const onnxGraphOptimizationLevel = ONNX_OPT_LEVELS.includes(merged.onnxGraphOptimizationLevel)
+  const onnxGraphOptimizationLevel = ONNX_OPT_LEVELS.includes(
+    merged.onnxGraphOptimizationLevel,
+  )
     ? merged.onnxGraphOptimizationLevel
     : DEFAULT_CONFIG.onnxGraphOptimizationLevel;
 
   const onnxExecutionProviders = Array.isArray(merged.onnxExecutionProviders)
     ? merged.onnxExecutionProviders
-      .map((provider) => String(provider).trim().toLowerCase())
-      .filter((provider) => provider.length > 0)
+        .map(provider => String(provider).trim().toLowerCase())
+        .filter(provider => provider.length > 0)
     : [...DEFAULT_CONFIG.onnxExecutionProviders];
 
   return {
     confidenceThreshold: clamp(
-      toFiniteNumber(merged.confidenceThreshold, DEFAULT_CONFIG.confidenceThreshold),
+      toFiniteNumber(
+        merged.confidenceThreshold,
+        DEFAULT_CONFIG.confidenceThreshold,
+      ),
       0,
       1,
     ),
@@ -94,12 +99,19 @@ function normalizeConfig(config) {
     inputResolution: normalizeInputResolution(merged.inputResolution),
     serverTimeoutMs: Math.max(
       1,
-      Math.trunc(toFiniteNumber(merged.serverTimeoutMs, DEFAULT_SERVER_TIMEOUT_MS)),
+      Math.trunc(
+        toFiniteNumber(merged.serverTimeoutMs, DEFAULT_SERVER_TIMEOUT_MS),
+      ),
     ),
     tfliteDelegate,
     tfliteAllowNnapiFallback: Boolean(merged.tfliteAllowNnapiFallback),
     tfliteNumThreads: clamp(
-      Math.trunc(toFiniteNumber(merged.tfliteNumThreads, DEFAULT_CONFIG.tfliteNumThreads)),
+      Math.trunc(
+        toFiniteNumber(
+          merged.tfliteNumThreads,
+          DEFAULT_CONFIG.tfliteNumThreads,
+        ),
+      ),
       1,
       8,
     ),
@@ -109,12 +121,22 @@ function normalizeConfig(config) {
         : [...DEFAULT_CONFIG.onnxExecutionProviders],
     onnxGraphOptimizationLevel,
     onnxIntraOpThreads: clamp(
-      Math.trunc(toFiniteNumber(merged.onnxIntraOpThreads, DEFAULT_CONFIG.onnxIntraOpThreads)),
+      Math.trunc(
+        toFiniteNumber(
+          merged.onnxIntraOpThreads,
+          DEFAULT_CONFIG.onnxIntraOpThreads,
+        ),
+      ),
       1,
       8,
     ),
     onnxInterOpThreads: clamp(
-      Math.trunc(toFiniteNumber(merged.onnxInterOpThreads, DEFAULT_CONFIG.onnxInterOpThreads)),
+      Math.trunc(
+        toFiniteNumber(
+          merged.onnxInterOpThreads,
+          DEFAULT_CONFIG.onnxInterOpThreads,
+        ),
+      ),
       1,
       4,
     ),
@@ -170,7 +192,12 @@ function normalizeBbox(input) {
     const x2 = toFiniteNumber(input[2], NaN);
     const y2 = toFiniteNumber(input[3], NaN);
     if ([x1, y1, x2, y2].every(Number.isFinite)) {
-      return [Math.min(x1, x2), Math.min(y1, y2), Math.max(x1, x2), Math.max(y1, y2)];
+      return [
+        Math.min(x1, x2),
+        Math.min(y1, y2),
+        Math.max(x1, x2),
+        Math.max(y1, y2),
+      ];
     }
   }
 
@@ -180,7 +207,12 @@ function normalizeBbox(input) {
     const x2 = toFiniteNumber(input.x2 ?? input.right, NaN);
     const y2 = toFiniteNumber(input.y2 ?? input.bottom, NaN);
     if ([x1, y1, x2, y2].every(Number.isFinite)) {
-      return [Math.min(x1, x2), Math.min(y1, y2), Math.max(x1, x2), Math.max(y1, y2)];
+      return [
+        Math.min(x1, x2),
+        Math.min(y1, y2),
+        Math.max(x1, x2),
+        Math.max(y1, y2),
+      ];
     }
 
     const x = toFiniteNumber(input.x, NaN);
@@ -196,12 +228,21 @@ function normalizeBbox(input) {
 }
 
 function normalizeClassFields(prediction) {
-  const rawClass = prediction.class ?? prediction.class_id ?? prediction.classId ?? prediction.cls;
+  const rawClass =
+    prediction.class ??
+    prediction.class_id ??
+    prediction.classId ??
+    prediction.cls;
   const rawName =
-    prediction.class_name ?? prediction.className ?? prediction.label ?? prediction.name ?? null;
+    prediction.class_name ??
+    prediction.className ??
+    prediction.label ??
+    prediction.name ??
+    null;
 
   let classId = null;
-  let className = typeof rawName === 'string' && rawName.trim() ? rawName.trim() : null;
+  let className =
+    typeof rawName === 'string' && rawName.trim() ? rawName.trim() : null;
 
   if (typeof rawClass === 'number' && Number.isFinite(rawClass)) {
     classId = Math.trunc(rawClass);
@@ -234,13 +275,18 @@ function normalizePrediction(prediction) {
     return null;
   }
 
-  const bbox = normalizeBbox(prediction.bbox ?? prediction.box ?? prediction.xyxy ?? prediction.coords);
+  const bbox = normalizeBbox(
+    prediction.bbox ?? prediction.box ?? prediction.xyxy ?? prediction.coords,
+  );
   if (!bbox) {
     return null;
   }
 
   const confidenceRaw =
-    prediction.confidence ?? prediction.score ?? prediction.conf ?? prediction.probability;
+    prediction.confidence ??
+    prediction.score ??
+    prediction.conf ??
+    prediction.probability;
   const confidence = clamp(toFiniteNumber(confidenceRaw, 0), 0, 1);
   const { classId, className, classValue } = normalizeClassFields(prediction);
 
@@ -305,7 +351,7 @@ function iou(a, b) {
 
 function applyNms(predictions, confidenceThreshold, nmsIoU) {
   const filtered = predictions
-    .filter((prediction) => prediction.confidence >= confidenceThreshold)
+    .filter(prediction => prediction.confidence >= confidenceThreshold)
     .sort((a, b) => b.confidence - a.confidence);
 
   const groupedByClass = new Map();
@@ -385,7 +431,9 @@ class NativeRuntimeAdapter {
   async load(config) {
     const { name, binding } = this.resolveBinding();
     if (!binding) {
-      throw new Error(`${this.runtimeName} runtime is not available on this build.`);
+      throw new Error(
+        `${this.runtimeName} runtime is not available on this build.`,
+      );
     }
 
     this.boundName = name;
@@ -428,12 +476,16 @@ class NativeRuntimeAdapter {
 
     const inferCall = binding.infer ?? binding.runInference ?? binding.run;
     if (typeof inferCall !== 'function') {
-      throw new Error(`${this.runtimeName} binding does not expose an infer method.`);
+      throw new Error(
+        `${this.runtimeName} binding does not expose an infer method.`,
+      );
     }
 
     const localInput = input?.frameTensor ?? input?.imageBuffer ?? input;
     if (localInput == null) {
-      throw new Error(`${this.runtimeName} runtime requires frameTensor or imageBuffer input.`);
+      throw new Error(
+        `${this.runtimeName} runtime requires frameTensor or imageBuffer input.`,
+      );
     }
 
     const startedAt = nowMs();
@@ -516,14 +568,16 @@ class ServerRuntimeAdapter {
     return typeof this.baseUrl === 'string' && this.baseUrl.trim().length > 0;
   }
 
-  async load() { }
+  async load() {}
 
-  async unload() { }
+  async unload() {}
 
   async infer(input) {
     const uploadValue = resolveUploadValue(input);
     if (!uploadValue) {
-      throw new Error('Server fallback requires an imageBuffer or URI-compatible input.');
+      throw new Error(
+        'Server fallback requires an imageBuffer or URI-compatible input.',
+      );
     }
 
     const formData = new FormData();
@@ -533,12 +587,13 @@ class ServerRuntimeAdapter {
       formData.append('file', uploadValue);
     }
 
-    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const controller =
+      typeof AbortController !== 'undefined' ? new AbortController() : null;
     const timeoutHandle =
       controller !== null
         ? setTimeout(() => {
-          controller.abort();
-        }, this.timeoutMs)
+            controller.abort();
+          }, this.timeoutMs)
         : null;
 
     const startedAt = nowMs();
@@ -553,7 +608,9 @@ class ServerRuntimeAdapter {
       const payload = await response.json().catch(() => null);
       if (!response.ok) {
         const detail = parseErrorDetail(payload);
-        throw new Error(detail ?? `Server inference failed with status ${response.status}.`);
+        throw new Error(
+          detail ?? `Server inference failed with status ${response.status}.`,
+        );
       }
 
       const normalized = normalizeRuntimeResult(payload);
@@ -563,7 +620,9 @@ class ServerRuntimeAdapter {
       };
     } catch (error) {
       if (error?.name === 'AbortError') {
-        throw new Error(`Server inference timed out after ${this.timeoutMs} ms.`);
+        throw new Error(
+          `Server inference timed out after ${this.timeoutMs} ms.`,
+        );
       }
       throw error;
     } finally {
@@ -592,7 +651,11 @@ export class ModelManager {
         'tflite',
         new NativeRuntimeAdapter({
           runtimeName: 'tflite',
-          bindingCandidates: ['VisionAITFLite', 'VisionAiTFLite', 'TFLiteInference'],
+          bindingCandidates: [
+            'VisionAITFLite',
+            'VisionAiTFLite',
+            'TFLiteInference',
+          ],
           modelAsset: DEFAULT_MODEL_ASSETS.tflite,
         }),
       ],
@@ -756,7 +819,9 @@ export class ModelManager {
       }
     }
 
-    throw new Error(`Inference failed for all runtimes (${errors.join(' | ')}).`);
+    throw new Error(
+      `Inference failed for all runtimes (${errors.join(' | ')}).`,
+    );
   }
 
   getAttemptOrder() {

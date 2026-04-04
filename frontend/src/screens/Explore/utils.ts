@@ -18,7 +18,8 @@ export function formatRuntime(runtime: string | null | undefined): string {
 export function getStatusColor(status: RuntimeStatus): string {
   if (status === 'running') return EXPLORE_COLORS.success;
   if (status === 'error') return EXPLORE_COLORS.error;
-  if (status === 'loading' || status === 'fallback') return EXPLORE_COLORS.warning;
+  if (status === 'loading' || status === 'fallback')
+    return EXPLORE_COLORS.warning;
   return EXPLORE_COLORS.label;
 }
 

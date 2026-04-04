@@ -3,7 +3,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const noop = () => undefined;
 
-const reactotron : ReactotronReactNative = Reactotron.setAsyncStorageHandler(AsyncStorage)
+const reactotron: ReactotronReactNative = Reactotron.setAsyncStorageHandler(
+  AsyncStorage,
+)
   .configure({
     name: 'VisionAI',
     host: 'localhost',
@@ -40,7 +42,9 @@ reactotron.onCustomCommand({
   description: 'Shake device or press Cmd+D (iOS) / Cmd+M (Android)',
   command: 'showDevMenu',
   handler: () => {
-    Reactotron.log('Shake device or press Cmd+D (iOS) / Cmd+M (Android) to open React Native dev menu');
+    Reactotron.log(
+      'Shake device or press Cmd+D (iOS) / Cmd+M (Android) to open React Native dev menu',
+    );
   },
 });
 

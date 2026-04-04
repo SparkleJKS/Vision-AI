@@ -6,12 +6,13 @@ export const MODEL_OPTIONS: { id: ModelRuntime; label: string }[] = [
   { id: 'server', label: 'Server' },
 ];
 
-export const TFLITE_DELEGATE_OPTIONS: { id: TfliteDelegate; label: string }[] = [
-  { id: 'gpu', label: 'GPU' },
-  { id: 'nnapi', label: 'NNAPI' },
-  { id: 'xnnpack', label: 'XNNPACK' },
-  { id: 'cpu', label: 'CPU' },
-];
+export const TFLITE_DELEGATE_OPTIONS: { id: TfliteDelegate; label: string }[] =
+  [
+    { id: 'gpu', label: 'GPU' },
+    { id: 'nnapi', label: 'NNAPI' },
+    { id: 'xnnpack', label: 'XNNPACK' },
+    { id: 'cpu', label: 'CPU' },
+  ];
 
 export const INPUT_RESOLUTION = [512, 512] as const;
 export const MAX_INFERENCE_FPS = 12;

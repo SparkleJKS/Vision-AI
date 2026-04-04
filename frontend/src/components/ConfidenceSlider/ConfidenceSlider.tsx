@@ -1,14 +1,14 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   type GestureResponderEvent,
   type LayoutChangeEvent,
   PanResponder,
   Text,
   View,
-} from "react-native";
-import type { DimensionValue } from "react-native";
-import { clamp } from "./utils";
-import type { ConfidenceSliderProps } from "./types";
+} from 'react-native';
+import type { DimensionValue } from 'react-native';
+import { clamp } from './utils';
+import type { ConfidenceSliderProps } from './types';
 
 const ConfidenceSlider = ({
   value,
@@ -59,9 +59,9 @@ const ConfidenceSlider = ({
 
   const handleAccessibilityAction = useCallback(
     (event: { nativeEvent: { actionName?: string } }) => {
-      if (event.nativeEvent.actionName === "increment") {
+      if (event.nativeEvent.actionName === 'increment') {
         onChange(Number(clamp(normalizedValue + 0.05, min, max).toFixed(2)));
-      } else if (event.nativeEvent.actionName === "decrement") {
+      } else if (event.nativeEvent.actionName === 'decrement') {
         onChange(Number(clamp(normalizedValue - 0.05, min, max).toFixed(2)));
       }
     },
@@ -85,11 +85,10 @@ const ConfidenceSlider = ({
           now: Number(normalizedValue.toFixed(2)),
         }}
         accessibilityActions={[
-          { name: "increment", label: "Increase confidence threshold" },
-          { name: "decrement", label: "Decrease confidence threshold" },
+          { name: 'increment', label: 'Increase confidence threshold' },
+          { name: 'decrement', label: 'Decrease confidence threshold' },
         ]}
-        onAccessibilityAction={handleAccessibilityAction}
-      >
+        onAccessibilityAction={handleAccessibilityAction}>
         <View className="h-1.5 rounded-full bg-[#374151]" />
         <View
           className="absolute left-0 h-1.5 rounded-full bg-[#FFD54F]"

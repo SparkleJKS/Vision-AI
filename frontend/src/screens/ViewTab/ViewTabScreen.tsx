@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { Text, View } from 'react-native';
 
 const ViewTabScreen = () => (
   <View className="flex-1 items-center justify-center bg-white">

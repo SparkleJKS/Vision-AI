@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { View, ActivityIndicator } from "react-native";
-import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
-import { Splash } from "@/screens/Splash";
-import Navigation from "./Navigation";
-import AuthStack from "@/screens/Auth/AuthStack";
-import { useAuth } from "@/auth/AuthContext";
-import { useTheme } from "@/theme/ThemeContext";
-import { navigationRef } from "@/navigators";
-import { logEvent } from "@/utils/logger";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { View, ActivityIndicator } from 'react-native';
+import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import { Splash } from '@/screens/Splash';
+import Navigation from './Navigation';
+import AuthStack from '@/screens/Auth/AuthStack';
+import { useAuth } from '@/auth/AuthContext';
+import { useTheme } from '@/theme/ThemeContext';
+import { navigationRef } from '@/navigators';
+import { logEvent } from '@/utils/logger';
 
 const SPLASH_DURATION_MS = 6_300;
 
@@ -36,7 +36,7 @@ const MainContainer = () => {
   const onNavStateChange = useCallback(() => {
     const route = navigationRef.getCurrentRoute();
     if (route?.name) {
-      logEvent("Navigation:ScreenFocus", {
+      logEvent('Navigation:ScreenFocus', {
         screen: route.name,
         params: route.params,
       });
@@ -58,8 +58,7 @@ const MainContainer = () => {
     return (
       <View
         className="flex-1 justify-center items-center"
-        style={{ backgroundColor: theme.screenBg }}
-      >
+        style={{ backgroundColor: theme.screenBg }}>
         <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );
@@ -69,8 +68,7 @@ const MainContainer = () => {
     <NavigationContainer
       ref={navigationRef}
       theme={navTheme}
-      onStateChange={onNavStateChange}
-    >
+      onStateChange={onNavStateChange}>
       {user || !authAvailable ? <Navigation /> : <AuthStack />}
     </NavigationContainer>
   );

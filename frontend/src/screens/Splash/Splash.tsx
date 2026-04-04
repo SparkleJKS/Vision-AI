@@ -1,13 +1,13 @@
-import { Component, type ErrorInfo, type ReactNode } from "react";
+import { Component, type ErrorInfo, type ReactNode } from 'react';
 import {
   ActivityIndicator,
   useWindowDimensions,
   View,
   Text,
-} from "react-native";
-import { Lottie } from "@/animations/components";
-import { AppInit } from "@/animations/assets";
-import { useTheme } from "@/theme/ThemeContext";
+} from 'react-native';
+import { Lottie } from '@/animations/components';
+import { AppInit } from '@/animations/assets';
+import { useTheme } from '@/theme/ThemeContext';
 
 type Props = { children: ReactNode };
 
@@ -17,7 +17,7 @@ class SplashErrorBoundary extends Component<Props, { hasError: boolean }> {
   static getDerivedStateFromError = () => ({ hasError: true });
 
   componentDidCatch(error: Error, _info: ErrorInfo) {
-    if (__DEV__) console.warn("[Splash] Lottie failed:", error?.message);
+    if (__DEV__) console.warn('[Splash] Lottie failed:', error?.message);
   }
 
   render() {
@@ -32,12 +32,10 @@ function FallbackSplash() {
   return (
     <View
       className="justify-center items-center"
-      style={{ width, height, backgroundColor: theme.screenBg }}
-    >
+      style={{ width, height, backgroundColor: theme.screenBg }}>
       <Text
         className="mb-6 text-3xl font-semibold"
-        style={{ color: theme.white }}
-      >
+        style={{ color: theme.white }}>
         VisionAI
       </Text>
       <ActivityIndicator size="large" color={theme.primary} className="mt-2" />
@@ -53,8 +51,7 @@ const Splash = () => {
     <SplashErrorBoundary>
       <View
         className="justify-center items-center"
-        style={{ width, height, backgroundColor: theme.screenBg }}
-      >
+        style={{ width, height, backgroundColor: theme.screenBg }}>
         <Lottie
           source={AppInit}
           width={width}

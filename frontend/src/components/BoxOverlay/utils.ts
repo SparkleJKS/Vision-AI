@@ -1,4 +1,10 @@
-import { DEFAULT_MODEL_SIZE, DEFAULT_MAX_BOXES, MIN_CONFIDENCE, MAX_CONFIDENCE, COLOR_PALETTE } from './config';
+import {
+  DEFAULT_MODEL_SIZE,
+  DEFAULT_MAX_BOXES,
+  MIN_CONFIDENCE,
+  MAX_CONFIDENCE,
+  COLOR_PALETTE,
+} from './config';
 
 export function toFiniteNumber(value: unknown, fallback = NaN): number {
   const numericValue = typeof value === 'number' ? value : Number(value);
@@ -27,23 +33,33 @@ export function normalizeBbox(bbox: unknown): number[] | null {
   const y1 = toFiniteNumber(bbox[1], NaN);
   const x2 = toFiniteNumber(bbox[2], NaN);
   const y2 = toFiniteNumber(bbox[3], NaN);
-  if ([x1, y1, x2, y2].some((v) => !Number.isFinite(v))) return null;
-  return [Math.min(x1, x2), Math.min(y1, y2), Math.max(x1, x2), Math.max(y1, y2)];
+  if ([x1, y1, x2, y2].some(v => !Number.isFinite(v))) return null;
+  return [
+    Math.min(x1, x2),
+    Math.min(y1, y2),
+    Math.max(x1, x2),
+    Math.max(y1, y2),
+  ];
 }
 
 export function isNormalizedBbox([x1, y1, x2, y2]: number[]): boolean {
   return x1 >= 0 && y1 >= 0 && x2 <= 1.01 && y2 <= 1.01;
 }
 
-export function getPredictionClassKey(prediction: Record<string, unknown>): string {
+export function getPredictionClassKey(
+  prediction: Record<string, unknown>,
+): string {
   const className =
-    typeof prediction?.className === 'string' && (prediction.className as string).trim()
+    typeof prediction?.className === 'string' &&
+    (prediction.className as string).trim()
       ? (prediction.className as string).trim().toLowerCase()
       : null;
   if (className) return className;
   const classId = prediction?.classId ?? prediction?.class;
-  if (typeof classId === 'number' && Number.isFinite(classId)) return `class_${Math.trunc(classId)}`;
-  if (typeof classId === 'string' && (classId as string).trim()) return (classId as string).trim().toLowerCase();
+  if (typeof classId === 'number' && Number.isFinite(classId))
+    return `class_${Math.trunc(classId)}`;
+  if (typeof classId === 'string' && (classId as string).trim())
+    return (classId as string).trim().toLowerCase();
   return 'unknown';
 }
 
@@ -62,9 +78,13 @@ export function getClassColor(classKey: string): string {
 
 export function hexToRgba(hexColor: string, alpha: number): string {
   const hex = hexColor.replace('#', '');
-  const value = hex.length === 3
-    ? hex.split('').map((char) => char + char).join('')
-    : hex;
+  const value =
+    hex.length === 3
+      ? hex
+          .split('')
+          .map(char => char + char)
+          .join('')
+      : hex;
   const red = parseInt(value.slice(0, 2), 16);
   const green = parseInt(value.slice(2, 4), 16);
   const blue = parseInt(value.slice(4, 6), 16);
@@ -141,7 +161,13 @@ export function sourceToScreenBox(
 ): number[] {
   const [sourceWidth, sourceHeight] = sourceSize;
   const [overlayWidth, overlayHeight] = overlaySize;
-  const transform = getDisplayTransform(sourceWidth, sourceHeight, overlayWidth, overlayHeight, resizeMode);
+  const transform = getDisplayTransform(
+    sourceWidth,
+    sourceHeight,
+    overlayWidth,
+    overlayHeight,
+    resizeMode,
+  );
   const x1 = sourceBox[0] * transform.scaleX + transform.offsetX;
   const y1 = sourceBox[1] * transform.scaleY + transform.offsetY;
   const x2 = sourceBox[2] * transform.scaleX + transform.offsetX;
@@ -173,13 +199,20 @@ export interface SanitizedPrediction {
   label: string;
 }
 
-export function sanitizePrediction(prediction: Record<string, unknown>): SanitizedPrediction | null {
+export function sanitizePrediction(
+  prediction: Record<string, unknown>,
+): SanitizedPrediction | null {
   const bbox = normalizeBbox(prediction?.bbox ?? prediction?.box);
   if (!bbox) return null;
-  const confidence = clamp(toFiniteNumber(prediction?.confidence, MIN_CONFIDENCE), MIN_CONFIDENCE, MAX_CONFIDENCE);
+  const confidence = clamp(
+    toFiniteNumber(prediction?.confidence, MIN_CONFIDENCE),
+    MIN_CONFIDENCE,
+    MAX_CONFIDENCE,
+  );
   const classKey = getPredictionClassKey(prediction);
   const label =
-    typeof prediction?.className === 'string' && (prediction.className as string).trim()
+    typeof prediction?.className === 'string' &&
+    (prediction.className as string).trim()
       ? (prediction.className as string).trim()
       : classKey.replace(/^class_/, 'class ');
   return { raw: prediction, bbox, confidence, classKey, label };
@@ -210,7 +243,9 @@ export interface ScreenBox {
   sourceBox: number[];
 }
 
-export function mapPredictionsToScreen(options: MapPredictionsOptions): ScreenBox[] {
+export function mapPredictionsToScreen(
+  options: MapPredictionsOptions,
+): ScreenBox[] {
   const {
     predictions,
     modelSize,
@@ -234,13 +269,23 @@ export function mapPredictionsToScreen(options: MapPredictionsOptions): ScreenBo
   const classOrder = new Map<string, number>();
 
   return valid
-    .map((item) => {
+    .map(item => {
       const classCount = classOrder.get(item.classKey) ?? 0;
       classOrder.set(item.classKey, classCount + 1);
       const trackKey = `${item.classKey}:${classCount}`;
       const modelSpaceBox = toModelSpaceBox(item.bbox, modelSize);
-      const sourceBox = modelToSourceBox(modelSpaceBox, modelSize, sourceSize, modelResizeMode);
-      const screenBox = sourceToScreenBox(sourceBox, sourceSize, overlaySize, resizeMode);
+      const sourceBox = modelToSourceBox(
+        modelSpaceBox,
+        modelSize,
+        sourceSize,
+        modelResizeMode,
+      );
+      const screenBox = sourceToScreenBox(
+        sourceBox,
+        sourceSize,
+        overlaySize,
+        resizeMode,
+      );
       const width = screenBox[2] - screenBox[0];
       const height = screenBox[3] - screenBox[1];
       if (width < minBoxSize || height < minBoxSize) return null;
@@ -274,7 +319,7 @@ export function smoothBoxes(
   const alpha = clamp(smoothingAlpha, 0, 1);
   const nextBoxesByKey = new Map<string, ScreenBox>();
 
-  const smoothed = targetBoxes.map((target) => {
+  const smoothed = targetBoxes.map(target => {
     const previous = previousBoxesByKey.get(target.trackKey);
     if (!previous) {
       nextBoxesByKey.set(target.trackKey, target);

@@ -11,7 +11,10 @@ export function getAuthErrorMessage(error: unknown): string {
   if (msg.includes('auth/user-not-found')) {
     return 'No account found with this email.';
   }
-  if (msg.includes('auth/wrong-password') || msg.includes('auth/invalid-credential')) {
+  if (
+    msg.includes('auth/wrong-password') ||
+    msg.includes('auth/invalid-credential')
+  ) {
     return 'Invalid email or password.';
   }
   if (msg.includes('auth/email-already-in-use')) {

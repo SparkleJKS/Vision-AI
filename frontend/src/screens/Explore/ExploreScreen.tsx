@@ -1,11 +1,11 @@
-import React, { useEffect, useRef } from "react";
-import { Animated, Pressable, ScrollView, Text, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useTheme } from "@/theme";
-import { ScreenNames } from "@/configs/navigation";
+import React, { useEffect, useRef } from 'react';
+import { Animated, Pressable, ScrollView, Text, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme } from '@/theme';
+import { ScreenNames } from '@/configs/navigation';
 
-type FeatureId = "objectDetection" | "ocr" | "tts";
+type FeatureId = 'objectDetection' | 'ocr' | 'tts';
 
 type Feature = {
   id: FeatureId;
@@ -13,55 +13,54 @@ type Feature = {
   subtitle: string;
   description: string;
   icon: string;
-  status: "active" | "coming_soon";
+  status: 'active' | 'coming_soon';
   accentColor: string;
   stats?: { label: string; value: string }[];
 };
 
 const FEATURES: Feature[] = [
   {
-    id: "objectDetection",
-    title: "Object Detection",
-    subtitle: "Real-time AI Vision",
+    id: 'objectDetection',
+    title: 'Object Detection',
+    subtitle: 'Real-time AI Vision',
     description:
-      "Detect and identify objects in your environment instantly using YOLOv8 neural network.",
-    icon: "⬡",
-    status: "active",
-    accentColor: "#22C55E",
+      'Detect and identify objects in your environment instantly using YOLOv8 neural network.',
+    icon: '⬡',
+    status: 'active',
+    accentColor: '#22C55E',
     stats: [
-      { label: "Model", value: "YOLOv8n" },
-      { label: "Classes", value: "80" },
-      { label: "Input", value: "320px" },
+      { label: 'Model', value: 'YOLOv8n' },
+      { label: 'Classes', value: '80' },
+      { label: 'Input', value: '320px' },
     ],
   },
   {
-    id: "ocr",
-    title: "QR & Barcode",
-    subtitle: "Instant Code Scanner",
-    description:
-      "Scan QR codes and barcodes instantly",
-    icon: "▦",
-    status: "active",
-    accentColor: "#6366F1",
+    id: 'ocr',
+    title: 'QR & Barcode',
+    subtitle: 'Instant Code Scanner',
+    description: 'Scan QR codes and barcodes instantly',
+    icon: '▦',
+    status: 'active',
+    accentColor: '#6366F1',
     stats: [
-      { label: "Formats", value: "8+" },
-      { label: "Camera", value: "Rear" },
-      { label: "Mode", value: "Live" },
+      { label: 'Formats', value: '8+' },
+      { label: 'Camera', value: 'Rear' },
+      { label: 'Mode', value: 'Live' },
     ],
   },
   {
-    id: "tts",
-    title: "Text to Speech",
-    subtitle: "Neural Voice Synthesis",
+    id: 'tts',
+    title: 'Text to Speech',
+    subtitle: 'Neural Voice Synthesis',
     description:
-      "Convert any text into natural-sounding speech with multiple voice profiles and languages.",
-    icon: "◎",
-    status: "active",
-    accentColor: "#F59E0B",
+      'Convert any text into natural-sounding speech with multiple voice profiles and languages.',
+    icon: '◎',
+    status: 'active',
+    accentColor: '#F59E0B',
     stats: [
-      { label: "Voices", value: "12" },
-      { label: "Languages", value: "30+" },
-      { label: "Quality", value: "Neural" },
+      { label: 'Voices', value: '12' },
+      { label: 'Languages', value: '30+' },
+      { label: 'Quality', value: 'Neural' },
     ],
   },
 ];
@@ -76,11 +75,11 @@ function FeatureCard({
   feature: Feature;
   onSelect: (id: FeatureId) => void;
   index: number;
-  theme: import("@/theme/tokens").ThemeTokens;
-  themeId: "accessibility" | "neon";
+  theme: import('@/theme/tokens').ThemeTokens;
+  themeId: 'accessibility' | 'neon';
 }) {
   const accent =
-    themeId === "accessibility" ? theme.primary : feature.accentColor;
+    themeId === 'accessibility' ? theme.primary : feature.accentColor;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(24)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -118,7 +117,7 @@ function FeatureCard({
     }).start();
   };
 
-  const isActive = feature.status === "active";
+  const isActive = feature.status === 'active';
 
   return (
     <Animated.View
@@ -126,15 +125,13 @@ function FeatureCard({
       style={{
         opacity: fadeAnim,
         transform: [{ translateY }, { scale: scaleAnim }],
-      }}
-    >
+      }}>
       <Pressable
         onPress={() => onSelect(feature.id)}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        className={`rounded-2xl p-5 overflow-hidden border ${!isActive ? "opacity-65" : ""}`}
-        style={{ backgroundColor: theme.cardBg, borderColor: theme.border }}
-      >
+        className={`rounded-2xl p-5 overflow-hidden border ${!isActive ? 'opacity-65' : ''}`}
+        style={{ backgroundColor: theme.cardBg, borderColor: theme.border }}>
         <View
           className="absolute top-0 left-5 right-5 h-px"
           style={{ backgroundColor: accent }}
@@ -143,10 +140,9 @@ function FeatureCard({
           <View
             className="w-11 h-11 rounded-xl border justify-center items-center"
             style={{
-              borderColor: accent + "40",
+              borderColor: accent + '40',
               backgroundColor: theme.darkBg,
-            }}
-          >
+            }}>
             <Text className="text-[22px]" style={{ color: accent }}>
               {feature.icon}
             </Text>
@@ -154,9 +150,8 @@ function FeatureCard({
           <View
             className="flex-row items-center gap-1.5 px-2.5 py-1.5 rounded-full"
             style={{
-              backgroundColor: isActive ? accent + "20" : theme.cardBg,
-            }}
-          >
+              backgroundColor: isActive ? accent + '20' : theme.cardBg,
+            }}>
             {!isActive && (
               <View
                 className="w-1.5 h-1.5 rounded-full"
@@ -165,47 +160,40 @@ function FeatureCard({
             )}
             <Text
               className="text-[10px] font-bold tracking-wider"
-              style={{ color: isActive ? accent : theme.muted }}
-            >
-              {isActive ? "LIVE" : "SOON"}
+              style={{ color: isActive ? accent : theme.muted }}>
+              {isActive ? 'LIVE' : 'SOON'}
             </Text>
           </View>
         </View>
         <Text
           className="text-xl font-bold tracking-tight mt-1"
-          style={{ color: theme.white }}
-        >
+          style={{ color: theme.white }}>
           {feature.title}
         </Text>
         <Text
           className="text-xs font-medium tracking-wide -mt-1.5"
-          style={{ color: theme.grey }}
-        >
+          style={{ color: theme.grey }}>
           {feature.subtitle}
         </Text>
         <Text
           className="text-[13px] leading-5 mt-0.5"
-          style={{ color: theme.muted }}
-        >
+          style={{ color: theme.muted }}>
           {feature.description}
         </Text>
         {feature.stats && (
           <View
             className="flex-row gap-0 mt-1 border-t pt-3.5"
-            style={{ borderColor: theme.border }}
-          >
+            style={{ borderColor: theme.border }}>
             {feature.stats.map((stat, i) => (
               <View key={i} className="flex-1 items-center gap-0.5">
                 <Text
                   className="text-[15px] font-bold"
-                  style={{ color: accent }}
-                >
+                  style={{ color: accent }}>
                   {stat.value}
                 </Text>
                 <Text
                   className="text-[10px] font-medium tracking-wider"
-                  style={{ color: theme.grey }}
-                >
+                  style={{ color: theme.grey }}>
                   {stat.label}
                 </Text>
               </View>
@@ -216,14 +204,12 @@ function FeatureCard({
           <View
             className="border rounded-[10px] py-2.5 items-center mt-1"
             style={{
-              backgroundColor: accent + "15",
-              borderColor: accent + "40",
-            }}
-          >
+              backgroundColor: accent + '15',
+              borderColor: accent + '40',
+            }}>
             <Text
               className="text-[13px] font-bold tracking-wide"
-              style={{ color: accent }}
-            >
+              style={{ color: accent }}>
               Launch →
             </Text>
           </View>
@@ -251,21 +237,18 @@ const ExploreScreen = () => {
   return (
     <View
       className="flex-1"
-      style={{ backgroundColor: theme.screenBg, paddingTop: insets.top }}
-    >
+      style={{ backgroundColor: theme.screenBg, paddingTop: insets.top }}>
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: 16,
           paddingTop: 8,
           paddingBottom: insets.bottom + 24,
         }}
-        showsVerticalScrollIndicator={false}
-      >
+        showsVerticalScrollIndicator={false}>
         <View className="py-6 gap-2">
           <Text
             className="text-3xl font-extrabold tracking-tight"
-            style={{ color: theme.white }}
-          >
+            style={{ color: theme.white }}>
             AI Tools
           </Text>
           <Text className="text-sm" style={{ color: theme.grey }}>
@@ -288,8 +271,7 @@ const ExploreScreen = () => {
 
         <Text
           className="text-xs text-center mt-6 tracking-wide"
-          style={{ color: theme.border }}
-        >
+          style={{ color: theme.border }}>
           More AI capabilities coming soon
         </Text>
       </ScrollView>
