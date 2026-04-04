@@ -62,7 +62,6 @@ npm install
 npm start
 ```
 
-
 ### Android dev build (physical device / emulator)
 
 To build and install the **dev debug** app on a connected Android device or emulator:
@@ -110,6 +109,7 @@ Backend runs at `http://localhost:8000`.
 **Endpoints:** `GET /health` | `POST /v1/describe` | `POST /v1/detect` (multipart form field `file`)
 
 **Example:**
+
 ```bash
 curl -X POST "http://localhost:8000/v1/detect" -F "file=@path/to/image.jpg"
 ```
@@ -130,3 +130,5 @@ See **[SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md)** for:
 Contributions are welcome. Read **[CONTRIBUTING.md](CONTRIBUTING.md)** for branch and PR workflow, Git hooks, code style (Prettier / TypeScript), detection and model change guidelines, and the minimal detection test checklist.
 
 This project is maintained for educational and research purposes.
+
+t
