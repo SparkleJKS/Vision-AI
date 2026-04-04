@@ -18,18 +18,25 @@ function serverTimestamp(): FirebaseTimestamp {
   return firestore.Timestamp.now() as unknown as FirebaseTimestamp;
 }
 
-function mergeWithDefaults<T extends object>(defaults: T, partial: Partial<T> | null): T {
+function mergeWithDefaults<T extends object>(
+  defaults: T,
+  partial: Partial<T> | null,
+): T {
   if (!partial) return defaults;
   return { ...defaults, ...partial };
 }
 
-export async function getUserDocument(uid: string): Promise<UserDocument | null> {
+export async function getUserDocument(
+  uid: string,
+): Promise<UserDocument | null> {
   const doc = await firestore().collection(USERS_COLLECTION).doc(uid).get();
   if (!doc.exists()) return null;
   return doc.data() as UserDocument;
 }
 
-export async function createOrGetUserDocument(uid: string): Promise<UserDocument> {
+export async function createOrGetUserDocument(
+  uid: string,
+): Promise<UserDocument> {
   const ref = firestore().collection(USERS_COLLECTION).doc(uid);
   const existing = await ref.get();
 
@@ -56,7 +63,10 @@ export async function createOrGetUserDocument(uid: string): Promise<UserDocument
   return newDoc;
 }
 
-export async function updateProfile(uid: string, profile: Partial<UserProfile>): Promise<void> {
+export async function updateProfile(
+  uid: string,
+  profile: Partial<UserProfile>,
+): Promise<void> {
   const ref = firestore().collection(USERS_COLLECTION).doc(uid);
   const existing = (await ref.get()).data() as UserDocument | undefined;
   const current = existing?.profile ?? {};
@@ -80,14 +90,23 @@ export async function clearProfileAge(uid: string): Promise<void> {
   });
 }
 
-export async function updateSettings(uid: string, settings: Partial<UserSettings>): Promise<void> {
+export async function updateSettings(
+  uid: string,
+  settings: Partial<UserSettings>,
+): Promise<void> {
   const ref = firestore().collection(USERS_COLLECTION).doc(uid);
   const existing = (await ref.get()).data() as UserDocument | undefined;
   const current = existing?.settings ?? DEFAULT_USER_SETTINGS;
 
   const next = {
-    voice: mergeWithDefaults(DEFAULT_VOICE_SETTINGS, settings.voice ?? current.voice),
-    vision: mergeWithDefaults(DEFAULT_VISION_SETTINGS, settings.vision ?? current.vision),
+    voice: mergeWithDefaults(
+      DEFAULT_VOICE_SETTINGS,
+      settings.voice ?? current.voice,
+    ),
+    vision: mergeWithDefaults(
+      DEFAULT_VISION_SETTINGS,
+      settings.vision ?? current.vision,
+    ),
     accessibility: mergeWithDefaults(
       DEFAULT_ACCESSIBILITY_SETTINGS,
       settings.accessibility ?? current.accessibility,
@@ -106,16 +125,19 @@ export function subscribeToUserDocument(
     .collection(USERS_COLLECTION)
     .doc(uid)
     .onSnapshot(
-      (snapshot) => {
+      snapshot => {
         if (!snapshot.exists()) {
           onData(null);
           return;
         }
         onData(snapshot.data() as UserDocument);
       },
-      (error) => {
+      error => {
         if (__DEV__) {
-          console.warn('[Firestore] subscribeToUserDocument error:', error?.message);
+          console.warn(
+            '[Firestore] subscribeToUserDocument error:',
+            error?.message,
+          );
         }
         onData(null);
       },

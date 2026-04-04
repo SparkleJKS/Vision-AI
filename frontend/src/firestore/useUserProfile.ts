@@ -35,10 +35,10 @@ export function useUserProfile() {
     setError(null);
 
     createOrGetUserDocument(user.uid)
-      .then((initial) => {
+      .then(initial => {
         setDoc(initial);
       })
-      .catch((err) => {
+      .catch(err => {
         setError(err?.message ?? 'Failed to load profile');
         setDoc(null);
       })
@@ -46,7 +46,7 @@ export function useUserProfile() {
         setLoading(false);
       });
 
-    const unsubscribe = subscribeToUserDocument(user.uid, (data) => {
+    const unsubscribe = subscribeToUserDocument(user.uid, data => {
       if (data) setDoc(data);
     });
 
@@ -88,4 +88,11 @@ export function useUserProfile() {
   };
 }
 
-export type { UserDocument, UserProfile, UserSettings, VoiceSettings, VisionSettings, AccessibilitySettings };
+export type {
+  UserDocument,
+  UserProfile,
+  UserSettings,
+  VoiceSettings,
+  VisionSettings,
+  AccessibilitySettings,
+};

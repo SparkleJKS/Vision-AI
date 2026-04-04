@@ -6,13 +6,17 @@ import {
   StyleSheet,
   Text,
   View,
-} from "react-native";
-import { useIsFocused, useNavigation, useRoute } from "@react-navigation/native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useTheme } from "@/theme";
-import CameraView from "../../components/CameraView";
-import DetectionOverlay from "../../components/DetectionOverlay";
-import { useExplorePermissions } from "./hooks";
+} from 'react-native';
+import {
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme } from '@/theme';
+import CameraView from '../../components/CameraView';
+import DetectionOverlay from '../../components/DetectionOverlay';
+import { useExplorePermissions } from './hooks';
 
 const ObjectDetectionScreen = () => {
   const navigation = useNavigation();
