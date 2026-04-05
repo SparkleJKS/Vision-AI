@@ -25,7 +25,7 @@ import { navigationActions } from '@/store/actions/navigation';
 import type { AppDispatch } from '@/store';
 
 const MIN_AGE = 1;
-const MAX_AGE = 120;
+const MAX_AGE = 130;
 
 const PersonalDetailsScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -38,17 +38,17 @@ const PersonalDetailsScreen = () => {
   const handleBack = () => dispatch(navigationActions.toBack());
   useBackHandler({ onBack: handleBack });
 
-  const [genderModalOpen, setGenderModalOpen] = useState(false);
-  const [ageInput, setAgeInput] = useState('');
+  const [genderModalOpen, setGenderModalOpen] = useState<boolean>(false);
+  const [ageInput, setAgeInput] = useState<number | null>(null);
   const [savingGender, setSavingGender] = useState(false);
   const [savingAge, setSavingAge] = useState(false);
   const [ageHint, setAgeHint] = useState<string | null>(null);
 
   useEffect(() => {
     if (profile?.age != null && !Number.isNaN(profile.age)) {
-      setAgeInput(String(profile.age));
+      setAgeInput(profile.age);
     } else {
-      setAgeInput('');
+      setAgeInput(null);
     }
   }, [profile?.age]);
 
@@ -73,8 +73,7 @@ const PersonalDetailsScreen = () => {
 
   const commitAge = useCallback(async () => {
     setAgeHint(null);
-    const trimmed = ageInput.trim();
-    if (trimmed === '') {
+    if (ageInput === null) {
       if (profile?.age != null) {
         setSavingAge(true);
         try {
@@ -85,10 +84,10 @@ const PersonalDetailsScreen = () => {
       }
       return;
     }
-    const n = parseInt(trimmed, 10);
-    if (Number.isNaN(n) || n < MIN_AGE || n > MAX_AGE) {
-      setAgeHint(`Enter a whole number between ${MIN_AGE} and ${MAX_AGE}.`);
-      setAgeInput(profile?.age != null ? String(profile.age) : '');
+    const n = ageInput;
+    if (n < MIN_AGE || n > MAX_AGE) {
+      setAgeHint(`Age must be between ${MIN_AGE} and ${MAX_AGE}.`);
+      setAgeInput(profile?.age != null ? profile.age : null);
       return;
     }
     if (n === profile?.age) return;
@@ -128,29 +127,25 @@ const PersonalDetailsScreen = () => {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}>
         <Text
-          className="text-2xl font-extrabold tracking-tight mt-2"
+          className="text-2xl font-extrabold tracking-tight mt-8"
           style={{ color: theme.white }}>
           Personal details
         </Text>
-        <Text className="text-[13px] mt-1 mb-6" style={{ color: theme.grey }}>
-          Name comes from your Google or email account and cannot be changed
-          here.
-        </Text>
 
-        {loading ? (
+        {loading && (
           <View className="py-16 items-center">
             <ActivityIndicator size="large" color={theme.primary} />
           </View>
-        ) : null}
+        )}
 
-        {error ? (
+        {error && (
           <Text className="text-sm mb-4" style={{ color: theme.warning }}>
             {error}
           </Text>
-        ) : null}
+        )}
 
         <Text
-          className="text-xs font-bold uppercase tracking-wider mb-2"
+          className="text-xs font-bold uppercase tracking-wider mt-8 mb-2"
           style={{ color: theme.grey }}>
           Account
         </Text>
@@ -234,10 +229,16 @@ const PersonalDetailsScreen = () => {
             Age
           </Text>
           <TextInput
-            value={ageInput}
+            value={ageInput === null ? '' : String(ageInput)}
             onChangeText={text => {
               setAgeHint(null);
-              setAgeInput(text.replace(/[^0-9]/g, ''));
+              const digits = text.replace(/[^0-9]/g, '');
+              if (digits === '') {
+                setAgeInput(null);
+                return;
+              }
+              const n = parseInt(digits, 10);
+              if (!Number.isNaN(n)) setAgeInput(n);
             }}
             onBlur={() => {
               void commitAge();
@@ -250,22 +251,18 @@ const PersonalDetailsScreen = () => {
             className="text-base font-semibold py-2 px-3 rounded-xl border"
             style={inputSurface}
           />
-          <Text className="text-xs mt-2" style={{ color: theme.muted }}>
-            {MIN_AGE}–{MAX_AGE}. Leave blank to clear. Saves when you leave the
-            field.
-          </Text>
-          {ageHint ? (
+          {ageHint && (
             <Text className="text-xs mt-2" style={{ color: theme.warning }}>
               {ageHint}
             </Text>
-          ) : null}
-          {savingAge ? (
+          )}
+          {savingAge && (
             <ActivityIndicator
               className="mt-2"
               size="small"
               color={theme.primary}
             />
-          ) : null}
+          )}
         </View>
       </ScrollView>
 
@@ -316,13 +313,13 @@ const PersonalDetailsScreen = () => {
                   style={{ color: theme.white }}>
                   {opt.label}
                 </Text>
-                {profile?.gender === opt.value ? (
+                {profile?.gender === opt.value && (
                   <Ionicons
                     name="checkmark-circle"
                     size={22}
                     color={theme.primary}
                   />
-                ) : null}
+                )}
               </TouchableOpacity>
             ))}
             <TouchableOpacity
