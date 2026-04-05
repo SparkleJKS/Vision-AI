@@ -17,7 +17,7 @@ import type {
 } from './types';
 import { DEFAULT_USER_SETTINGS } from './types';
 
-export function useUserProfile() {
+export const useUserProfile = () => {
   const { user } = useAuth();
   const [doc, setDoc] = useState<UserDocument | null>(null);
   const [loading, setLoading] = useState(true);
@@ -86,7 +86,7 @@ export function useUserProfile() {
     removeProfileAge,
     updateSettings: updateUserSettings,
   };
-}
+};
 
 export type {
   UserDocument,

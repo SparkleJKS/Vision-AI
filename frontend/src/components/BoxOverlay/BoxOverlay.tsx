@@ -23,10 +23,10 @@ import {
 import type { BoxOverlayProps } from './types';
 import type { ScreenBox } from './utils';
 
-function propsAreEqual(
+const propsAreEqual = (
   previousProps: BoxOverlayProps,
   nextProps: BoxOverlayProps,
-): boolean {
+): boolean => {
   const isSamePair = (first: unknown, second: unknown) =>
     Array.isArray(first) &&
     Array.isArray(second) &&
@@ -49,19 +49,20 @@ function propsAreEqual(
     previousProps.onBoxPress === nextProps.onBoxPress &&
     previousProps.style === nextProps.style
   );
-}
+};
 
-const OverlayBox = memo(function OverlayBox({
-  box,
-  showLabels,
-  onPress,
-  isPressable,
-}: {
-  box: ScreenBox;
-  showLabels: boolean;
-  onPress?: () => void;
-  isPressable: boolean;
-}) {
+const OverlayBox = memo(
+  ({
+    box,
+    showLabels,
+    onPress,
+    isPressable,
+  }: {
+    box: ScreenBox;
+    showLabels: boolean;
+    onPress?: () => void;
+    isPressable: boolean;
+  }) => {
   const borderStyle = useMemo(
     () => ({
       left: box.x,
@@ -101,9 +102,11 @@ const OverlayBox = memo(function OverlayBox({
       ) : null}
     </Pressable>
   );
-});
+  },
+);
+OverlayBox.displayName = 'OverlayBox';
 
-function BoxOverlay({
+const BoxOverlay = ({
   predictions = [],
   modelSize = [...DEFAULT_MODEL_SIZE],
   sourceSize = modelSize,
@@ -116,7 +119,7 @@ function BoxOverlay({
   enableTapDetails = false,
   onBoxPress = null,
   style,
-}: BoxOverlayProps) {
+}: BoxOverlayProps) => {
   const [layoutSize, setLayoutSize] = useState<[number, number]>([0, 0]);
   const [selectedBox, setSelectedBox] = useState<ScreenBox | null>(null);
   const previousBoxesByKeyRef = useRef(new Map<string, ScreenBox>());
@@ -245,6 +248,6 @@ function BoxOverlay({
       ) : null}
     </View>
   );
-}
+};
 
 export default memo(BoxOverlay, propsAreEqual);

@@ -22,7 +22,7 @@ export type VoiceIntent =
   | { type: 'already_in_voice_mode' }
   | { type: 'unsupported' };
 
-export function resolveVoiceIntent(normalized: string): VoiceIntent {
+export const resolveVoiceIntent = (normalized: string): VoiceIntent => {
   if (!normalized) {
     return { type: 'empty' };
   }
@@ -136,4 +136,4 @@ export function resolveVoiceIntent(normalized: string): VoiceIntent {
   }
 
   return { type: 'unsupported' };
-}
+};

@@ -27,7 +27,7 @@ const LEGACY_MIGRATION: Record<string, ThemeId> = {
   modern: 'neon',
 };
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [themeId, setThemeIdState] = useState<ThemeId>('accessibility');
 
   useEffect(() => {
@@ -67,12 +67,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return (
     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
-}
+};
 
-export function useTheme(): ThemeContextValue {
+export const useTheme = (): ThemeContextValue => {
   const ctx = useContext(ThemeContext);
   if (!ctx) {
     throw new Error('useTheme must be used within ThemeProvider');
   }
   return ctx;
-}
+};

@@ -1,7 +1,7 @@
 /**
  * Maps Firebase auth error codes/messages to user-friendly strings.
  */
-export function getAuthErrorMessage(error: unknown): string {
+export const getAuthErrorMessage = (error: unknown): string => {
   const msg = error instanceof Error ? error.message : String(error);
 
   // Firebase auth error codes (e.g. [auth/invalid-email])
@@ -37,4 +37,4 @@ export function getAuthErrorMessage(error: unknown): string {
   }
 
   return msg || 'Something went wrong. Please try again.';
-}
+};

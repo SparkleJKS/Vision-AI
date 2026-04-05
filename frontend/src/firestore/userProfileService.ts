@@ -14,29 +14,29 @@ import {
 
 const USERS_COLLECTION = 'users';
 
-function serverTimestamp(): FirebaseTimestamp {
+const serverTimestamp = (): FirebaseTimestamp => {
   return firestore.Timestamp.now() as unknown as FirebaseTimestamp;
-}
+};
 
-function mergeWithDefaults<T extends object>(
+const mergeWithDefaults = <T extends object>(
   defaults: T,
   partial: Partial<T> | null,
-): T {
+): T => {
   if (!partial) return defaults;
   return { ...defaults, ...partial };
-}
+};
 
-export async function getUserDocument(
+export const getUserDocument = async (
   uid: string,
-): Promise<UserDocument | null> {
+): Promise<UserDocument | null> => {
   const doc = await firestore().collection(USERS_COLLECTION).doc(uid).get();
   if (!doc.exists()) return null;
   return doc.data() as UserDocument;
-}
+};
 
-export async function createOrGetUserDocument(
+export const createOrGetUserDocument = async (
   uid: string,
-): Promise<UserDocument> {
+): Promise<UserDocument> => {
   const ref = firestore().collection(USERS_COLLECTION).doc(uid);
   const existing = await ref.get();
 
@@ -61,12 +61,12 @@ export async function createOrGetUserDocument(
 
   await ref.set(newDoc);
   return newDoc;
-}
+};
 
-export async function updateProfile(
+export const updateProfile = async (
   uid: string,
   profile: Partial<UserProfile>,
-): Promise<void> {
+): Promise<void> => {
   const ref = firestore().collection(USERS_COLLECTION).doc(uid);
   const existing = (await ref.get()).data() as UserDocument | undefined;
   const current = existing?.profile ?? {};
@@ -80,20 +80,20 @@ export async function updateProfile(
     },
     { merge: true },
   );
-}
+};
 
 /** Removes `profile.age` from the user document (e.g. user cleared the field). */
-export async function clearProfileAge(uid: string): Promise<void> {
+export const clearProfileAge = async (uid: string): Promise<void> => {
   await firestore().collection(USERS_COLLECTION).doc(uid).update({
     'profile.age': firestore.FieldValue.delete(),
     'profile.updatedAt': firestore.Timestamp.now(),
   });
-}
+};
 
-export async function updateSettings(
+export const updateSettings = async (
   uid: string,
   settings: Partial<UserSettings>,
-): Promise<void> {
+): Promise<void> => {
   const ref = firestore().collection(USERS_COLLECTION).doc(uid);
   const existing = (await ref.get()).data() as UserDocument | undefined;
   const current = existing?.settings ?? DEFAULT_USER_SETTINGS;
@@ -115,12 +115,12 @@ export async function updateSettings(
   };
 
   await ref.set({ settings: next }, { merge: true });
-}
+};
 
-export function subscribeToUserDocument(
+export const subscribeToUserDocument = (
   uid: string,
   onData: (doc: UserDocument | null) => void,
-): () => void {
+): (() => void) => {
   return firestore()
     .collection(USERS_COLLECTION)
     .doc(uid)
@@ -142,4 +142,4 @@ export function subscribeToUserDocument(
         onData(null);
       },
     );
-}
+};

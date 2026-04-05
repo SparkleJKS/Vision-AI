@@ -9,15 +9,17 @@ export type CameraPermissionResult = {
 };
 
 /** Map vision-camera status to a permission-like object for UI compatibility */
-export function statusToPermission(status: CameraPermissionStatus): {
+export const statusToPermission = (
+  status: CameraPermissionStatus,
+): {
   granted: boolean;
   canAskAgain: boolean;
-} {
+} => {
   return {
     granted: status === 'granted',
     canAskAgain: status === 'not-determined',
   };
-}
+};
 
 /**
  * Check if camera permission is granted.

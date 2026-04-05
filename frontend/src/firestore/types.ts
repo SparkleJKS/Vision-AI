@@ -16,11 +16,13 @@ export const GENDER_OPTIONS: { value: GenderOption; label: string }[] = [
   { value: 'prefer_not_to_say', label: 'Prefer not to say' },
 ];
 
-export function labelForGender(value: GenderOption | undefined | null): string {
+export const labelForGender = (
+  value: GenderOption | undefined | null,
+): string => {
   if (value == null) return 'Not set';
   const row = GENDER_OPTIONS.find(o => o.value === value);
   return row?.label ?? 'Not set';
-}
+};
 
 export interface UserProfile {
   displayName?: string;

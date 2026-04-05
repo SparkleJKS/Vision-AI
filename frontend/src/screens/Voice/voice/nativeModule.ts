@@ -1,10 +1,10 @@
 import { NativeModules } from 'react-native';
 import type { VoiceAssistantNativeModule } from './types';
 
-export function getVoiceAssistantModule():
+export const getVoiceAssistantModule = ():
   | VoiceAssistantNativeModule
-  | undefined {
+  | undefined => {
   return NativeModules?.VoiceAssistantModule as
     | VoiceAssistantNativeModule
     | undefined;
-}
+};

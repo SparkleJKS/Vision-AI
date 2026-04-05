@@ -29,18 +29,18 @@ type AuthContextValue = {
   clearAuthError: () => void;
 };
 
-function getLoginTypeFromUser(user: User | null): LoginType | null {
+const getLoginTypeFromUser = (user: User | null): LoginType | null => {
   if (!user?.providerData?.length) return null;
   const hasGoogle = user.providerData.some(p => p?.providerId === 'google.com');
   const hasEmail = user.providerData.some(p => p?.providerId === 'password');
   if (hasGoogle) return 'google';
   if (hasEmail) return 'email';
   return null;
-}
+};
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -187,10 +187,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
+};
 
-export function useAuth(): AuthContextValue {
+export const useAuth = (): AuthContextValue => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');
   return ctx;
-}
+};

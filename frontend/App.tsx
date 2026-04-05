@@ -10,16 +10,16 @@ import { MainContainer } from './src/screens/Main';
 import { store } from './src/store';
 import { logApp } from './src/utils/logger';
 
-function AppContent() {
+const AppContent = () => {
   const { theme } = useTheme();
   return (
     <View className="flex-1" style={{ backgroundColor: theme.screenBg }}>
       <MainContainer />
     </View>
   );
-}
+};
 
-export default function App() {
+const App = () => {
   useEffect(() => {
     logApp('ready', { mounted: true });
   }, []);
@@ -58,4 +58,6 @@ export default function App() {
       </ThemeProvider>
     </Provider>
   );
-}
+};
+
+export default App;

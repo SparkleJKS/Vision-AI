@@ -1,16 +1,16 @@
-export function normalizeCommand(value: string): string {
+export const normalizeCommand = (value: string): string => {
   return value
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
-}
+};
 
-export function includesAny(text: string, phrases: string[]): boolean {
+export const includesAny = (text: string, phrases: string[]): boolean => {
   return phrases.some(phrase => text.includes(phrase));
-}
+};
 
-export function isObjectDetectionCommand(text: string): boolean {
+export const isObjectDetectionCommand = (text: string): boolean => {
   if (
     includesAny(text, [
       'start object detection',
@@ -27,4 +27,4 @@ export function isObjectDetectionCommand(text: string): boolean {
     (text.includes('object') || text.includes('objects')) &&
     (text.includes('detect') || text.includes('detection'))
   );
-}
+};

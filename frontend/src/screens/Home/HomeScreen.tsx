@@ -16,12 +16,12 @@ import { useAuth } from '@/auth/AuthContext';
 import { navigationActions } from '@/store/actions/navigation';
 import type { AppDispatch } from '@/store';
 
-function getGreeting(): string {
+const getGreeting = (): string => {
   const hour = new Date().getHours();
   if (hour < 12) return 'Good Morning';
   if (hour < 17) return 'Good Afternoon';
   return 'Good Evening';
-}
+};
 
 const QUICK_ACTIONS = [
   {
