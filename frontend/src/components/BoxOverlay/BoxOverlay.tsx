@@ -23,10 +23,10 @@ import {
 import type { BoxOverlayProps } from './types';
 import type { ScreenBox } from './utils';
 
-function propsAreEqual(
+const propsAreEqual = (
   previousProps: BoxOverlayProps,
   nextProps: BoxOverlayProps,
-): boolean {
+): boolean => {
   const isSamePair = (first: unknown, second: unknown) =>
     Array.isArray(first) &&
     Array.isArray(second) &&
@@ -49,61 +49,66 @@ function propsAreEqual(
     previousProps.onBoxPress === nextProps.onBoxPress &&
     previousProps.style === nextProps.style
   );
-}
+};
 
-const OverlayBox = memo(function OverlayBox({
-  box,
-  showLabels,
-  onPress,
-  isPressable,
-}: {
-  box: ScreenBox;
-  showLabels: boolean;
-  onPress?: () => void;
-  isPressable: boolean;
-}) {
-  const borderStyle = useMemo(
-    () => ({
-      left: box.x,
-      top: box.y,
-      width: box.width,
-      height: box.height,
-      borderColor: box.color,
-    }),
-    [box.x, box.y, box.width, box.height, box.color],
-  );
+const OverlayBox = memo(
+  ({
+    box,
+    showLabels,
+    onPress,
+    isPressable,
+  }: {
+    box: ScreenBox;
+    showLabels: boolean;
+    onPress?: () => void;
+    isPressable: boolean;
+  }) => {
+    const borderStyle = useMemo(
+      () => ({
+        left: box.x,
+        top: box.y,
+        width: box.width,
+        height: box.height,
+        borderColor: box.color,
+      }),
+      [box.x, box.y, box.width, box.height, box.color],
+    );
 
-  const labelContainerStyle = useMemo(
-    () => ({ backgroundColor: hexToRgba(box.color, 0.85) }),
-    [box.color],
-  );
+    const labelContainerStyle = useMemo(
+      () => ({ backgroundColor: hexToRgba(box.color, 0.85) }),
+      [box.color],
+    );
 
-  const labelText = useMemo(
-    () => `${box.label} ${Math.round(box.confidence * 100)}%`,
-    [box.label, box.confidence],
-  );
+    const labelText = useMemo(
+      () => `${box.label} ${Math.round(box.confidence * 100)}%`,
+      [box.label, box.confidence],
+    );
 
-  return (
-    <Pressable
-      className="absolute border-2 rounded-md"
-      style={borderStyle}
-      onPress={onPress}
-      disabled={!isPressable}
-      pointerEvents={isPressable ? 'auto' : 'none'}>
-      {showLabels ? (
-        <View
-          className="absolute left-0 -top-6 max-w-[220px] rounded px-1.5 py-0.5"
-          style={labelContainerStyle}>
-          <Text className="text-white text-[11px] font-bold" numberOfLines={1}>
-            {labelText}
-          </Text>
-        </View>
-      ) : null}
-    </Pressable>
-  );
-});
+    return (
+      <Pressable
+        className="absolute border-2 rounded-md"
+        style={borderStyle}
+        onPress={onPress}
+        disabled={!isPressable}
+        pointerEvents={isPressable ? 'auto' : 'none'}>
+        {showLabels && (
+          <View
+            className="absolute left-0 -top-6 max-w-[220px] rounded px-1.5 py-0.5"
+            style={labelContainerStyle}>
+            <Text
+              className="text-white text-[11px] font-bold"
+              numberOfLines={1}>
+              {labelText}
+            </Text>
+          </View>
+        )}
+      </Pressable>
+    );
+  },
+);
+OverlayBox.displayName = 'OverlayBox';
 
-function BoxOverlay({
+const BoxOverlay = ({
   predictions = [],
   modelSize = [...DEFAULT_MODEL_SIZE],
   sourceSize = modelSize,
@@ -116,7 +121,7 @@ function BoxOverlay({
   enableTapDetails = false,
   onBoxPress = null,
   style,
-}: BoxOverlayProps) {
+}: BoxOverlayProps) => {
   const [layoutSize, setLayoutSize] = useState<[number, number]>([0, 0]);
   const [selectedBox, setSelectedBox] = useState<ScreenBox | null>(null);
   const previousBoxesByKeyRef = useRef(new Map<string, ScreenBox>());
@@ -245,6 +250,6 @@ function BoxOverlay({
       ) : null}
     </View>
   );
-}
+};
 
 export default memo(BoxOverlay, propsAreEqual);

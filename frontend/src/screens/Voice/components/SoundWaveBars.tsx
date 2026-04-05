@@ -4,10 +4,10 @@ import { BAR_COUNT, BAR_MAX, BAR_MIN } from '../voice/constants';
 
 export type SoundWaveBarsProps = { isActive: boolean; barColor?: string };
 
-export function SoundWaveBars({
+export const SoundWaveBars = ({
   isActive,
   barColor = '#6366F1',
-}: SoundWaveBarsProps) {
+}: SoundWaveBarsProps) => {
   const bars = useRef(
     Array.from({ length: BAR_COUNT }, () => new Animated.Value(BAR_MIN)),
   ).current;
@@ -81,4 +81,4 @@ export function SoundWaveBars({
       })}
     </View>
   );
-}
+};

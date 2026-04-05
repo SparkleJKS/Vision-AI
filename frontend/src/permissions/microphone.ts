@@ -1,6 +1,6 @@
 import { PermissionsAndroid, Platform } from 'react-native';
 
-export async function ensureMicrophonePermission(): Promise<boolean> {
+export const ensureMicrophonePermission = async (): Promise<boolean> => {
   if (Platform.OS !== 'android') return false;
 
   const permission = PermissionsAndroid.PERMISSIONS.RECORD_AUDIO;
@@ -15,4 +15,4 @@ export async function ensureMicrophonePermission(): Promise<boolean> {
     buttonNegative: 'Deny',
   });
   return result === PermissionsAndroid.RESULTS.GRANTED;
-}
+};

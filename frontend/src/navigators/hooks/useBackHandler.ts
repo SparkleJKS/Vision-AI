@@ -9,11 +9,11 @@ interface UseBackHandlerOptions {
   showExitPrompt?: boolean;
 }
 
-export function useBackHandler({
+export const useBackHandler = ({
   enabled = true,
   onBack,
   showExitPrompt = false,
-}: UseBackHandlerOptions = {}): void {
+}: UseBackHandlerOptions = {}): void => {
   const navigation =
     useNavigation<NavigationProp<Record<string, object | undefined>>>();
 
@@ -53,4 +53,4 @@ export function useBackHandler({
 
     return () => subscription.remove();
   }, [enabled, onBack, showExitPrompt, navigation]);
-}
+};

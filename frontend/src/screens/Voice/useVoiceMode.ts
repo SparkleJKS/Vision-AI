@@ -28,7 +28,7 @@ import type {
   VoiceStatePayload,
 } from './voice';
 
-export function useVoiceMode() {
+export const useVoiceMode = () => {
   const isFocused = useIsFocused();
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const voiceAssistantModule = useMemo(() => getVoiceAssistantModule(), []);
@@ -413,4 +413,4 @@ export function useVoiceMode() {
     statusText,
     toggleAssistant,
   };
-}
+};

@@ -32,11 +32,11 @@ const ALERTS = [
   },
 ];
 
-function getAlertAccent(
+const getAlertAccent = (
   theme: import('@/theme/tokens').ThemeTokens,
   type: AlertType,
   themeId: 'accessibility' | 'neon',
-): string {
+): string => {
   switch (type) {
     case 'warning':
       return theme.warning;
@@ -47,7 +47,7 @@ function getAlertAccent(
     default:
       return theme.primary;
   }
-}
+};
 
 const AlertsScreen = () => {
   const insets = useSafeAreaInsets();

@@ -65,7 +65,7 @@ const FEATURES: Feature[] = [
   },
 ];
 
-function FeatureCard({
+const FeatureCard = ({
   feature,
   onSelect,
   index,
@@ -77,7 +77,7 @@ function FeatureCard({
   index: number;
   theme: import('@/theme/tokens').ThemeTokens;
   themeId: 'accessibility' | 'neon';
-}) {
+}) => {
   const accent =
     themeId === 'accessibility' ? theme.primary : feature.accentColor;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -217,7 +217,7 @@ function FeatureCard({
       </Pressable>
     </Animated.View>
   );
-}
+};
 
 const FEATURE_TO_SCREEN: Record<FeatureId, keyof typeof ScreenNames> = {
   objectDetection: ScreenNames.ExploreObjectDetection,

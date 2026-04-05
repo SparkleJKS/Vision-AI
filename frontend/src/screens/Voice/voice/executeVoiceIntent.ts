@@ -20,10 +20,10 @@ export type VoiceIntentExecutorDeps = {
  * Runs side effects for a resolved intent (TTS + navigation). Keeps phrase
  * lists out of the screen component.
  */
-export async function executeVoiceIntent(
+export const executeVoiceIntent = async (
   intent: VoiceIntent,
   deps: VoiceIntentExecutorDeps,
-): Promise<void> {
+): Promise<void> => {
   const { navigation, speakReply, navigateAndConfirm, deactivateAssistant } =
     deps;
 
@@ -143,4 +143,4 @@ export async function executeVoiceIntent(
       );
       return;
   }
-}
+};

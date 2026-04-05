@@ -42,12 +42,12 @@ type NativeYoloModule = {
   getLatestDetections?: () => NativeYoloDetection[];
 };
 
-export function useExploreDetection({
+export const useExploreDetection = ({
   isFocused,
   selectedRuntime,
   tfliteDelegate,
   nmsEnabled,
-}: UseExploreDetectionOptions) {
+}: UseExploreDetectionOptions) => {
   const nativeYoloModule = NativeModules?.YoloInferenceModule as
     | NativeYoloModule
     | undefined;
@@ -57,7 +57,7 @@ export function useExploreDetection({
 
   const lastFrameAtRef = useRef<number | null>(null);
 
-  const [isDetecting, setIsDetecting] = useState(false);
+  const [isDetecting, setIsDetecting] = useState<boolean>(false);
   const [activeRuntime, setActiveRuntime] = useState<string | null>(null);
   const [runtimeStatus, setRuntimeStatus] = useState<RuntimeStatus>('idle');
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -67,9 +67,9 @@ export function useExploreDetection({
   const [preprocessMs, setPreprocessMs] = useState<number | null>(null);
   const [totalMs, setTotalMs] = useState<number | null>(null);
   const [latencyHistory, setLatencyHistory] = useState<number[]>([]);
-  const [currentStride, setCurrentStride] = useState(1);
-  const [droppedFrames, setDroppedFrames] = useState(0);
-  const [targetBudgetMs, setTargetBudgetMs] = useState(
+  const [currentStride, setCurrentStride] = useState<number>(1);
+  const [droppedFrames, setDroppedFrames] = useState<number>(0);
+  const [targetBudgetMs, setTargetBudgetMs] = useState<number>(
     1000 / MAX_INFERENCE_FPS,
   );
   const [modelSize, setModelSize] = useState<number[]>(
@@ -78,7 +78,7 @@ export function useExploreDetection({
   const [sourceSize, setSourceSize] = useState<number[]>(
     INPUT_RESOLUTION as unknown as number[],
   );
-  const [isSwitchingRuntime, setIsSwitchingRuntime] = useState(false);
+  const [isSwitchingRuntime, setIsSwitchingRuntime] = useState<boolean>(false);
 
   const effectiveNmsIoU = nmsEnabled ? NMS_IOU : 1;
 
@@ -269,4 +269,4 @@ export function useExploreDetection({
     stopDetection,
     latencyBars,
   };
-}
+};

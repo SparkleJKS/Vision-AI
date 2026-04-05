@@ -9,7 +9,7 @@ type PermissionState = {
   canAskAgain: boolean;
 } | null;
 
-export function useExplorePermissions() {
+export const useExplorePermissions = () => {
   const [permission, setPermission] = useState<PermissionState>(null);
 
   const refreshPermission = useCallback(() => {
@@ -49,4 +49,4 @@ export function useExplorePermissions() {
   }, [permission?.canAskAgain, refreshPermission]);
 
   return { permission, refreshPermission, handlePermissionButtonPress };
-}
+};

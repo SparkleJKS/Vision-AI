@@ -6,28 +6,28 @@ import {
   COLOR_PALETTE,
 } from './config';
 
-export function toFiniteNumber(value: unknown, fallback = NaN): number {
+export const toFiniteNumber = (value: unknown, fallback = NaN): number => {
   const numericValue = typeof value === 'number' ? value : Number(value);
   return Number.isFinite(numericValue) ? numericValue : fallback;
-}
+};
 
-export function clamp(value: number, min: number, max: number): number {
+export const clamp = (value: number, min: number, max: number): number => {
   return Math.min(Math.max(value, min), max);
-}
+};
 
-export function normalizeSize(
+export const normalizeSize = (
   size: unknown,
   fallback: number[] = [...DEFAULT_MODEL_SIZE] as number[],
-): number[] {
+): number[] => {
   if (Array.isArray(size) && size.length === 2) {
     const width = Math.trunc(toFiniteNumber(size[0], NaN));
     const height = Math.trunc(toFiniteNumber(size[1], NaN));
     if (width > 0 && height > 0) return [width, height];
   }
   return [...fallback];
-}
+};
 
-export function normalizeBbox(bbox: unknown): number[] | null {
+export const normalizeBbox = (bbox: unknown): number[] | null => {
   if (!Array.isArray(bbox) || bbox.length < 4) return null;
   const x1 = toFiniteNumber(bbox[0], NaN);
   const y1 = toFiniteNumber(bbox[1], NaN);
@@ -40,15 +40,15 @@ export function normalizeBbox(bbox: unknown): number[] | null {
     Math.max(x1, x2),
     Math.max(y1, y2),
   ];
-}
+};
 
-export function isNormalizedBbox([x1, y1, x2, y2]: number[]): boolean {
+export const isNormalizedBbox = ([x1, y1, x2, y2]: number[]): boolean => {
   return x1 >= 0 && y1 >= 0 && x2 <= 1.01 && y2 <= 1.01;
-}
+};
 
-export function getPredictionClassKey(
+export const getPredictionClassKey = (
   prediction: Record<string, unknown>,
-): string {
+): string => {
   const className =
     typeof prediction?.className === 'string' &&
     (prediction.className as string).trim()
@@ -61,22 +61,22 @@ export function getPredictionClassKey(
   if (typeof classId === 'string' && (classId as string).trim())
     return (classId as string).trim().toLowerCase();
   return 'unknown';
-}
+};
 
-export function hashString(input: string): number {
+export const hashString = (input: string): number => {
   let hash = 2166136261;
   for (let i = 0; i < input.length; i++) {
     hash ^= input.charCodeAt(i);
     hash *= 16777619;
   }
   return Math.abs(hash >>> 0);
-}
+};
 
-export function getClassColor(classKey: string): string {
+export const getClassColor = (classKey: string): string => {
   return COLOR_PALETTE[hashString(classKey) % COLOR_PALETTE.length];
-}
+};
 
-export function hexToRgba(hexColor: string, alpha: number): string {
+export const hexToRgba = (hexColor: string, alpha: number): string => {
   const hex = hexColor.replace('#', '');
   const value =
     hex.length === 3
@@ -90,7 +90,7 @@ export function hexToRgba(hexColor: string, alpha: number): string {
   const blue = parseInt(value.slice(4, 6), 16);
   const normalizedAlpha = clamp(alpha, 0, 1);
   return `rgba(${red}, ${green}, ${blue}, ${normalizedAlpha})`;
-}
+};
 
 export interface DisplayTransform {
   scaleX: number;
@@ -99,13 +99,13 @@ export interface DisplayTransform {
   offsetY: number;
 }
 
-export function getDisplayTransform(
+export const getDisplayTransform = (
   sourceWidth: number,
   sourceHeight: number,
   overlayWidth: number,
   overlayHeight: number,
   resizeMode: string,
-): DisplayTransform {
+): DisplayTransform => {
   if (resizeMode === 'stretch') {
     return {
       scaleX: overlayWidth / sourceWidth,
@@ -124,14 +124,14 @@ export function getDisplayTransform(
     offsetX: (overlayWidth - sourceWidth * uniformScale) / 2,
     offsetY: (overlayHeight - sourceHeight * uniformScale) / 2,
   };
-}
+};
 
-export function modelToSourceBox(
+export const modelToSourceBox = (
   modelBox: number[],
   modelSize: number[],
   sourceSize: number[],
   modelResizeMode: string,
-): number[] {
+): number[] => {
   const [modelWidth, modelHeight] = modelSize;
   const [sourceWidth, sourceHeight] = sourceSize;
   if (modelResizeMode === 'letterbox') {
@@ -151,14 +151,14 @@ export function modelToSourceBox(
     modelBox[2] * (sourceWidth / modelWidth),
     modelBox[3] * (sourceHeight / modelHeight),
   ];
-}
+};
 
-export function sourceToScreenBox(
+export const sourceToScreenBox = (
   sourceBox: number[],
   sourceSize: number[],
   overlaySize: number[],
   resizeMode: string,
-): number[] {
+): number[] => {
   const [sourceWidth, sourceHeight] = sourceSize;
   const [overlayWidth, overlayHeight] = overlaySize;
   const transform = getDisplayTransform(
@@ -177,9 +177,12 @@ export function sourceToScreenBox(
   const right = clamp(Math.max(x1, x2), 0, overlayWidth);
   const bottom = clamp(Math.max(y1, y2), 0, overlayHeight);
   return [left, top, right, bottom];
-}
+};
 
-export function toModelSpaceBox(bbox: number[], modelSize: number[]): number[] {
+export const toModelSpaceBox = (
+  bbox: number[],
+  modelSize: number[],
+): number[] => {
   if (isNormalizedBbox(bbox)) {
     return [
       bbox[0] * modelSize[0],
@@ -189,7 +192,7 @@ export function toModelSpaceBox(bbox: number[], modelSize: number[]): number[] {
     ];
   }
   return bbox;
-}
+};
 
 export interface SanitizedPrediction {
   raw: Record<string, unknown>;
@@ -199,9 +202,9 @@ export interface SanitizedPrediction {
   label: string;
 }
 
-export function sanitizePrediction(
+export const sanitizePrediction = (
   prediction: Record<string, unknown>,
-): SanitizedPrediction | null {
+): SanitizedPrediction | null => {
   const bbox = normalizeBbox(prediction?.bbox ?? prediction?.box);
   if (!bbox) return null;
   const confidence = clamp(
@@ -216,7 +219,7 @@ export function sanitizePrediction(
       ? (prediction.className as string).trim()
       : classKey.replace(/^class_/, 'class ');
   return { raw: prediction, bbox, confidence, classKey, label };
-}
+};
 
 export interface MapPredictionsOptions {
   predictions: Record<string, unknown>[];
@@ -243,9 +246,9 @@ export interface ScreenBox {
   sourceBox: number[];
 }
 
-export function mapPredictionsToScreen(
+export const mapPredictionsToScreen = (
   options: MapPredictionsOptions,
-): ScreenBox[] {
+): ScreenBox[] => {
   const {
     predictions,
     modelSize,
@@ -304,18 +307,18 @@ export function mapPredictionsToScreen(
       };
     })
     .filter((b): b is ScreenBox => b !== null);
-}
+};
 
 export interface SmoothBoxesResult {
   boxes: ScreenBox[];
   nextBoxesByKey: Map<string, ScreenBox>;
 }
 
-export function smoothBoxes(
+export const smoothBoxes = (
   targetBoxes: ScreenBox[],
   previousBoxesByKey: Map<string, ScreenBox>,
   smoothingAlpha: number,
-): SmoothBoxesResult {
+): SmoothBoxesResult => {
   const alpha = clamp(smoothingAlpha, 0, 1);
   const nextBoxesByKey = new Map<string, ScreenBox>();
 
@@ -337,4 +340,4 @@ export function smoothBoxes(
   });
 
   return { boxes: smoothed, nextBoxesByKey };
-}
+};

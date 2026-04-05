@@ -26,7 +26,7 @@ class SplashErrorBoundary extends Component<Props, { hasError: boolean }> {
   }
 }
 
-function FallbackSplash() {
+const FallbackSplash = () => {
   const { width, height } = useWindowDimensions();
   const { theme } = useTheme();
   return (
@@ -41,7 +41,7 @@ function FallbackSplash() {
       <ActivityIndicator size="large" color={theme.primary} className="mt-2" />
     </View>
   );
-}
+};
 
 const Splash = () => {
   const { width, height } = useWindowDimensions();

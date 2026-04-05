@@ -47,10 +47,7 @@ type CornerBracketProps = {
   color: string;
 };
 
-const CornerBracket = memo(function CornerBracket({
-  position,
-  color,
-}: CornerBracketProps) {
+const CornerBracket = memo(({ position, color }: CornerBracketProps) => {
   const style = useMemo(
     () => [
       styles.corner,
@@ -61,6 +58,7 @@ const CornerBracket = memo(function CornerBracket({
   );
   return <View style={style} />;
 });
+CornerBracket.displayName = 'CornerBracket';
 
 const ExploreQrScreen = () => {
   const navigation = useNavigation();

@@ -187,7 +187,7 @@ const BOX_COLORS = [
 
 const getColor = (classId: number) => BOX_COLORS[classId % BOX_COLORS.length];
 
-function useLatestDetectionsLoop(enabled: boolean) {
+const useLatestDetectionsLoop = (enabled: boolean) => {
   const latestDetectionsRef = useRef<Detection[]>([]);
   const detectionsVersionRef = useRef(0);
 
@@ -208,7 +208,7 @@ function useLatestDetectionsLoop(enabled: boolean) {
   }, [enabled]);
 
   return { latestDetectionsRef, detectionsVersionRef };
-}
+};
 
 const DetectionOverlay = ({ enabled = true }: DetectionOverlayProps) => {
   const { latestDetectionsRef, detectionsVersionRef } =
