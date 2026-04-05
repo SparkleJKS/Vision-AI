@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/auth/AuthContext';
+import { error as logError } from '@/utils/logger';
 import {
   createOrGetUserDocument,
   subscribeToUserDocument,
@@ -20,7 +21,7 @@ import { DEFAULT_USER_SETTINGS } from './types';
 export const useUserProfile = () => {
   const { user } = useAuth();
   const [doc, setDoc] = useState<UserDocument | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,6 +40,10 @@ export const useUserProfile = () => {
         setDoc(initial);
       })
       .catch(err => {
+        logError('Firestore:useUserProfile bootstrap', {
+          uid: user.uid,
+          message: String(err?.message ?? err),
+        });
         setError(err?.message ?? 'Failed to load profile');
         setDoc(null);
       })

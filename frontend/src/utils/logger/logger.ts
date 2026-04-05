@@ -142,4 +142,80 @@ const logApp = (phase: string, details?: Record<string, unknown>) => {
   });
 };
 
-export { log, info, warn, error, debug, display, logEvent, logApi, logApp };
+/** JSON-safe values for logs (e.g. Firestore `changes` meta; timestamps → short strings). */
+const serializeForLog = (v: unknown): unknown => {
+  if (v === undefined) return '(undefined)';
+  if (v === null) return null;
+  if (typeof v === 'number' || typeof v === 'boolean' || typeof v === 'string')
+    return v;
+  if (typeof v === 'object' && v !== null) {
+    const plain = v as {
+      seconds?: number;
+      nanoseconds?: number;
+      toDate?: () => Date;
+    };
+    if (
+      typeof plain.seconds === 'number' &&
+      typeof plain.nanoseconds === 'number'
+    ) {
+      return `<ts ${plain.seconds}s>`;
+    }
+    if (typeof plain.toDate === 'function') {
+      try {
+        return `<ts ${plain.toDate().toISOString()}>`;
+      } catch {
+        return '<ts>';
+      }
+    }
+    try {
+      return JSON.parse(JSON.stringify(v)) as unknown;
+    } catch {
+      return String(v);
+    }
+  }
+  return String(v);
+};
+
+/**
+ * Firestore reads/writes/listeners — use for every Firestore touchpoint so
+ * Reactotron stays searchable. New Firestore code should call this (or `error`
+ * on failure) for parity.
+ *
+ * For writes, prefer `meta.changes` as `Record<string, { before; after }>` so
+ * diffs are visible in the log preview.
+ */
+const logFirestore = (
+  verb:
+    | 'get'
+    | 'create'
+    | 'set_merge'
+    | 'update'
+    | 'delete_field'
+    | 'listen_start'
+    | 'listen_error',
+  path: string,
+  meta?: Record<string, unknown>,
+) => {
+  if (!isDev) return;
+  const important = verb === 'listen_error';
+  display({
+    name: `Firestore ${verb}: ${path}`,
+    preview: meta ? JSON.stringify(meta) : '',
+    value: meta ?? null,
+    important,
+  });
+};
+
+export {
+  log,
+  info,
+  warn,
+  error,
+  debug,
+  display,
+  logEvent,
+  logApi,
+  logApp,
+  serializeForLog,
+  logFirestore,
+};
