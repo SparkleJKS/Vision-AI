@@ -11,7 +11,14 @@ import {
   type EmergencyContactEntry,
   type GenderOption,
 } from '@/firestore';
+import { showToast } from '@/utils/toast';
 import { MAX_AGE, MIN_AGE } from '../constants';
+
+const toastSaveFailed = () =>
+  showToast.error(
+    "Couldn't save changes",
+    'Check your connection and try again.',
+  );
 
 export const usePersonalDetailsForm = () => {
   const { user } = useAuth();
@@ -91,6 +98,8 @@ export const usePersonalDetailsForm = () => {
       try {
         await updateProfile({ gender: value });
         setGenderModalOpen(false);
+      } catch {
+        toastSaveFailed();
       } finally {
         setSavingGender(false);
       }
@@ -104,6 +113,8 @@ export const usePersonalDetailsForm = () => {
       try {
         await updateProfile({ bloodGroup: value });
         setBloodModalOpen(false);
+      } catch {
+        toastSaveFailed();
       } finally {
         setSavingBlood(false);
       }
@@ -116,6 +127,8 @@ export const usePersonalDetailsForm = () => {
     try {
       await removeProfileBloodGroup();
       setBloodModalOpen(false);
+    } catch {
+      toastSaveFailed();
     } finally {
       setSavingBlood(false);
     }
@@ -128,6 +141,8 @@ export const usePersonalDetailsForm = () => {
         setSavingAge(true);
         try {
           await removeProfileAge();
+        } catch {
+          toastSaveFailed();
         } finally {
           setSavingAge(false);
         }
@@ -144,6 +159,8 @@ export const usePersonalDetailsForm = () => {
     setSavingAge(true);
     try {
       await updateProfile({ age: n });
+    } catch {
+      toastSaveFailed();
     } finally {
       setSavingAge(false);
     }
@@ -156,6 +173,8 @@ export const usePersonalDetailsForm = () => {
     setSavingExtras(true);
     try {
       await updateProfile({ cityOrArea: next });
+    } catch {
+      toastSaveFailed();
     } finally {
       setSavingExtras(false);
     }
@@ -185,6 +204,8 @@ export const usePersonalDetailsForm = () => {
     setSavingExtras(true);
     try {
       await updateEmergencyContacts(user.uid, emergencyContactsDraft);
+    } catch {
+      toastSaveFailed();
     } finally {
       setSavingExtras(false);
     }
@@ -208,6 +229,8 @@ export const usePersonalDetailsForm = () => {
       setSavingExtras(true);
       try {
         await updateEmergencyContacts(user.uid, next);
+      } catch {
+        toastSaveFailed();
       } finally {
         setSavingExtras(false);
       }
@@ -222,6 +245,8 @@ export const usePersonalDetailsForm = () => {
     setSavingExtras(true);
     try {
       await updateProfile({ medicalNotes: next });
+    } catch {
+      toastSaveFailed();
     } finally {
       setSavingExtras(false);
     }
@@ -234,6 +259,8 @@ export const usePersonalDetailsForm = () => {
     setSavingExtras(true);
     try {
       await updateProfile({ occupation: next });
+    } catch {
+      toastSaveFailed();
     } finally {
       setSavingExtras(false);
     }
@@ -246,6 +273,8 @@ export const usePersonalDetailsForm = () => {
     setSavingExtras(true);
     try {
       await updateProfile({ livingSituation: next });
+    } catch {
+      toastSaveFailed();
     } finally {
       setSavingExtras(false);
     }

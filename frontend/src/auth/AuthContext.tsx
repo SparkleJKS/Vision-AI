@@ -9,6 +9,7 @@ import { useDispatch } from 'react-redux';
 import type { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { AUTH_CONFIG } from '@/configs/auth';
 import { logEvent, logApp, error } from '@/utils/logger';
+import { showToast } from '@/utils/toast';
 import { getAuthErrorMessage } from './authErrors';
 import { authActions } from '@/store/slices/authSlice';
 import type { LoginType } from '@/store/slices/authSlice';
@@ -171,6 +172,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       logEvent('Auth:SignOutSuccess');
     } catch (err) {
       logEvent('Auth:SignOutError', { error: String(err) });
+      showToast.error(
+        "Couldn't sign out",
+        'Something went wrong. Please try again.',
+      );
     }
   }, []);
 

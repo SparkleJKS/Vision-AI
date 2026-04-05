@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Tts from 'react-native-tts';
 import { useTheme } from '@/theme';
 import { logEvent, warn, error } from '@/utils/logger';
+import { showToast } from '@/utils/toast';
 
 const LOG_NAME = 'ExploreTts';
 
@@ -64,6 +65,10 @@ const ExploreTtsScreen = () => {
     const handleError = (err: { message?: string; code?: string }) => {
       setIsSpeaking(false);
       error(LOG_NAME, 'TTS error', err?.message ?? err?.code ?? err);
+      showToast.error(
+        'Speech failed',
+        'Text-to-speech hit an error. Try again or restart the app.',
+      );
     };
 
     const initializeTts = async () => {
@@ -77,6 +82,10 @@ const ExploreTtsScreen = () => {
       } catch (e) {
         setIsReady(false);
         warn(LOG_NAME, 'TTS initialization failed', e);
+        showToast.error(
+          'Voice preview unavailable',
+          'Text-to-speech could not start on this device.',
+        );
       }
     };
 

@@ -25,6 +25,7 @@ import {
 import type { CameraPermissionStatus, Code } from 'react-native-vision-camera';
 import { useTheme } from '@/theme';
 import { logEvent, warn, error } from '@/utils/logger';
+import { showToast } from '@/utils/toast';
 import {
   CORNER_SIZE,
   CORNER_THICKNESS,
@@ -176,6 +177,7 @@ const ExploreQrScreen = () => {
         logEvent(`${LOG_NAME}_open_settings`, {});
       } catch (e) {
         error(LOG_NAME, 'Failed to open app settings', e);
+        showToast.error("Couldn't open Settings", 'Open Settings manually from your device.');
       }
     }
     refreshPermissionStatus();
@@ -333,9 +335,13 @@ const ExploreQrScreen = () => {
                     }}
                     onPress={() => {
                       logEvent(`${LOG_NAME}_open_link`, { url: urlToOpen });
-                      Linking.openURL(urlToOpen).catch(e =>
-                        error(LOG_NAME, 'Failed to open URL', urlToOpen, e),
-                      );
+                      Linking.openURL(urlToOpen).catch(e => {
+                        error(LOG_NAME, 'Failed to open URL', urlToOpen, e);
+                        showToast.error(
+                          "Couldn't open link",
+                          'No app can handle this URL.',
+                        );
+                      });
                     }}>
                     <Text
                       className="text-[13px] font-bold"

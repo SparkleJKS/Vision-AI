@@ -5,6 +5,7 @@ import {
   type EmergencyContactEntry,
 } from '@/firestore';
 import type { ThemeTokens } from '@/theme';
+import { showToast } from '@/utils/toast';
 import { MAX_EC_NAME, MAX_EC_PHONE, MAX_EC_RELATIONSHIP } from '../constants';
 import { ProfileTextField } from './ProfileTextField';
 
@@ -23,6 +24,11 @@ type Props = {
   savingExtras: boolean;
 };
 
+const contactHasAnyDetail = (c: EmergencyContactEntry) =>
+  c.name.trim() !== '' ||
+  c.phone.trim() !== '' ||
+  c.relationship.trim() !== '';
+
 export const EmergencyContactsEditor = ({
   theme,
   contacts,
@@ -35,6 +41,18 @@ export const EmergencyContactsEditor = ({
 }: Props) => {
   const canAdd = contacts.length < MAX_EMERGENCY_CONTACTS;
   const inputLocked = !editable || savingExtras;
+
+  const handleAddPress = () => {
+    const first = contacts[0];
+    if (!first || !contactHasAnyDetail(first)) {
+      showToast.info(
+        'Finish contact 1 first',
+        'Add a name, phone, or relationship before adding another contact.',
+      );
+      return;
+    }
+    onAdd();
+  };
 
   return (
     <View className="gap-4">
@@ -109,7 +127,7 @@ export const EmergencyContactsEditor = ({
             borderColor: theme.primary,
             backgroundColor: theme.cardBg,
           }}
-          onPress={onAdd}
+          onPress={handleAddPress}
           disabled={inputLocked}
           activeOpacity={0.85}>
           <Ionicons name="add-circle-outline" size={22} color={theme.primary} />
@@ -120,6 +138,10 @@ export const EmergencyContactsEditor = ({
           </Text>
         </TouchableOpacity>
       )}
+      <Text className="text-xs" style={{ color: theme.muted }}>
+        Up to {MAX_EMERGENCY_CONTACTS} contacts. Fill contact 1 before adding
+        another. Saves when you leave a field.
+      </Text>
     </View>
   );
 };
