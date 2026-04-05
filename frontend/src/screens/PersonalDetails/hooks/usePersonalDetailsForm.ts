@@ -1,8 +1,14 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '@/auth/AuthContext';
 import {
+  emergencyContactsDraftFromProfile,
+  emergencyContactsEqual,
+  emergencyContactsFromStored,
+  MAX_EMERGENCY_CONTACTS,
+  updateEmergencyContacts,
   useUserProfile,
   type BloodGroupOption,
+  type EmergencyContactEntry,
   type GenderOption,
 } from '@/firestore';
 import { MAX_AGE, MIN_AGE } from '../constants';
@@ -25,7 +31,9 @@ export const usePersonalDetailsForm = () => {
 
   const [ageInput, setAgeInput] = useState<number | null>(null);
   const [cityDraft, setCityDraft] = useState<string>('');
-  const [emergencyDraft, setEmergencyDraft] = useState<string>('');
+  const [emergencyContactsDraft, setEmergencyContactsDraft] = useState<
+    EmergencyContactEntry[]
+  >([{ name: '', phone: '', relationship: '' }]);
   const [medicalDraft, setMedicalDraft] = useState<string>('');
   const [occupationDraft, setOccupationDraft] = useState<string>('');
   const [livingDraft, setLivingDraft] = useState<string>('');
@@ -35,6 +43,14 @@ export const usePersonalDetailsForm = () => {
   const [savingAge, setSavingAge] = useState<boolean>(false);
   const [savingExtras, setSavingExtras] = useState<boolean>(false);
   const [ageHint, setAgeHint] = useState<string | null>(null);
+
+  const profileEmergencyKey = useMemo(
+    () => JSON.stringify(profile?.emergencyContacts ?? null),
+    [profile?.emergencyContacts],
+  );
+
+  const profileRef = useRef(profile);
+  profileRef.current = profile;
 
   useEffect(() => {
     if (profile?.age != null && !Number.isNaN(profile.age)) {
@@ -46,17 +62,21 @@ export const usePersonalDetailsForm = () => {
 
   useEffect(() => {
     setCityDraft(profile?.cityOrArea ?? '');
-    setEmergencyDraft(profile?.emergencyContact ?? '');
     setMedicalDraft(profile?.medicalNotes ?? '');
     setOccupationDraft(profile?.occupation ?? '');
     setLivingDraft(profile?.livingSituation ?? '');
   }, [
     profile?.cityOrArea,
-    profile?.emergencyContact,
     profile?.medicalNotes,
     profile?.occupation,
     profile?.livingSituation,
   ]);
+
+  useEffect(() => {
+    setEmergencyContactsDraft(
+      emergencyContactsDraftFromProfile(profileRef.current),
+    );
+  }, [profileEmergencyKey]);
 
   const authDisplayName =
     user?.displayName?.trim() ||
@@ -141,17 +161,59 @@ export const usePersonalDetailsForm = () => {
     }
   }, [cityDraft, profile?.cityOrArea, updateProfile]);
 
-  const commitEmergency = useCallback(async () => {
-    const next = emergencyDraft.trim();
-    const prev = profile?.emergencyContact ?? '';
-    if (next === prev) return;
+  const updateEmergencyField = useCallback(
+    (index: number, field: keyof EmergencyContactEntry, value: string) => {
+      setEmergencyContactsDraft(prev => {
+        const next = [...prev];
+        next[index] = { ...next[index], [field]: value };
+        return next;
+      });
+    },
+    [],
+  );
+
+  const commitEmergencyContacts = useCallback(async () => {
+    if (!user?.uid) return;
+    if (
+      emergencyContactsEqual(
+        emergencyContactsDraft,
+        emergencyContactsFromStored(profile),
+      )
+    ) {
+      return;
+    }
     setSavingExtras(true);
     try {
-      await updateProfile({ emergencyContact: next });
+      await updateEmergencyContacts(user.uid, emergencyContactsDraft);
     } finally {
       setSavingExtras(false);
     }
-  }, [emergencyDraft, profile?.emergencyContact, updateProfile]);
+  }, [emergencyContactsDraft, profile, user?.uid]);
+
+  const addEmergencyContact = useCallback(() => {
+    setEmergencyContactsDraft(prev => {
+      if (prev.length >= MAX_EMERGENCY_CONTACTS) return prev;
+      return [...prev, { name: '', phone: '', relationship: '' }];
+    });
+  }, []);
+
+  const removeEmergencyContact = useCallback(
+    async (index: number) => {
+      if (!user?.uid) return;
+      const next =
+        emergencyContactsDraft.length <= 1
+          ? [{ name: '', phone: '', relationship: '' }]
+          : emergencyContactsDraft.filter((_, i) => i !== index);
+      setEmergencyContactsDraft(next);
+      setSavingExtras(true);
+      try {
+        await updateEmergencyContacts(user.uid, next);
+      } finally {
+        setSavingExtras(false);
+      }
+    },
+    [emergencyContactsDraft, user?.uid],
+  );
 
   const commitMedical = useCallback(async () => {
     const next = medicalDraft.trim();
@@ -213,9 +275,11 @@ export const usePersonalDetailsForm = () => {
     cityDraft,
     setCityDraft,
     commitCity,
-    emergencyDraft,
-    setEmergencyDraft,
-    commitEmergency,
+    emergencyContactsDraft,
+    updateEmergencyField,
+    commitEmergencyContacts,
+    addEmergencyContact,
+    removeEmergencyContact,
     medicalDraft,
     setMedicalDraft,
     commitMedical,

@@ -1,9 +1,14 @@
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
-import { labelForBloodGroup, type UserProfile } from '@/firestore';
+import {
+  labelForBloodGroup,
+  type EmergencyContactEntry,
+  type UserProfile,
+} from '@/firestore';
 import type { ThemeTokens } from '@/theme';
-import { MAX_EMERGENCY, MAX_MEDICAL } from '../constants';
+import { MAX_MEDICAL } from '../constants';
 import { CollapsibleSection } from './CollapsibleSection';
+import { EmergencyContactsEditor } from './EmergencyContactsEditor';
 import { ProfileTextField } from './ProfileTextField';
 
 type Props = {
@@ -11,9 +16,15 @@ type Props = {
   expanded: boolean;
   onToggle: () => void;
   profile: UserProfile | null;
-  emergencyDraft: string;
-  setEmergencyDraft: (s: string) => void;
-  onCommitEmergency: () => void;
+  emergencyContactsDraft: EmergencyContactEntry[];
+  onEmergencyFieldChange: (
+    index: number,
+    field: keyof EmergencyContactEntry,
+    value: string,
+  ) => void;
+  onCommitEmergencyContacts: () => void;
+  onAddEmergencyContact: () => void;
+  onRemoveEmergencyContact: (index: number) => void;
   medicalDraft: string;
   setMedicalDraft: (s: string) => void;
   onCommitMedical: () => void;
@@ -28,9 +39,11 @@ export const SafetySection = ({
   expanded,
   onToggle,
   profile,
-  emergencyDraft,
-  setEmergencyDraft,
-  onCommitEmergency,
+  emergencyContactsDraft,
+  onEmergencyFieldChange,
+  onCommitEmergencyContacts,
+  onAddEmergencyContact,
+  onRemoveEmergencyContact,
   medicalDraft,
   setMedicalDraft,
   onCommitMedical,
@@ -45,23 +58,25 @@ export const SafetySection = ({
     expanded={expanded}
     onToggle={onToggle}
     theme={theme}>
-    <ProfileTextField
+    <EmergencyContactsEditor
       theme={theme}
-      label="Emergency contact"
-      value={emergencyDraft}
-      onChangeText={setEmergencyDraft}
-      onBlur={onCommitEmergency}
-      maxLength={MAX_EMERGENCY}
-      multiline
-      minHeight={88}
-      placeholder="Name, phone, relationship"
-      editable={editable && !savingExtras}
+      contacts={emergencyContactsDraft}
+      onChangeField={onEmergencyFieldChange}
+      onBlurCommit={() => {
+        void onCommitEmergencyContacts();
+      }}
+      onAdd={onAddEmergencyContact}
+      onRemove={index => {
+        void onRemoveEmergencyContact(index);
+      }}
+      editable={editable}
+      savingExtras={savingExtras}
     />
     <View>
       <Text
         className="text-xs font-semibold mb-2"
         style={{ color: theme.grey }}>
-        Blood group (optional)
+        Blood group (Optional)
       </Text>
       <TouchableOpacity
         className="rounded-xl border px-3 py-3 flex-row items-center justify-between"

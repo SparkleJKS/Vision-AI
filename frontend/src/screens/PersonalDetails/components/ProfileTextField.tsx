@@ -1,4 +1,4 @@
-import { Text, TextInput, View } from 'react-native';
+import { Text, TextInput, View, type TextInputProps } from 'react-native';
 import type { ThemeTokens } from '@/theme';
 
 export type ProfileTextFieldProps = {
@@ -13,6 +13,7 @@ export type ProfileTextFieldProps = {
   placeholder: string;
   minHeight?: number;
   editable: boolean;
+  keyboardType?: TextInputProps['keyboardType'];
 };
 
 export const ProfileTextField = ({
@@ -27,6 +28,7 @@ export const ProfileTextField = ({
   placeholder,
   minHeight,
   editable,
+  keyboardType = 'default',
 }: ProfileTextFieldProps) => {
   const inputSurface = {
     backgroundColor: theme.cardBg,
@@ -40,9 +42,7 @@ export const ProfileTextField = ({
         className="text-xs font-semibold mb-2"
         style={{ color: theme.grey }}>
         {label}
-        {optional ? (
-          <Text style={{ color: theme.muted }}> (optional)</Text>
-        ) : null}
+        {optional && <Text style={{ color: theme.muted }}> (Optional)</Text>}
       </Text>
       <TextInput
         value={value}
@@ -54,6 +54,7 @@ export const ProfileTextField = ({
         placeholderTextColor={theme.grey}
         maxLength={maxLength}
         multiline={multiline}
+        keyboardType={keyboardType}
         textAlignVertical={multiline ? 'top' : 'center'}
         editable={editable}
         className="text-base font-semibold py-2 px-3 rounded-xl border"

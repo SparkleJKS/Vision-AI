@@ -7,9 +7,11 @@ export {
   subscribeToUserDocument,
   clearProfileAge,
   clearProfileBloodGroup,
+  updateEmergencyContacts,
 } from './userProfileService';
 export type {
   UserDocument,
+  EmergencyContactEntry,
   UserProfile,
   UserSettings,
   VoiceSettings,
@@ -28,4 +30,9 @@ export {
   labelForGender,
   BLOOD_GROUP_OPTIONS,
   labelForBloodGroup,
+  MAX_EMERGENCY_CONTACTS,
+  normalizeEmergencyContacts,
+  emergencyContactsFromStored,
+  emergencyContactsDraftFromProfile,
+  emergencyContactsEqual,
 } from './types';

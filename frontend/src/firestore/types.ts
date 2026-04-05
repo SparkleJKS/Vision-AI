@@ -56,6 +56,28 @@ export const labelForBloodGroup = (
   return row?.label ?? 'Not set';
 };
 
+/** Max emergency contacts stored under `profile.emergencyContacts`. */
+export const MAX_EMERGENCY_CONTACTS = 3;
+
+export interface EmergencyContactEntry {
+  name: string;
+  phone: string;
+  relationship: string;
+}
+
+export function normalizeEmergencyContacts(
+  entries: EmergencyContactEntry[],
+): EmergencyContactEntry[] {
+  return entries
+    .slice(0, MAX_EMERGENCY_CONTACTS)
+    .map(e => ({
+      name: (e.name ?? '').trim(),
+      phone: (e.phone ?? '').trim(),
+      relationship: (e.relationship ?? '').trim(),
+    }))
+    .filter(e => e.name || e.phone || e.relationship);
+}
+
 export interface UserProfile {
   displayName?: string;
   photoURL?: string;
@@ -63,12 +85,46 @@ export interface UserProfile {
   /** Whole years; optional */
   age?: number;
   cityOrArea?: string;
-  emergencyContact?: string;
+  emergencyContacts?: EmergencyContactEntry[];
   bloodGroup?: BloodGroupOption;
   medicalNotes?: string;
   occupation?: string;
   livingSituation?: string;
   updatedAt: FirebaseTimestamp;
+}
+
+/** Normalized list as stored in `profile.emergencyContacts`. */
+export function emergencyContactsFromStored(
+  profile: UserProfile | null | undefined,
+): EmergencyContactEntry[] {
+  if (!profile?.emergencyContacts?.length) return [];
+  return normalizeEmergencyContacts(profile.emergencyContacts);
+}
+
+/** UI draft: at least one row; mirrors stored contacts when present. */
+export function emergencyContactsDraftFromProfile(
+  profile: UserProfile | null | undefined,
+): EmergencyContactEntry[] {
+  const stored = emergencyContactsFromStored(profile);
+  if (stored.length > 0) {
+    return stored.map(c => ({ ...c }));
+  }
+  return [{ name: '', phone: '', relationship: '' }];
+}
+
+export function emergencyContactsEqual(
+  a: EmergencyContactEntry[],
+  b: EmergencyContactEntry[],
+): boolean {
+  const na = normalizeEmergencyContacts(a);
+  const nb = normalizeEmergencyContacts(b);
+  if (na.length !== nb.length) return false;
+  return na.every(
+    (c, i) =>
+      c.name === nb[i].name &&
+      c.phone === nb[i].phone &&
+      c.relationship === nb[i].relationship,
+  );
 }
 
 export interface VoiceSettings {

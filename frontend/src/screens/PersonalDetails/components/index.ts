@@ -3,6 +3,7 @@ export { AdditionalSection } from './AdditionalSection';
 export { AgeFieldCard } from './AgeFieldCard';
 export { BloodGroupPickerModal } from './BloodGroupPickerModal';
 export { CollapsibleSection } from './CollapsibleSection';
+export { EmergencyContactsEditor } from './EmergencyContactsEditor';
 export { GenderPickerModal } from './GenderPickerModal';
 export { GenderRow } from './GenderRow';
 export { LocationCard } from './LocationCard';

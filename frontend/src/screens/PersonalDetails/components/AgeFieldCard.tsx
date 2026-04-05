@@ -63,18 +63,18 @@ export const AgeFieldCard = ({
         className="text-base font-semibold py-2 px-3 rounded-xl border"
         style={inputSurface}
       />
-      {ageHint ? (
+      {ageHint && (
         <Text className="text-xs mt-2" style={{ color: theme.warning }}>
           {ageHint}
         </Text>
-      ) : null}
-      {saving ? (
+      )}
+      {saving && (
         <ActivityIndicator
           className="mt-2"
           size="small"
           color={theme.primary}
         />
-      ) : null}
+      )}
     </View>
   );
 };

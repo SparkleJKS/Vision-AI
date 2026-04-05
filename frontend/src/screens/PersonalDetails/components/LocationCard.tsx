@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
 import type { ThemeTokens } from '@/theme';
 import { MAX_CITY } from '../constants';
 import { ProfileTextField } from './ProfileTextField';
@@ -34,7 +34,7 @@ export const LocationCard = ({
       }}>
       <ProfileTextField
         theme={theme}
-        label="City / area"
+        label="City / Area"
         value={cityDraft}
         onChangeText={setCityDraft}
         onBlur={onCommitCity}
@@ -42,9 +42,9 @@ export const LocationCard = ({
         placeholder="e.g. Mumbai, Bandra"
         editable={editable && !savingExtras}
       />
-      <Text className="text-xs mt-2" style={{ color: theme.muted }}>
-        Saves when you leave the field.
-      </Text>
     </View>
+    {savingExtras && (
+      <ActivityIndicator className="mt-2" size="small" color={theme.primary} />
+    )}
   </>
 );

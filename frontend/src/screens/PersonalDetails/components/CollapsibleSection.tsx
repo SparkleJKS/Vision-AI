@@ -33,11 +33,11 @@ export const CollapsibleSection = ({
         <Text className="text-base font-bold" style={{ color: theme.white }}>
           {title}
         </Text>
-        {subtitle ? (
+        {subtitle && (
           <Text className="text-xs mt-0.5" style={{ color: theme.grey }}>
             {subtitle}
           </Text>
-        ) : null}
+        )}
       </View>
       <Ionicons
         name={expanded ? 'chevron-up' : 'chevron-down'}
@@ -45,7 +45,7 @@ export const CollapsibleSection = ({
         color={theme.grey}
       />
     </TouchableOpacity>
-    {expanded ? (
+    {expanded && (
       <View
         className="rounded-2xl border px-4 py-4 gap-4"
         style={{
@@ -54,6 +54,6 @@ export const CollapsibleSection = ({
         }}>
         {children}
       </View>
-    ) : null}
+    )}
   </View>
 );

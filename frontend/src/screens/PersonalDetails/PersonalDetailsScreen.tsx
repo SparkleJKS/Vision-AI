@@ -135,11 +135,13 @@ const PersonalDetailsScreen = () => {
           expanded={form.safetyExpanded}
           onToggle={() => form.setSafetyExpanded(v => !v)}
           profile={form.profile}
-          emergencyDraft={form.emergencyDraft}
-          setEmergencyDraft={form.setEmergencyDraft}
-          onCommitEmergency={() => {
-            void form.commitEmergency();
+          emergencyContactsDraft={form.emergencyContactsDraft}
+          onEmergencyFieldChange={form.updateEmergencyField}
+          onCommitEmergencyContacts={() => {
+            void form.commitEmergencyContacts();
           }}
+          onAddEmergencyContact={form.addEmergencyContact}
+          onRemoveEmergencyContact={form.removeEmergencyContact}
           medicalDraft={form.medicalDraft}
           setMedicalDraft={form.setMedicalDraft}
           onCommitMedical={() => {

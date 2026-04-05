@@ -1,7 +1,9 @@
 export const MIN_AGE = 1;
 export const MAX_AGE = 130;
 export const MAX_CITY = 120;
-export const MAX_EMERGENCY = 300;
+export const MAX_EC_NAME = 80;
+export const MAX_EC_PHONE = 40;
+export const MAX_EC_RELATIONSHIP = 80;
 export const MAX_MEDICAL = 2000;
 export const MAX_OCCUPATION = 120;
 export const MAX_LIVING = 200;

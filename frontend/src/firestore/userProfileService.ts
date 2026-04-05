@@ -2,6 +2,7 @@ import firestore from '@react-native-firebase/firestore';
 import { error, logFirestore, serializeForLog } from '@/utils/logger';
 import type {
   UserDocument,
+  EmergencyContactEntry,
   UserProfile,
   UserSettings,
   FirebaseTimestamp,
@@ -11,6 +12,7 @@ import {
   DEFAULT_VOICE_SETTINGS,
   DEFAULT_VISION_SETTINGS,
   DEFAULT_ACCESSIBILITY_SETTINGS,
+  normalizeEmergencyContacts,
 } from './types';
 
 const USERS_COLLECTION = 'users';
@@ -164,6 +166,38 @@ export const clearProfileBloodGroup = async (uid: string): Promise<void> => {
     });
   } catch (e) {
     error('Firestore:clearProfileBloodGroup', { path, message: String(e) });
+    throw e;
+  }
+};
+
+export const updateEmergencyContacts = async (
+  uid: string,
+  contacts: EmergencyContactEntry[],
+): Promise<void> => {
+  const path = userDocPath(uid);
+  try {
+    const ref = firestore().collection(USERS_COLLECTION).doc(uid);
+    const snap = await ref.get();
+    const existing = snap.data() as UserDocument | undefined;
+    const beforeStored = existing?.profile?.emergencyContacts ?? [];
+    const sanitized = normalizeEmergencyContacts(contacts);
+
+    await ref.update({
+      'profile.emergencyContacts': sanitized,
+      'profile.updatedAt': firestore.Timestamp.now(),
+    });
+    logFirestore('update', path, {
+      target: 'emergencyContacts',
+      count: sanitized.length,
+      changes: {
+        emergencyContacts: {
+          before: serializeForLog(beforeStored),
+          after: serializeForLog(sanitized),
+        },
+      },
+    });
+  } catch (e) {
+    error('Firestore:updateEmergencyContacts', { path, message: String(e) });
     throw e;
   }
 };
