@@ -61,26 +61,26 @@ const PersonalDetailsScreen = () => {
           Personal details
         </Text>
 
-        {form.loading ? (
+        {form.loading && (
           <View className="py-16 items-center">
             <ActivityIndicator size="large" color={theme.primary} />
           </View>
-        ) : null}
+        )}
 
-        {form.error ? (
+        {form.error && (
           <Text className="text-sm mb-4" style={{ color: theme.warning }}>
             {form.error}
           </Text>
-        ) : null}
+        )}
 
-        {form.savingExtras ? (
+        {form.savingExtras && (
           <View className="flex-row items-center gap-2 my-2">
             <ActivityIndicator size="small" color={theme.primary} />
             <Text className="text-xs" style={{ color: theme.grey }}>
               Saving…
             </Text>
           </View>
-        ) : null}
+        )}
 
         <Text
           className="text-xs font-bold uppercase tracking-wider mt-8 mb-2"
