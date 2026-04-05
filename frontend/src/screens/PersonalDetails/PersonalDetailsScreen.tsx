@@ -1,110 +1,33 @@
-import { useCallback, useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Modal,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch } from 'react-redux';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme';
 import { useBackHandler } from '@/navigators';
-import { useAuth } from '@/auth/AuthContext';
-import {
-  GENDER_OPTIONS,
-  labelForGender,
-  useUserProfile,
-  type GenderOption,
-} from '@/firestore';
+import { labelForGender } from '@/firestore';
 import { navigationActions } from '@/store/actions/navigation';
 import type { AppDispatch } from '@/store';
-
-const MIN_AGE = 1;
-const MAX_AGE = 120;
+import {
+  AccountCard,
+  AdditionalSection,
+  AgeFieldCard,
+  BloodGroupPickerModal,
+  GenderPickerModal,
+  GenderRow,
+  LocationCard,
+  SafetySection,
+} from './components';
+import { usePersonalDetailsForm } from './hooks';
 
 const PersonalDetailsScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
-  const { user } = useAuth();
-  const { profile, loading, error, updateProfile, removeProfileAge } =
-    useUserProfile();
+  const form = usePersonalDetailsForm();
 
   const handleBack = () => dispatch(navigationActions.toBack());
   useBackHandler({ onBack: handleBack });
-
-  const [genderModalOpen, setGenderModalOpen] = useState(false);
-  const [ageInput, setAgeInput] = useState('');
-  const [savingGender, setSavingGender] = useState(false);
-  const [savingAge, setSavingAge] = useState(false);
-  const [ageHint, setAgeHint] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (profile?.age != null && !Number.isNaN(profile.age)) {
-      setAgeInput(String(profile.age));
-    } else {
-      setAgeInput('');
-    }
-  }, [profile?.age]);
-
-  const authDisplayName =
-    user?.displayName?.trim() ||
-    (user?.email ? user.email.split('@')[0] : '') ||
-    '—';
-  const authEmail = user?.email ?? '—';
-
-  const pickGender = useCallback(
-    async (value: GenderOption) => {
-      setSavingGender(true);
-      try {
-        await updateProfile({ gender: value });
-        setGenderModalOpen(false);
-      } finally {
-        setSavingGender(false);
-      }
-    },
-    [updateProfile],
-  );
-
-  const commitAge = useCallback(async () => {
-    setAgeHint(null);
-    const trimmed = ageInput.trim();
-    if (trimmed === '') {
-      if (profile?.age != null) {
-        setSavingAge(true);
-        try {
-          await removeProfileAge();
-        } finally {
-          setSavingAge(false);
-        }
-      }
-      return;
-    }
-    const n = parseInt(trimmed, 10);
-    if (Number.isNaN(n) || n < MIN_AGE || n > MAX_AGE) {
-      setAgeHint(`Enter a whole number between ${MIN_AGE} and ${MAX_AGE}.`);
-      setAgeInput(profile?.age != null ? String(profile.age) : '');
-      return;
-    }
-    if (n === profile?.age) return;
-    setSavingAge(true);
-    try {
-      await updateProfile({ age: n });
-    } finally {
-      setSavingAge(false);
-    }
-  }, [ageInput, profile?.age, removeProfileAge, updateProfile]);
-
-  const inputSurface = {
-    backgroundColor: theme.cardBg,
-    borderColor: theme.border,
-    color: theme.white,
-  } as const;
 
   return (
     <View
@@ -120,73 +43,58 @@ const PersonalDetailsScreen = () => {
         </Text>
       </TouchableOpacity>
 
-      <ScrollView
-        className="flex-1 px-4"
+      <KeyboardAwareScrollView
+        style={{ flex: 1 }}
         contentContainerStyle={{
+          flexGrow: 1,
+          paddingHorizontal: 16,
           paddingBottom: insets.bottom + 32,
         }}
         keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}>
+        keyboardDismissMode="on-drag"
+        showsVerticalScrollIndicator={false}
+        enableOnAndroid
+        enableAutomaticScroll
+        extraScrollHeight={96}
+        extraHeight={insets.bottom + 48}
+        keyboardOpeningTime={0}>
         <Text
-          className="text-2xl font-extrabold tracking-tight mt-2"
+          className="text-2xl font-extrabold tracking-tight mt-8"
           style={{ color: theme.white }}>
           Personal details
         </Text>
-        <Text className="text-[13px] mt-1 mb-6" style={{ color: theme.grey }}>
-          Name comes from your Google or email account and cannot be changed
-          here.
-        </Text>
 
-        {loading ? (
+        {form.loading && (
           <View className="py-16 items-center">
             <ActivityIndicator size="large" color={theme.primary} />
           </View>
-        ) : null}
+        )}
 
-        {error ? (
+        {form.error && (
           <Text className="text-sm mb-4" style={{ color: theme.warning }}>
-            {error}
+            {form.error}
           </Text>
-        ) : null}
+        )}
+
+        {form.savingExtras && (
+          <View className="flex-row items-center gap-2 my-2">
+            <ActivityIndicator size="small" color={theme.primary} />
+            <Text className="text-xs" style={{ color: theme.grey }}>
+              Saving…
+            </Text>
+          </View>
+        )}
 
         <Text
-          className="text-xs font-bold uppercase tracking-wider mb-2"
+          className="text-xs font-bold uppercase tracking-wider mt-8 mb-2"
           style={{ color: theme.grey }}>
           Account
         </Text>
-        <View
-          className="rounded-2xl border overflow-hidden mb-6"
-          style={{
-            backgroundColor: theme.cardBg,
-            borderColor: theme.border,
-          }}>
-          <View
-            className="px-4 py-3 border-b"
-            style={{ borderColor: theme.border }}>
-            <Text
-              className="text-xs font-semibold mb-1"
-              style={{ color: theme.grey }}>
-              Name
-            </Text>
-            <Text
-              className="text-base font-semibold"
-              style={{ color: theme.white }}>
-              {authDisplayName}
-            </Text>
-          </View>
-          <View className="px-4 py-3">
-            <Text
-              className="text-xs font-semibold mb-1"
-              style={{ color: theme.grey }}>
-              Email
-            </Text>
-            <Text
-              className="text-base font-semibold"
-              style={{ color: theme.white }}>
-              {authEmail}
-            </Text>
-          </View>
-        </View>
+        <AccountCard
+          theme={theme}
+          displayName={form.authDisplayName}
+          email={form.authEmail}
+        />
 
         <Text
           className="text-xs font-bold uppercase tracking-wider mb-2"
@@ -194,150 +102,97 @@ const PersonalDetailsScreen = () => {
           About you
         </Text>
 
-        <TouchableOpacity
-          className="rounded-2xl border px-4 py-3 mb-3 flex-row items-center justify-between"
-          style={{
-            backgroundColor: theme.cardBg,
-            borderColor: theme.border,
+        <GenderRow
+          theme={theme}
+          label="Gender"
+          valueLabel={labelForGender(form.profile?.gender)}
+          onPress={() => form.setGenderModalOpen(true)}
+          disabled={!form.editable || form.savingGender}
+          saving={form.savingGender}
+        />
+
+        <AgeFieldCard
+          theme={theme}
+          ageInput={form.ageInput}
+          setAgeInput={form.setAgeInput}
+          setAgeHint={form.setAgeHint}
+          ageHint={form.ageHint}
+          onBlurCommit={form.commitAge}
+          saving={form.savingAge}
+          editable={form.editable}
+        />
+
+        <LocationCard
+          theme={theme}
+          cityDraft={form.cityDraft}
+          setCityDraft={form.setCityDraft}
+          onCommitCity={() => {
+            void form.commitCity();
           }}
-          activeOpacity={0.85}
-          onPress={() => setGenderModalOpen(true)}
-          disabled={!user?.uid || savingGender}>
-          <View>
-            <Text
-              className="text-xs font-semibold mb-1"
-              style={{ color: theme.grey }}>
-              Gender
-            </Text>
-            <Text
-              className="text-base font-semibold"
-              style={{ color: theme.white }}>
-              {labelForGender(profile?.gender)}
-            </Text>
-          </View>
-          {savingGender ? (
-            <ActivityIndicator size="small" color={theme.primary} />
-          ) : (
-            <Ionicons name="chevron-forward" size={20} color={theme.grey} />
-          )}
-        </TouchableOpacity>
+          savingExtras={form.savingExtras}
+          editable={form.editable}
+        />
 
-        <View
-          className="rounded-2xl border px-4 py-3 mb-2"
-          style={{
-            backgroundColor: theme.cardBg,
-            borderColor: theme.border,
-          }}>
-          <Text
-            className="text-xs font-semibold mb-2"
-            style={{ color: theme.grey }}>
-            Age
-          </Text>
-          <TextInput
-            value={ageInput}
-            onChangeText={text => {
-              setAgeHint(null);
-              setAgeInput(text.replace(/[^0-9]/g, ''));
-            }}
-            onBlur={() => {
-              void commitAge();
-            }}
-            placeholder="Optional"
-            placeholderTextColor={theme.grey}
-            keyboardType="number-pad"
-            maxLength={3}
-            editable={!!user?.uid && !savingAge}
-            className="text-base font-semibold py-2 px-3 rounded-xl border"
-            style={inputSurface}
-          />
-          <Text className="text-xs mt-2" style={{ color: theme.muted }}>
-            {MIN_AGE}–{MAX_AGE}. Leave blank to clear. Saves when you leave the
-            field.
-          </Text>
-          {ageHint ? (
-            <Text className="text-xs mt-2" style={{ color: theme.warning }}>
-              {ageHint}
-            </Text>
-          ) : null}
-          {savingAge ? (
-            <ActivityIndicator
-              className="mt-2"
-              size="small"
-              color={theme.primary}
-            />
-          ) : null}
-        </View>
-      </ScrollView>
+        <SafetySection
+          theme={theme}
+          expanded={form.safetyExpanded}
+          onToggle={() => form.setSafetyExpanded(v => !v)}
+          profile={form.profile}
+          emergencyContactsDraft={form.emergencyContactsDraft}
+          onEmergencyFieldChange={form.updateEmergencyField}
+          onCommitEmergencyContacts={() => {
+            void form.commitEmergencyContacts();
+          }}
+          onAddEmergencyContact={form.addEmergencyContact}
+          onRemoveEmergencyContact={form.removeEmergencyContact}
+          medicalDraft={form.medicalDraft}
+          setMedicalDraft={form.setMedicalDraft}
+          onCommitMedical={() => {
+            void form.commitMedical();
+          }}
+          onOpenBloodModal={() => form.setBloodModalOpen(true)}
+          savingExtras={form.savingExtras}
+          savingBlood={form.savingBlood}
+          editable={form.editable}
+        />
 
-      <Modal
-        visible={genderModalOpen}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setGenderModalOpen(false)}>
-        <View className="flex-1 justify-end">
-          <Pressable
-            className="flex-1"
-            style={{ backgroundColor: '#000000aa' }}
-            onPress={() => !savingGender && setGenderModalOpen(false)}
-          />
-          <View
-            className="rounded-t-3xl px-4 pt-4 pb-8"
-            style={{
-              backgroundColor: theme.screenBg,
-              paddingBottom: insets.bottom + 16,
-            }}>
-            <View className="items-center mb-4">
-              <View
-                className="w-10 h-1 rounded-full mb-4"
-                style={{ backgroundColor: theme.border }}
-              />
-              <Text
-                className="text-lg font-bold"
-                style={{ color: theme.white }}>
-                Gender
-              </Text>
-            </View>
-            {GENDER_OPTIONS.map(opt => (
-              <TouchableOpacity
-                key={opt.value}
-                className="py-3.5 px-3 rounded-xl mb-2 flex-row items-center justify-between border"
-                style={{
-                  backgroundColor: theme.cardBg,
-                  borderColor:
-                    profile?.gender === opt.value
-                      ? theme.primary
-                      : theme.border,
-                }}
-                activeOpacity={0.85}
-                disabled={savingGender}
-                onPress={() => void pickGender(opt.value)}>
-                <Text
-                  className="text-[16px] font-semibold"
-                  style={{ color: theme.white }}>
-                  {opt.label}
-                </Text>
-                {profile?.gender === opt.value ? (
-                  <Ionicons
-                    name="checkmark-circle"
-                    size={22}
-                    color={theme.primary}
-                  />
-                ) : null}
-              </TouchableOpacity>
-            ))}
-            <TouchableOpacity
-              className="mt-2 py-3 items-center"
-              onPress={() => setGenderModalOpen(false)}
-              disabled={savingGender}>
-              <Text
-                className="text-base font-semibold"
-                style={{ color: theme.grey }}>
-                Cancel
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+        <AdditionalSection
+          theme={theme}
+          expanded={form.additionalExpanded}
+          onToggle={() => form.setAdditionalExpanded(v => !v)}
+          occupationDraft={form.occupationDraft}
+          setOccupationDraft={form.setOccupationDraft}
+          onCommitOccupation={() => {
+            void form.commitOccupation();
+          }}
+          livingDraft={form.livingDraft}
+          setLivingDraft={form.setLivingDraft}
+          onCommitLiving={() => {
+            void form.commitLiving();
+          }}
+          savingExtras={form.savingExtras}
+          editable={form.editable}
+        />
+      </KeyboardAwareScrollView>
+
+      <GenderPickerModal
+        visible={form.genderModalOpen}
+        theme={theme}
+        onClose={() => form.setGenderModalOpen(false)}
+        profileGender={form.profile?.gender}
+        saving={form.savingGender}
+        onPick={form.pickGender}
+      />
+
+      <BloodGroupPickerModal
+        visible={form.bloodModalOpen}
+        theme={theme}
+        onClose={() => form.setBloodModalOpen(false)}
+        profileBloodGroup={form.profile?.bloodGroup}
+        saving={form.savingBlood}
+        onPick={form.pickBloodGroup}
+        onClear={form.clearBloodGroup}
+      />
     </View>
   );
 };

@@ -7,6 +7,7 @@ import {
   updateProfile,
   updateSettings,
   clearProfileAge,
+  clearProfileBloodGroup,
 } from './userProfileService';
 import type {
   UserDocument,
@@ -71,6 +72,11 @@ export const useUserProfile = () => {
     await clearProfileAge(user.uid);
   }, [user?.uid]);
 
+  const removeProfileBloodGroup = useCallback(async () => {
+    if (!user?.uid) return;
+    await clearProfileBloodGroup(user.uid);
+  }, [user?.uid]);
+
   const updateUserSettings = useCallback(
     async (settings: Partial<UserSettings>) => {
       if (!user?.uid) return;
@@ -89,6 +95,7 @@ export const useUserProfile = () => {
     error,
     updateProfile: updateProfileFields,
     removeProfileAge,
+    removeProfileBloodGroup,
     updateSettings: updateUserSettings,
   };
 };

@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { ThemeId, ThemeTokens } from './tokens';
 import { THEMES, THEME_ACCESSIBILITY } from './tokens';
 import { logApp } from '@/utils/logger';
+import { showToast } from '@/utils/toast';
 
 const STORAGE_KEY = '@visionai/theme';
 
@@ -51,8 +52,20 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const setTheme = useCallback(async (id: ThemeId) => {
-    setThemeIdState(id);
-    await AsyncStorage.setItem(STORAGE_KEY, id);
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY, id);
+      setThemeIdState(id);
+    } catch (err) {
+      logApp('error', {
+        component: 'ThemeProvider',
+        phase: 'theme_persist',
+        error: String(err),
+      });
+      showToast.error(
+        "Couldn't save theme",
+        'Your choice was not saved. Please try again.',
+      );
+    }
   }, []);
 
   const safeThemeId = themeId ?? 'accessibility';

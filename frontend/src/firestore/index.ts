@@ -6,9 +6,12 @@ export {
   updateSettings,
   subscribeToUserDocument,
   clearProfileAge,
+  clearProfileBloodGroup,
+  updateEmergencyContacts,
 } from './userProfileService';
 export type {
   UserDocument,
+  EmergencyContactEntry,
   UserProfile,
   UserSettings,
   VoiceSettings,
@@ -16,6 +19,7 @@ export type {
   AccessibilitySettings,
   FirebaseTimestamp,
   GenderOption,
+  BloodGroupOption,
 } from './types';
 export {
   DEFAULT_VOICE_SETTINGS,
@@ -24,4 +28,11 @@ export {
   DEFAULT_USER_SETTINGS,
   GENDER_OPTIONS,
   labelForGender,
+  BLOOD_GROUP_OPTIONS,
+  labelForBloodGroup,
+  MAX_EMERGENCY_CONTACTS,
+  normalizeEmergencyContacts,
+  emergencyContactsFromStored,
+  emergencyContactsDraftFromProfile,
+  emergencyContactsEqual,
 } from './types';
