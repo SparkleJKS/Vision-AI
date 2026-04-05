@@ -1,11 +1,6 @@
-import {
-  ActivityIndicator,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch } from 'react-redux';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme';
@@ -48,13 +43,21 @@ const PersonalDetailsScreen = () => {
         </Text>
       </TouchableOpacity>
 
-      <ScrollView
-        className="flex-1 px-4"
+      <KeyboardAwareScrollView
+        style={{ flex: 1 }}
         contentContainerStyle={{
+          flexGrow: 1,
+          paddingHorizontal: 16,
           paddingBottom: insets.bottom + 32,
         }}
         keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}>
+        keyboardDismissMode="on-drag"
+        showsVerticalScrollIndicator={false}
+        enableOnAndroid
+        enableAutomaticScroll
+        extraScrollHeight={96}
+        extraHeight={insets.bottom + 48}
+        keyboardOpeningTime={0}>
         <Text
           className="text-2xl font-extrabold tracking-tight mt-8"
           style={{ color: theme.white }}>
@@ -170,7 +173,7 @@ const PersonalDetailsScreen = () => {
           savingExtras={form.savingExtras}
           editable={form.editable}
         />
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <GenderPickerModal
         visible={form.genderModalOpen}
