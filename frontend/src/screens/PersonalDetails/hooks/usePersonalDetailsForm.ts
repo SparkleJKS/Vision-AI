@@ -11,6 +11,7 @@ import {
   type EmergencyContactEntry,
   type GenderOption,
 } from '@/firestore';
+import { parseIndianMobile } from '@/utils/openPhoneDialer';
 import { showToast } from '@/utils/toast';
 import { MAX_AGE, MIN_AGE } from '../constants';
 
@@ -201,6 +202,18 @@ export const usePersonalDetailsForm = () => {
     ) {
       return;
     }
+
+    const invalid = emergencyContactsDraft.find(
+      c => c.phone.trim() !== '' && !parseIndianMobile(c.phone),
+    );
+    if (invalid) {
+      showToast.info(
+        'Fix phone number',
+        'Emergency contact phone must be a valid mobile number.',
+      );
+      return;
+    }
+
     setSavingExtras(true);
     try {
       await updateEmergencyContacts(user.uid, emergencyContactsDraft);

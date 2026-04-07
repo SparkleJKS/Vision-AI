@@ -8,6 +8,7 @@ import type { ThemeTokens } from '@/theme';
 import {
   normalizeTelNumberForDial,
   openPhoneDialer,
+  parseIndianMobile,
 } from '@/utils/openPhoneDialer';
 import { showToast } from '@/utils/toast';
 import { MAX_EC_NAME, MAX_EC_PHONE, MAX_EC_RELATIONSHIP } from '../constants';
@@ -103,8 +104,21 @@ export const EmergencyContactsEditor = ({
             theme={theme}
             label="Phone"
             value={row.phone}
-            onChangeText={v => onChangeField(index, 'phone', v)}
-            onBlur={onBlurCommit}
+            onChangeText={v => {
+              // Allow digits, spaces, +, (), - and trim to max.
+              const cleaned = v.replace(/[^0-9+\s\-().]/g, '');
+              onChangeField(index, 'phone', cleaned);
+            }}
+            onBlur={() => {
+              const trimmed = row.phone.trim();
+              if (trimmed.length > 0 && !parseIndianMobile(trimmed)) {
+                showToast.info(
+                  'Invalid Indian mobile number',
+                  'Use a 10-digit number starting 6–9 (optional +91 / 0 prefix).',
+                );
+              }
+              onBlurCommit();
+            }}
             maxLength={MAX_EC_PHONE}
             placeholder="Phone number"
             keyboardType="phone-pad"
