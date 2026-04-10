@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { AppStateStatus } from 'react-native';
 import {
   ActivityIndicator,
@@ -6,7 +6,6 @@ import {
   AppState,
   Linking,
   Pressable,
-  StyleSheet,
   Text,
   View,
 } from 'react-native';
@@ -26,13 +25,10 @@ import type { CameraPermissionStatus, Code } from 'react-native-vision-camera';
 import { useTheme } from '@/theme';
 import { logEvent, warn, error } from '@/utils/logger';
 import { showToast } from '@/utils/toast';
-import {
-  CORNER_SIZE,
-  CORNER_THICKNESS,
-  SCAN_BOX_SIZE,
-  SUPPORTED_CODE_TYPES,
-} from './constants';
-import { getCodeTypeLabel, getOpenableUrl } from './helpers';
+import { SCAN_BOX_SIZE, SUPPORTED_CODE_TYPES } from './constants';
+import { getOpenableUrl } from './helpers';
+import { QrScanBox } from './components/QrScanBox';
+import { QrResultSheet } from './components/QrResultSheet';
 
 const LOG_NAME = 'ExploreQr';
 
@@ -40,26 +36,6 @@ type ScannedResult = {
   value: string;
   type: Code['type'];
 };
-
-type CornerPosition = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
-
-type CornerBracketProps = {
-  position: CornerPosition;
-  color: string;
-};
-
-const CornerBracket = memo(({ position, color }: CornerBracketProps) => {
-  const style = useMemo(
-    () => [
-      styles.corner,
-      CORNER_POSITION_STYLES[position],
-      { borderColor: color },
-    ],
-    [position, color],
-  );
-  return <View style={style} />;
-});
-CornerBracket.displayName = 'CornerBracket';
 
 const ExploreQrScreen = () => {
   const navigation = useNavigation();
@@ -243,7 +219,13 @@ const ExploreQrScreen = () => {
       {hasPermission && device ? (
         <View className="flex-1">
           <Camera
-            style={StyleSheet.absoluteFill}
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              right: 0,
+              bottom: 0,
+            }}
             device={device}
             isActive={isCameraActive}
             codeScanner={codeScanner}
@@ -255,107 +237,25 @@ const ExploreQrScreen = () => {
           <View
             className="absolute inset-0 items-center justify-center"
             pointerEvents="none">
-            <Animated.View
-              style={{
-                width: SCAN_BOX_SIZE,
-                height: SCAN_BOX_SIZE,
-                transform: [{ scale: cornerScale }],
-                opacity: cornerOpacity,
-              }}>
-              <CornerBracket position="topLeft" color={cornerColor} />
-              <CornerBracket position="topRight" color={cornerColor} />
-              <CornerBracket position="bottomLeft" color={cornerColor} />
-              <CornerBracket position="bottomRight" color={cornerColor} />
-              {!scanned && (
-                <Animated.View
-                  style={[
-                    styles.scanLine,
-                    {
-                      backgroundColor: theme.primary + 'B3',
-                      transform: [{ translateY: scanLineTranslateY }],
-                    },
-                  ]}
-                />
-              )}
-            </Animated.View>
+            <QrScanBox
+              scanned={scanned}
+              cornerColor={cornerColor}
+              scanLineColor={theme.primary + 'B3'}
+              scanLineTranslateY={scanLineTranslateY}
+              cornerScale={cornerScale}
+              cornerOpacity={cornerOpacity}
+            />
           </View>
 
-          {result && (
-            <View
-              className="absolute left-4 right-4 rounded-2xl border px-4 py-3.5 gap-3"
-              style={{
-                bottom: insets.bottom + 14,
-                backgroundColor: theme.cardBg + 'F2',
-                borderColor: theme.border,
-              }}>
-              <View className="flex-row items-center justify-between">
-                <Text
-                  className="text-[12px] font-bold tracking-wider"
-                  style={{ color: theme.primary }}>
-                  CODE DETECTED
-                </Text>
-                <Text
-                  className="text-[12px] font-semibold"
-                  style={{ color: theme.grey }}>
-                  {getCodeTypeLabel(result.type)}
-                </Text>
-              </View>
-
-              <View
-                className="rounded-xl border px-3 py-2.5"
-                style={{
-                  borderColor: theme.border,
-                  backgroundColor: theme.screenBg + 'B3',
-                }}>
-                <Text
-                  selectable
-                  className="text-[13px] font-medium"
-                  style={{ color: theme.white }}>
-                  {result.value}
-                </Text>
-              </View>
-
-              <View className="flex-row gap-2.5">
-                <Pressable
-                  className="flex-1 rounded-xl py-3 border items-center justify-center"
-                  style={{
-                    borderColor: theme.primary,
-                    backgroundColor: theme.primary + '20',
-                  }}
-                  onPress={handleScanAgain}>
-                  <Text
-                    className="text-[13px] font-bold"
-                    style={{ color: theme.primary }}>
-                    Scan Again
-                  </Text>
-                </Pressable>
-                {urlToOpen && (
-                  <Pressable
-                    className="flex-1 rounded-xl py-3 border items-center justify-center"
-                    style={{
-                      borderColor: theme.border,
-                      backgroundColor: theme.cardBg,
-                    }}
-                    onPress={() => {
-                      logEvent(`${LOG_NAME}_open_link`, { url: urlToOpen });
-                      Linking.openURL(urlToOpen).catch(e => {
-                        error(LOG_NAME, 'Failed to open URL', urlToOpen, e);
-                        showToast.error(
-                          "Couldn't open link",
-                          'No app can handle this URL.',
-                        );
-                      });
-                    }}>
-                    <Text
-                      className="text-[13px] font-bold"
-                      style={{ color: theme.white }}>
-                      Open Link
-                    </Text>
-                  </Pressable>
-                )}
-              </View>
-            </View>
-          )}
+          {result ? (
+            <QrResultSheet
+              insets={insets}
+              logName={LOG_NAME}
+              result={result}
+              urlToOpen={urlToOpen}
+              onScanAgain={handleScanAgain}
+            />
+          ) : null}
         </View>
       ) : (
         <View className="flex-1 justify-center items-center px-6">
@@ -436,56 +336,6 @@ const ExploreQrScreen = () => {
       </View>
     </View>
   );
-};
-
-const styles = StyleSheet.create({
-  corner: {
-    position: 'absolute',
-    width: CORNER_SIZE,
-    height: CORNER_SIZE,
-  },
-  topLeft: {
-    top: 0,
-    left: 0,
-    borderTopWidth: CORNER_THICKNESS,
-    borderLeftWidth: CORNER_THICKNESS,
-    borderTopLeftRadius: 12,
-  },
-  topRight: {
-    top: 0,
-    right: 0,
-    borderTopWidth: CORNER_THICKNESS,
-    borderRightWidth: CORNER_THICKNESS,
-    borderTopRightRadius: 12,
-  },
-  bottomLeft: {
-    bottom: 0,
-    left: 0,
-    borderBottomWidth: CORNER_THICKNESS,
-    borderLeftWidth: CORNER_THICKNESS,
-    borderBottomLeftRadius: 12,
-  },
-  bottomRight: {
-    bottom: 0,
-    right: 0,
-    borderBottomWidth: CORNER_THICKNESS,
-    borderRightWidth: CORNER_THICKNESS,
-    borderBottomRightRadius: 12,
-  },
-  scanLine: {
-    position: 'absolute',
-    left: 10,
-    right: 10,
-    height: 2,
-    borderRadius: 999,
-  },
-});
-
-const CORNER_POSITION_STYLES: Record<CornerPosition, object> = {
-  topLeft: styles.topLeft,
-  topRight: styles.topRight,
-  bottomLeft: styles.bottomLeft,
-  bottomRight: styles.bottomRight,
 };
 
 export default ExploreQrScreen;

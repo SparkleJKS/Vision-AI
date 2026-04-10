@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -10,10 +10,10 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Tts from 'react-native-tts';
 import { useTheme } from '@/theme';
-import { logEvent, warn, error } from '@/utils/logger';
-import { showToast } from '@/utils/toast';
+import { ExploreHeader } from './components/ExploreHeader';
+import { StatusPill } from './components/StatusPill';
+import { useTtsEngine } from './hooks/useTtsEngine';
 
 const LOG_NAME = 'ExploreTts';
 
@@ -44,114 +44,19 @@ const ExploreTtsScreen = () => {
   const [text, setText] = useState<string>(
     'Welcome to Vision AI. Type your message and press Speak.',
   );
-  const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
-  const [speechRate, setSpeechRate] = useState<number>(0.5);
-  const [pitch, setPitch] = useState<number>(1.0);
-  const [isReady, setIsReady] = useState<boolean>(false);
+  const {
+    isReady,
+    isSpeaking,
+    rate,
+    pitch,
+    adjustRate,
+    adjustPitch,
+    speak,
+    stop,
+  } = useTtsEngine({ logName: LOG_NAME });
 
-  useEffect(() => {
-    const handleStart = () => {
-      setIsSpeaking(true);
-      logEvent(`${LOG_NAME}_tts_start`, {});
-    };
-    const handleFinish = () => {
-      setIsSpeaking(false);
-      logEvent(`${LOG_NAME}_tts_finish`, {});
-    };
-    const handleCancel = () => {
-      setIsSpeaking(false);
-      logEvent(`${LOG_NAME}_tts_cancel`, {});
-    };
-    const handleError = (err: { message?: string; code?: string }) => {
-      setIsSpeaking(false);
-      error(LOG_NAME, 'TTS error', err?.message ?? err?.code ?? err);
-      showToast.error(
-        'Speech failed',
-        'Text-to-speech hit an error. Try again or restart the app.',
-      );
-    };
-
-    const initializeTts = async () => {
-      try {
-        await Tts.getInitStatus();
-        await Tts.setDefaultLanguage('en-US');
-        await Tts.setDefaultRate(speechRate);
-        await Tts.setDefaultPitch(pitch);
-        setIsReady(true);
-        logEvent(`${LOG_NAME}_ready`, { language: 'en-US' });
-      } catch (e) {
-        setIsReady(false);
-        warn(LOG_NAME, 'TTS initialization failed', e);
-        showToast.error(
-          'Voice preview unavailable',
-          'Text-to-speech could not start on this device.',
-        );
-      }
-    };
-
-    const startSubscription = Tts.addListener('tts-start', handleStart);
-    const finishSubscription = Tts.addListener('tts-finish', handleFinish);
-    const cancelSubscription = Tts.addListener('tts-cancel', handleCancel);
-    const errorSubscription = Tts.addListener('tts-error', handleError);
-    void initializeTts();
-
-    return () => {
-      void Tts.stop();
-      startSubscription.remove();
-      finishSubscription.remove();
-      cancelSubscription.remove();
-      errorSubscription.remove();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isReady) return;
-    void Tts.setDefaultRate(speechRate);
-  }, [isReady, speechRate]);
-
-  useEffect(() => {
-    if (!isReady) return;
-    void Tts.setDefaultPitch(pitch);
-  }, [isReady, pitch]);
-
-  const adjustSpeechRate = (delta: number) => {
-    setSpeechRate(value => {
-      const next = Number((value + delta).toFixed(2));
-      return Math.min(1, Math.max(0.1, next));
-    });
-  };
-
-  const adjustPitch = (delta: number) => {
-    setPitch(value => {
-      const next = Number((value + delta).toFixed(2));
-      return Math.min(2, Math.max(0.5, next));
-    });
-  };
-
-  const handleSpeak = () => {
-    const nextText = text.trim();
-    if (!nextText || !isReady) {
-      if (!isReady) warn(LOG_NAME, 'Speak pressed while TTS not ready');
-      return;
-    }
-    logEvent(`${LOG_NAME}_speak`, {
-      length: nextText.length,
-      rate: speechRate,
-      pitch,
-    });
-    setIsSpeaking(true);
-    void Tts.stop()
-      .catch(() => undefined)
-      .finally(() => {
-        Tts.speak(nextText);
-      });
-  };
-
-  const handleStop = () => {
-    logEvent(`${LOG_NAME}_stop`, {});
-    setIsSpeaking(false);
-    void Tts.stop();
-  };
+  const handleSpeak = () => speak(text);
+  const handleStop = () => stop();
 
   return (
     <KeyboardAvoidingView
@@ -171,49 +76,14 @@ const ExploreTtsScreen = () => {
         }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}>
-        <View className="flex-row items-center gap-3 py-2">
-          <Pressable
-            onPress={() => navigation.goBack()}
-            className="w-10 h-10 rounded-[10px] justify-center items-center border"
-            style={{
-              backgroundColor: theme.cardBg,
-              borderColor: theme.border,
-            }}>
-            <Text className="text-lg font-light" style={{ color: theme.grey }}>
-              ←
-            </Text>
-          </Pressable>
-          <View className="flex-1 gap-0.5">
-            <Text
-              className="text-[17px] font-bold"
-              style={{ color: theme.white }}>
-              Text to Speech
-            </Text>
-            <Text
-              className="text-[11px] font-medium tracking-wide"
-              style={{ color: theme.grey }}>
-              Neural voice synthesis
-            </Text>
-          </View>
-          <View
-            className="flex-row items-center gap-1.5 px-2.5 py-1.5 rounded-lg border"
-            style={{
-              backgroundColor: isSpeaking ? theme.primary + '15' : theme.cardBg,
-              borderColor: isSpeaking ? theme.primary + '35' : theme.border,
-            }}>
-            <View
-              className="w-1.5 h-1.5 rounded-full"
-              style={{
-                backgroundColor: isSpeaking ? theme.primary : theme.tabInactive,
-              }}
-            />
-            <Text
-              className="text-[10px] font-bold tracking-wider"
-              style={{ color: isSpeaking ? theme.primary : theme.grey }}>
-              {isSpeaking ? 'SPEAKING' : 'IDLE'}
-            </Text>
-          </View>
-        </View>
+        <ExploreHeader
+          title="Text to Speech"
+          subtitle="Neural voice synthesis"
+          onBack={() => navigation.goBack()}
+          right={
+            <StatusPill isOn={isSpeaking} onLabel="SPEAKING" offLabel="IDLE" />
+          }
+        />
 
         <View
           className="rounded-2xl border p-4 mt-2"
@@ -255,14 +125,11 @@ const ExploreTtsScreen = () => {
               <Text
                 className="text-[12px] font-bold"
                 style={{ color: theme.primary }}>
-                {speechRate.toFixed(2)}
+                {rate.toFixed(2)}
               </Text>
             </View>
             <View className="flex-row gap-2">
-              <ValueAdjustButton
-                icon="-"
-                onPress={() => adjustSpeechRate(-0.1)}
-              />
+              <ValueAdjustButton icon="-" onPress={() => adjustRate(-0.1)} />
               <View
                 className="flex-1 rounded-lg border items-center justify-center"
                 style={{
@@ -273,10 +140,7 @@ const ExploreTtsScreen = () => {
                   0.10 to 1.00
                 </Text>
               </View>
-              <ValueAdjustButton
-                icon="+"
-                onPress={() => adjustSpeechRate(0.1)}
-              />
+              <ValueAdjustButton icon="+" onPress={() => adjustRate(0.1)} />
             </View>
           </View>
 
