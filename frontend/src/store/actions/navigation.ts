@@ -38,4 +38,5 @@ export const navigationActions = {
   toPrivacyAndSecurity: createAction(
     `${NAV_PREFIX}${ScreenNames.PrivacyAndSecurity}`,
   ),
+  toHelpAndSupport: createAction(`${NAV_PREFIX}${ScreenNames.HelpAndSupport}`),
 };

@@ -29,6 +29,7 @@ export enum ScreenNames {
   Profile = 'Profile',
   PersonalDetails = 'PersonalDetails',
   PrivacyAndSecurity = 'PrivacyAndSecurity',
+  HelpAndSupport = 'HelpAndSupport',
   VoiceAndAudio = 'VoiceAndAudio',
   VisionSettings = 'VisionSettings',
   ConnectedDevices = 'ConnectedDevices',
