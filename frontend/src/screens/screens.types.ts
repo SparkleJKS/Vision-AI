@@ -42,6 +42,7 @@ export type ISettingsStackParamList = {
   [ScreenNames.Profile]: undefined;
   [ScreenNames.PersonalDetails]: undefined;
   [ScreenNames.PrivacyAndSecurity]: undefined;
+  [ScreenNames.HelpAndSupport]: undefined;
   [ScreenNames.VoiceAndAudio]: undefined;
   [ScreenNames.VisionSettings]: undefined;
   [ScreenNames.ConnectedDevices]: undefined;
@@ -91,6 +92,10 @@ export type IProfileScreenProps = NativeStackScreenProps<
 export type IPersonalDetailsScreenProps = NativeStackScreenProps<
   ISettingsStackParamList,
   ScreenNames.PersonalDetails
+>;
+export type IHelpAndSupportScreenProps = NativeStackScreenProps<
+  ISettingsStackParamList,
+  ScreenNames.HelpAndSupport
 >;
 export type IVoiceAndAudioScreenProps = NativeStackScreenProps<
   ISettingsStackParamList,
