@@ -283,7 +283,7 @@ export const useVoiceMode = () => {
     const initializeTts = async () => {
       try {
         await Tts.getInitStatus();
-        await Tts.setDefaultLanguage('en-US');
+        await Tts.setDefaultLanguage('en-IN');
         await Tts.setDefaultRate(0.5);
         await Tts.setDefaultPitch(1.0);
         ttsReadyRef.current = true;

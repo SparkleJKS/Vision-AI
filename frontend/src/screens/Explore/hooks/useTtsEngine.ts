@@ -11,9 +11,22 @@ type UseTtsEngineOptions = {
   showInitToast?: boolean;
 };
 
+const DEVANAGARI_REGEX = /[\u0900-\u097F]/;
+
+const getPreferredLanguageForText = (text: string) =>
+  DEVANAGARI_REGEX.test(text) ? 'hi-IN' : 'en-IN';
+
+const setLanguage = async (language: string) => {
+  try {
+    await Tts.setDefaultLanguage(language);
+  } catch (e) {
+    warn('TTS Engine', 'Failed to set default language', { language }, e);
+  }
+};
+
 export const useTtsEngine = ({
   logName,
-  language = 'en-US',
+  language = 'en-IN',
   initialRate = 0.5,
   initialPitch = 1.0,
   showInitToast = true,
@@ -53,7 +66,7 @@ export const useTtsEngine = ({
     const initializeTts = async () => {
       try {
         await Tts.getInitStatus();
-        await Tts.setDefaultLanguage(language);
+        await setLanguage(language);
         await Tts.setDefaultRate(initialRate);
         await Tts.setDefaultPitch(initialPitch);
         setIsReady(true);
@@ -100,15 +113,18 @@ export const useTtsEngine = ({
         if (!isReady) warn(logName, 'Speak pressed while TTS not ready');
         return;
       }
+      const nextLanguage = getPreferredLanguageForText(nextText);
       logEvent(`${logName}_speak`, {
         length: nextText.length,
         rate,
         pitch,
+        language: nextLanguage,
       });
       setIsSpeaking(true);
       void Tts.stop()
         .catch(() => undefined)
-        .finally(() => {
+        .then(async () => {
+          await setLanguage(nextLanguage);
           Tts.speak(nextText);
         });
     },
