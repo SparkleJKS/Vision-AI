@@ -103,6 +103,42 @@ def enableMinifyInReleaseBuilds = (findProperty('android.enableMinifyInReleaseBu
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+// Fallback keystore used when no release keystore is provided (e.g. in CI).
+// We generate it so builds don't depend on committing a binary `debug.keystore`.
+def fallbackKeystoreFile = file("${rootProject.buildDir}/fallback-debug.keystore")
+def usingFallbackKeystore = !(
+    findProperty('release.keystore.file') &&
+    file(findProperty('release.keystore.file')).exists() &&
+    findProperty('release.keystore.password') &&
+    findProperty('release.keystore.alias') &&
+    findProperty('release.keystore.keyPassword')
+)
+
+def generateFallbackDebugKeystore = tasks.register("generateFallbackDebugKeystore") {
+    outputs.file(fallbackKeystoreFile)
+    doLast {
+        if (!fallbackKeystoreFile.exists()) {
+            println "VisionAI: Generating fallback debug keystore at ${fallbackKeystoreFile}"
+            exec {
+                commandLine(
+                    "keytool",
+                    "-genkeypair",
+                    "-v",
+                    "-storetype", "JKS",
+                    "-keystore", fallbackKeystoreFile.absolutePath,
+                    "-storepass", "android",
+                    "-keypass", "android",
+                    "-alias", "androiddebugkey",
+                    "-keyalg", "RSA",
+                    "-keysize", "2048",
+                    "-validity", "10000",
+                    "-dname", "CN=Android Debug,O=Android,C=US"
+                )
+            }
+        }
+    }
+}
+
 android {
     // Pin NDK 26 so app/codegen link uses same C++ stdlib (avoids undefined symbol errors)
     ndkVersion "26.1.10909125"
@@ -147,6 +183,11 @@ android {
         tasks.matching { it.name.startsWith("merge") && it.name.endsWith("Assets") }.configureEach { it.dependsOn("copyTfliteModel") }
         // Lint tasks read src/main/assets; must run after copyTfliteModel (Gradle implicit-dependency validation)
         tasks.matching { it.name.toLowerCase().contains("lintvital") }.configureEach { it.dependsOn("copyTfliteModel") }
+        if (usingFallbackKeystore) {
+            tasks.matching { it.name.startsWith("package") && it.name.endsWith("Release") }.configureEach {
+                it.dependsOn(generateFallbackDebugKeystore)
+            }
+        }
     }
     signingConfigs {
         debug {
@@ -161,13 +202,13 @@ android {
             // Not named `keyAlias` — that shadows SigningConfig DSL and breaks `keyAlias '…'` when the var is null.
             def releaseKeyAlias = findProperty('release.keystore.alias')
             def keyPass = findProperty('release.keystore.keyPassword')
-            if (keystoreFile && file(keystoreFile).exists() && keystorePass && releaseKeyAlias && keyPass) {
+            if (!usingFallbackKeystore && keystoreFile && file(keystoreFile).exists() && keystorePass && releaseKeyAlias && keyPass) {
                 storeFile file(keystoreFile)
                 storePassword keystorePass
                 keyAlias releaseKeyAlias
                 keyPassword keyPass
             } else {
-                storeFile file('debug.keystore')
+                storeFile fallbackKeystoreFile
                 storePassword 'android'
                 keyAlias 'androiddebugkey'
                 keyPassword 'android'
