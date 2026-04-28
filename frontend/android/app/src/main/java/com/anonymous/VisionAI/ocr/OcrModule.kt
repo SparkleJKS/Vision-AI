@@ -40,16 +40,12 @@ class OcrModule(
     }
 
     val latinRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+    val devanagariRecognizer =
+      TextRecognition.getClient(DevanagariTextRecognizerOptions.Builder().build())
+
     latinRecognizer
       .process(image)
       .addOnSuccessListener { latinResult ->
-        if (latinResult.text.isNotBlank()) {
-          promise.resolve(toPayload(latinResult))
-          return@addOnSuccessListener
-        }
-
-        val devanagariRecognizer =
-          TextRecognition.getClient(DevanagariTextRecognizerOptions.Builder().build())
         devanagariRecognizer
           .process(image)
           .addOnSuccessListener { devanagariResult ->
@@ -69,8 +65,6 @@ class OcrModule(
           }
       }
       .addOnFailureListener { error ->
-        val devanagariRecognizer =
-          TextRecognition.getClient(DevanagariTextRecognizerOptions.Builder().build())
         devanagariRecognizer
           .process(image)
           .addOnSuccessListener { devanagariResult ->
