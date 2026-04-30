@@ -17,6 +17,8 @@ import { useTheme } from '@/theme';
 import CameraView from '../../components/CameraView';
 import DetectionOverlay from '../../components/DetectionOverlay';
 import { useExplorePermissions } from './hooks';
+import { ExploreHeader } from './components/ExploreHeader';
+import { StatusPill } from './components/StatusPill';
 
 const ObjectDetectionScreen = () => {
   const navigation = useNavigation();
@@ -80,53 +82,12 @@ const ObjectDetectionScreen = () => {
       <Animated.View
         className="flex-1 gap-3 px-4 pt-2"
         style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
-        <View className="flex-row items-center gap-3 py-2">
-          <Pressable
-            onPress={() => navigation.goBack()}
-            className="w-10 h-10 rounded-[10px] justify-center items-center border"
-            style={{
-              backgroundColor: theme.cardBg,
-              borderColor: theme.border,
-            }}>
-            <Text className="text-lg font-light" style={{ color: theme.grey }}>
-              ←
-            </Text>
-          </Pressable>
-          <View className="flex-1 gap-0.5">
-            <Text
-              className="text-[17px] font-bold"
-              style={{ color: theme.white }}>
-              Object Detection
-            </Text>
-            <Text
-              className="text-[11px] font-medium tracking-wide"
-              style={{ color: theme.grey }}>
-              YOLOv8n · 80 Classes
-            </Text>
-          </View>
-          <View
-            className="flex-row items-center gap-1.5 px-2.5 py-1.5 rounded-lg border"
-            style={{
-              backgroundColor: isModelActive
-                ? theme.primary + '15'
-                : theme.cardBg,
-              borderColor: isModelActive ? theme.primary + '35' : theme.border,
-            }}>
-            <View
-              className="w-1.5 h-1.5 rounded-full"
-              style={{
-                backgroundColor: isModelActive
-                  ? theme.primary
-                  : theme.tabInactive,
-              }}
-            />
-            <Text
-              className="text-[10px] font-bold tracking-wider"
-              style={{ color: isModelActive ? theme.primary : theme.grey }}>
-              {isModelActive ? 'LIVE' : 'OFF'}
-            </Text>
-          </View>
-        </View>
+        <ExploreHeader
+          title="Object Detection"
+          subtitle="YOLOv8n · 80 Classes"
+          onBack={() => navigation.goBack()}
+          right={<StatusPill isOn={isModelActive} onLabel="LIVE" offLabel="OFF" />}
+        />
 
         <View
           className="flex-1 rounded-2xl border bg-black overflow-hidden"

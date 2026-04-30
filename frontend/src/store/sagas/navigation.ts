@@ -25,6 +25,30 @@ const getNavigationPayload = (
     case navigationActions.toExplore.type:
       navigationPayload = { name: ScreenNames.Explore };
       break;
+    case navigationActions.toExploreObjectDetection.type:
+      navigationPayload = {
+        name: ScreenNames.Explore,
+        params: { screen: ScreenNames.ExploreObjectDetection },
+      };
+      break;
+    case navigationActions.toExploreQrScanner.type:
+      navigationPayload = {
+        name: ScreenNames.Explore,
+        params: { screen: ScreenNames.ExploreQrScanner },
+      };
+      break;
+    case navigationActions.toExploreOcr.type:
+      navigationPayload = {
+        name: ScreenNames.Explore,
+        params: { screen: ScreenNames.ExploreOcr },
+      };
+      break;
+    case navigationActions.toExploreTts.type:
+      navigationPayload = {
+        name: ScreenNames.Explore,
+        params: { screen: ScreenNames.ExploreTts },
+      };
+      break;
     case navigationActions.toVoice.type:
       navigationPayload = { name: ScreenNames.Voice };
       break;

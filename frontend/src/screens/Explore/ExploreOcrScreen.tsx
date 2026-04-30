@@ -10,7 +10,6 @@ import {
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Camera, useCameraDevice } from 'react-native-vision-camera';
-import Tts from 'react-native-tts';
 import { useTheme } from '@/theme';
 import { showToast } from '@/utils/toast';
 import { error, logEvent } from '@/utils/logger';
@@ -20,6 +19,8 @@ import {
   type OcrBlock,
   type OcrLine,
 } from '@/services';
+import { ExploreHeader } from './components/ExploreHeader';
+import { useTtsEngine } from './hooks/useTtsEngine';
 
 const ExploreOcrScreen = () => {
   const navigation = useNavigation();
@@ -31,78 +32,44 @@ const ExploreOcrScreen = () => {
   const cameraDevice = useCameraDevice('back');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [ocrText, setOcrText] = useState<string>('');
-  const [isTtsReady, setIsTtsReady] = useState<boolean>(false);
-  const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
   const [capturedImagePath, setCapturedImagePath] = useState<string | null>(
     null,
   );
+
+  const {
+    isReady: isTtsReady,
+    isSpeaking,
+    speak,
+    stop,
+  } = useTtsEngine({
+    logName: 'OCR',
+    showInitToast: false,
+  });
 
   useEffect(() => {
     void handlePermissionButtonPress();
   }, [handlePermissionButtonPress]);
 
-  useEffect(() => {
-    const onStart = () => setIsSpeaking(true);
-    const onFinish = () => setIsSpeaking(false);
-    const onCancel = () => setIsSpeaking(false);
-    const onError = () => {
-      setIsSpeaking(false);
-      showToast.error('Speech failed', 'Could not read text aloud.');
-    };
-
-    const startSub = Tts.addListener('tts-start', onStart);
-    const finishSub = Tts.addListener('tts-finish', onFinish);
-    const cancelSub = Tts.addListener('tts-cancel', onCancel);
-    const errorSub = Tts.addListener('tts-error', onError);
-
-    const initializeTts = async () => {
-      try {
-        await Tts.getInitStatus();
-        await Tts.setDefaultLanguage('en-US');
-        await Tts.setDefaultRate(0.5);
-        await Tts.setDefaultPitch(1.0);
-        setIsTtsReady(true);
-      } catch (e: unknown) {
-        setIsTtsReady(false);
-        const message = e instanceof Error ? e.message : String(e);
-        error('OCR:TTSInit', { message });
-      }
-    };
-
-    void initializeTts();
-
-    return () => {
-      setIsTtsReady(false);
-      void Tts.stop();
-      startSub.remove();
-      finishSub.remove();
-      cancelSub.remove();
-      errorSub.remove();
-    };
-  }, []);
-
   const canUseCamera = permission?.granted === true && cameraDevice != null;
 
   const speakExtractedText = useCallback(
     (text: string) => {
-      const normalized = text.trim();
-      if (!normalized || !isTtsReady) return;
-
-      setIsSpeaking(true);
-      void Tts.stop()
-        .catch(() => undefined)
-        .finally(() => {
-          Tts.speak(normalized);
-        });
+      if (!isTtsReady) {
+        showToast.error(
+          'Speech unavailable',
+          'Text-to-speech is not ready yet.',
+        );
+        return;
+      }
+      speak(text);
     },
-    [isTtsReady],
+    [isTtsReady, speak],
   );
 
   const stopSpeaking = useCallback(() => {
     logEvent('OCR:StopSpeaking', {});
-    setIsSpeaking(false);
-    void Tts.stop();
-  }, []);
+    stop();
+  }, [stop]);
 
   const handleCaptureAndRead = useCallback(async () => {
     if (!cameraRef.current || !canUseCamera || isProcessing) return;
@@ -161,31 +128,12 @@ const ExploreOcrScreen = () => {
         paddingBottom: insets.bottom,
       }}>
       <View className="flex-1 px-4 pt-2">
-        <View className="flex-row items-center gap-3 py-2">
-          <Pressable
-            onPress={() => navigation.goBack()}
-            className="w-10 h-10 rounded-[10px] justify-center items-center border"
-            style={{
-              backgroundColor: theme.cardBg,
-              borderColor: theme.border,
-            }}>
-            <Text className="text-lg font-light" style={{ color: theme.grey }}>
-              {'<'}
-            </Text>
-          </Pressable>
-          <View className="flex-1 gap-0.5">
-            <Text
-              className="text-[17px] font-bold"
-              style={{ color: theme.white }}>
-              Photo to Text
-            </Text>
-            <Text
-              className="text-[11px] font-medium tracking-wide"
-              style={{ color: theme.grey }}>
-              OCR - Camera capture
-            </Text>
-          </View>
-        </View>
+        <ExploreHeader
+          title="Photo to Text"
+          subtitle="OCR - Camera capture"
+          onBack={() => navigation.goBack()}
+          backGlyph="‹"
+        />
 
         <View
           className="rounded-2xl border overflow-hidden"

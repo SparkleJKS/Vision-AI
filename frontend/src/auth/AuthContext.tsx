@@ -141,7 +141,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         logEvent('Auth:SignInWithGoogleCancelled');
         throw new Error('Google Sign-In was cancelled');
       }
-      const idToken = response.data.idToken;
+      const idToken = response?.data?.idToken;
       if (!idToken) {
         logEvent('Auth:SignInWithGoogleError', {
           error: 'No id token returned',

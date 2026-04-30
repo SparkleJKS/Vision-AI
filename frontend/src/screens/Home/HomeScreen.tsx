@@ -122,6 +122,26 @@ const HomeScreen = () => {
   const handlePressProfile = () => {
     dispatch(navigationActions.toProfile());
   };
+
+  const handlePressQuickAction = (actionId: string) => {
+    switch (actionId) {
+      case 'detect':
+        dispatch(navigationActions.toExploreObjectDetection());
+        break;
+      case 'read':
+        dispatch(navigationActions.toExploreOcr());
+        break;
+      case 'scene':
+        dispatch(navigationActions.toExplore());
+        break;
+      case 'navigate':
+        dispatch(navigationActions.toVoice());
+        break;
+      default:
+        break;
+    }
+  };
+
   const displayName = user?.displayName ?? user?.email?.split('@')[0] ?? 'User';
 
   useBackHandler({
@@ -269,7 +289,7 @@ const HomeScreen = () => {
                     borderColor: isHighlighted ? theme.primary : theme.border,
                   }}
                   activeOpacity={0.85}
-                  onPress={() => {}}>
+                  onPress={() => handlePressQuickAction(action.id)}>
                   <View
                     className="absolute -top-5 -right-5 w-[60px] h-[60px] rounded-full"
                     style={{

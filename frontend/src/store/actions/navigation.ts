@@ -9,6 +9,14 @@ export const navigationActions = {
   toSignUp: createAction(`${NAV_PREFIX}${ScreenNames.SignUp}`),
   toHome: createAction(`${NAV_PREFIX}${ScreenNames.Home}`),
   toExplore: createAction(`${NAV_PREFIX}${ScreenNames.Explore}`),
+  toExploreObjectDetection: createAction(
+    `${NAV_PREFIX}${ScreenNames.ExploreObjectDetection}`,
+  ),
+  toExploreQrScanner: createAction(
+    `${NAV_PREFIX}${ScreenNames.ExploreQrScanner}`,
+  ),
+  toExploreOcr: createAction(`${NAV_PREFIX}${ScreenNames.ExploreOcr}`),
+  toExploreTts: createAction(`${NAV_PREFIX}${ScreenNames.ExploreTts}`),
   toVoice: createAction(`${NAV_PREFIX}${ScreenNames.Voice}`),
   toAlerts: createAction(`${NAV_PREFIX}${ScreenNames.Alerts}`),
   toSettings: createAction<Record<string, unknown> | undefined>(
@@ -24,7 +32,9 @@ export const navigationActions = {
     `${NAV_PREFIX}${ScreenNames.ConnectedDevices}`,
   ),
   toAccessibility: createAction(`${NAV_PREFIX}${ScreenNames.Accessibility}`),
-  toPersonalDetails: createAction(`${NAV_PREFIX}${ScreenNames.PersonalDetails}`),
+  toPersonalDetails: createAction(
+    `${NAV_PREFIX}${ScreenNames.PersonalDetails}`,
+  ),
   toPrivacyAndSecurity: createAction(
     `${NAV_PREFIX}${ScreenNames.PrivacyAndSecurity}`,
   ),

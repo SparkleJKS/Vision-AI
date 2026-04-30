@@ -1,9 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Animated, Pressable, ScrollView, Text, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useDispatch } from 'react-redux';
 import { useTheme } from '@/theme';
-import { ScreenNames } from '@/configs/navigation';
+import { navigationActions } from '@/store/actions/navigation';
+import { AppDispatch } from '@/store';
 
 type FeatureId = 'objectDetection' | 'qrScanner' | 'ocr' | 'tts';
 
@@ -238,20 +239,20 @@ const FeatureCard = ({
   );
 };
 
-const FEATURE_TO_SCREEN: Record<FeatureId, keyof typeof ScreenNames> = {
-  objectDetection: ScreenNames.ExploreObjectDetection,
-  qrScanner: ScreenNames.ExploreQrScanner,
-  ocr: ScreenNames.ExploreOcr,
-  tts: ScreenNames.ExploreTts,
-};
-
 const ExploreScreen = () => {
-  const navigation = useNavigation();
+  const dispatch = useDispatch<AppDispatch>();
   const insets = useSafeAreaInsets();
   const { theme, themeId } = useTheme();
 
   const handleSelectFeature = (id: FeatureId) => {
-    navigation.navigate(FEATURE_TO_SCREEN[id] as never);
+    const actionById: Partial<Record<FeatureId, () => void>> = {
+      objectDetection: () =>
+        dispatch(navigationActions.toExploreObjectDetection()),
+      qrScanner: () => dispatch(navigationActions.toExploreQrScanner()),
+      ocr: () => dispatch(navigationActions.toExploreOcr()),
+      tts: () => dispatch(navigationActions.toExploreTts()),
+    };
+    actionById[id]?.();
   };
 
   return (
