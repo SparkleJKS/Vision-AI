@@ -29,9 +29,9 @@ const PROFILE_OPTIONS = [
     icon: 'shield-checkmark-outline' as const,
   },
   {
-    id: 'subscription',
-    title: 'Subscription',
-    icon: 'card-outline' as const,
+    id: 'help',
+    title: 'Help & Support',
+    icon: 'help-circle-outline' as const,
   },
 ];
 
@@ -76,6 +76,7 @@ const ProfileScreen = () => {
     > = {
       personal: () => dispatch(navigationActions.toPersonalDetails()),
       privacy: () => dispatch(navigationActions.toPrivacyAndSecurity()),
+      help: () => dispatch(navigationActions.toHelpAndSupport()),
     };
     actionById[id]?.();
   };

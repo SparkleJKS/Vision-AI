@@ -5,6 +5,7 @@ import SettingsListScreen from './SettingsListScreen';
 import { ProfileScreen } from '@/screens/Profile';
 import { PersonalDetailsScreen } from '@/screens/PersonalDetails';
 import { PrivacyAndSecurityScreen } from '@/screens/PrivacyAndSecurity';
+import { HelpAndSupportScreen } from '@/screens/HelpAndSupport';
 import { VoiceAndAudioScreen } from '@/screens/VoiceAndAudio';
 import { VisionSettingsScreen } from '@/screens/VisionSettings';
 import { ConnectedDevicesScreen } from '@/screens/ConnectedDevices';
@@ -23,7 +24,7 @@ const SettingsStack = () => (
       name={ScreenNames.SettingsList}
       component={SettingsListScreen}
     />
-    {/* Profile Screen : Personal Details, Privacy & Security, Subscription */}
+    {/* Profile: Personal Details, Privacy & Security, Help & Support */}
     <Stack.Screen name={ScreenNames.Profile} component={ProfileScreen} />
     <Stack.Screen
       name={ScreenNames.PersonalDetails}
@@ -33,10 +34,10 @@ const SettingsStack = () => (
       name={ScreenNames.PrivacyAndSecurity}
       component={PrivacyAndSecurityScreen}
     />
-    {/* <Stack.Screen
-      name={ScreenNames.Subscription}
-      component={SubscriptionScreen}
-    /> */}
+    <Stack.Screen
+      name={ScreenNames.HelpAndSupport}
+      component={HelpAndSupportScreen}
+    />
 
     {/* Voice & Audio, Vision Settings, Connected Devices, Accessibility */}
     <Stack.Screen

@@ -112,6 +112,12 @@ const getNavigationPayload = (
         params: { screen: ScreenNames.PrivacyAndSecurity },
       };
       break;
+    case navigationActions.toHelpAndSupport.type:
+      navigationPayload = {
+        name: ScreenNames.Settings,
+        params: { screen: ScreenNames.HelpAndSupport },
+      };
+      break;
     default:
       break;
   }
